@@ -1,7 +1,7 @@
 import { AppShell } from "@/components/app-shell";
 import { BillingPanel } from "@/components/billing-panel";
 import { requireUser } from "@/lib/auth";
-import { specialistHasAccess } from "@/lib/billing";
+import { specialistBillingEnabled, specialistHasAccess } from "@/lib/billing";
 
 const nav = [
   { href: "/specialist", label: "Inbound queue" },
@@ -18,9 +18,11 @@ export default async function SpecialistLayout({
   children: React.ReactNode;
 }) {
   const user = await requireUser("SPECIALIST");
-  const locked = !specialistHasAccess(user.billing);
+  const billingOn = specialistBillingEnabled();
+  const locked = billingOn && !specialistHasAccess(user.billing);
+  const items = billingOn ? nav : nav.filter((item) => item.href !== "/specialist/billing");
   return (
-    <AppShell user={user} nav={nav} eyebrow="Specialty care">
+    <AppShell user={user} nav={items} eyebrow="Specialty care">
       {locked ? <BillingPanel user={user} /> : children}
     </AppShell>
   );

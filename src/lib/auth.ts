@@ -96,6 +96,8 @@ export async function signupPractice(input: SignupInput) {
     specialty: input.portal === "SPECIALIST" ? input.specialty?.trim() : undefined,
     city: input.city.trim() || "—",
     phone: input.phone.trim() || "",
+    // Always record the specialist trial clock so flipping
+    // SPECIALIST_BILLING_ENABLED later does not need a data migration.
     subscriptionStatus: input.portal === "PCP" ? "free" : "trial",
     trialEndsAt: input.portal === "SPECIALIST" ? trialEndFrom(now) : undefined,
   });

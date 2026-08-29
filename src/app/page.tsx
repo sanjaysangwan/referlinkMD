@@ -1,7 +1,16 @@
 import Link from "next/link";
 import { Brand } from "@/components/brand";
+import {
+  SPECIALIST_MONTHLY_USD,
+  SPECIALIST_TRIAL_MONTHS,
+  specialistBillingEnabled,
+  specialistHeaderCta,
+  specialistSignupCta,
+} from "@/lib/billing";
 
 export default function HomePage() {
+  const billingOn = specialistBillingEnabled();
+
   return (
     <div className="min-h-screen bg-paper">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
@@ -17,7 +26,7 @@ export default function HomePage() {
             className="rounded-full bg-ink px-4 py-2 text-sand hover:bg-brand-deep"
             href="/signup/specialist"
           >
-            Specialist trial
+            {specialistHeaderCta()}
           </Link>
         </div>
       </header>
@@ -46,7 +55,7 @@ export default function HomePage() {
             href="/signup/specialist"
             className="rounded-full border border-ink/15 bg-white px-6 py-3 text-sm font-semibold text-ink hover:border-ink/40"
           >
-            Start a 3-month specialist trial
+            {specialistSignupCta()}
           </Link>
         </div>
       </section>
@@ -55,7 +64,6 @@ export default function HomePage() {
         <article className="rounded-3xl border border-line bg-white p-8 shadow-[var(--shadow)]">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand">Primary care</p>
           <h2 className="mt-3 text-3xl">Free to sign up</h2>
-          <p className="mt-2 text-4xl font-[family-name:var(--font-fraunces)]">$0</p>
           <p className="mt-3 text-sm leading-6 text-ink-soft">
             The practice that starts the referral never pays. Create the workspace, invite MD,
             midlevel, office manager, and staff, and send patients.
@@ -66,15 +74,28 @@ export default function HomePage() {
         </article>
         <article className="rounded-3xl border border-line bg-white p-8 shadow-[var(--shadow)]">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand">Specialty care</p>
-          <h2 className="mt-3 text-3xl">3 months free, then $49/month</h2>
-          <p className="mt-2 text-4xl font-[family-name:var(--font-fraunces)]">$49</p>
-          <p className="mt-3 text-sm leading-6 text-ink-soft">
-            One price for the whole specialist practice after the trial — not per clinician.
-            Alerts, queue, and pool analytics stay on during the trial. When it ends, inbound
-            work pauses until the practice subscribes.
-          </p>
+          {billingOn ? (
+            <>
+              <h2 className="mt-3 text-3xl">
+                {SPECIALIST_TRIAL_MONTHS} months free, then ${SPECIALIST_MONTHLY_USD}/month
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-ink-soft">
+                One price for the whole specialist practice after the trial — not per clinician.
+                Alerts, queue, and pool analytics stay on during the trial. When it ends, inbound
+                work pauses until the practice subscribes.
+              </p>
+            </>
+          ) : (
+            <>
+              <h2 className="mt-3 text-3xl">Free while we grow</h2>
+              <p className="mt-3 text-sm leading-6 text-ink-soft">
+                Specialty practices get the full inbound queue, alerts, and pool analytics at no
+                charge. We want specialists on the network first.
+              </p>
+            </>
+          )}
           <Link href="/signup/specialist" className="mt-6 inline-block text-sm font-semibold text-brand">
-            Start the specialist trial
+            {specialistSignupCta()}
           </Link>
         </article>
       </section>

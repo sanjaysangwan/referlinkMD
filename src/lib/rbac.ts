@@ -1,3 +1,4 @@
+import { specialistBillingEnabled } from "./billing";
 import type { OrgType, Privilege, Role, SessionUser } from "./types";
 
 const PCP_PRIVILEGES: Record<Role, Privilege[]> = {
@@ -55,7 +56,11 @@ const SPECIALIST_PRIVILEGES: Record<Role, Privilege[]> = {
 };
 
 export function privilegesFor(orgType: OrgType, role: Role): Privilege[] {
-  return orgType === "PCP" ? PCP_PRIVILEGES[role] : SPECIALIST_PRIVILEGES[role];
+  const list = orgType === "PCP" ? PCP_PRIVILEGES[role] : SPECIALIST_PRIVILEGES[role];
+  if (!specialistBillingEnabled()) {
+    return list.filter((p) => p !== "MANAGE_BILLING");
+  }
+  return list;
 }
 
 export function can(user: SessionUser, privilege: Privilege): boolean {
@@ -153,7 +158,7 @@ export const DEMO_ACCOUNTS = {
       name: "Sam Ortiz",
       credentials: "CMPE",
       role: "OFFICE_MANAGER" as const,
-      note: "Queue, scheduling, alerts, billing, and pool analytics",
+      note: "Queue, scheduling, alerts, and pool analytics",
     },
     {
       email: "riley.brooks@summitcardio.health",
@@ -167,7 +172,7 @@ export const DEMO_ACCOUNTS = {
       name: "Iris Vale",
       credentials: "MD",
       role: "MD" as const,
-      note: "Trial ended — paywall until $49/month",
+      note: "Riverbend Pulmonology — past trial (paywall only if billing is enabled)",
     },
   ],
 } as const;

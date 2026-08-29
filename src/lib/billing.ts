@@ -3,6 +3,27 @@ import type { BillingSnapshot, Organization } from "./types";
 export const SPECIALIST_MONTHLY_USD = 49;
 export const SPECIALIST_TRIAL_MONTHS = 3;
 
+/**
+ * Specialists are free until we have adoption.
+ *
+ * Flip on without a rewrite:
+ *   SPECIALIST_BILLING_ENABLED=true
+ *
+ * When off: paywall, trial banner, billing nav, and pricing copy stay hidden.
+ * Org trial clocks are still written on specialist signup, so turning this on
+ * later enforces the existing 3-month trial → $49/month model.
+ */
+export function specialistBillingEnabled(): boolean {
+  const raw = (
+    process.env.SPECIALIST_BILLING_ENABLED ??
+    process.env.NEXT_PUBLIC_SPECIALIST_BILLING_ENABLED ??
+    ""
+  )
+    .trim()
+    .toLowerCase();
+  return raw === "true" || raw === "1" || raw === "on";
+}
+
 export function addMonths(from: Date, months: number) {
   const next = new Date(from);
   next.setMonth(next.getMonth() + months);
@@ -45,6 +66,7 @@ export function billingFor(org: Organization): BillingSnapshot {
 }
 
 export function specialistHasAccess(billing: BillingSnapshot) {
+  if (!specialistBillingEnabled()) return true;
   return billing.status === "trial" || billing.status === "active";
 }
 
@@ -54,4 +76,22 @@ export function formatTrialEnd(iso: string) {
     day: "numeric",
     year: "numeric",
   });
+}
+
+export function specialistSignupCta() {
+  return specialistBillingEnabled()
+    ? "Start a 3-month specialist trial"
+    : "Create a specialist practice";
+}
+
+export function specialistSignupSubmit() {
+  return specialistBillingEnabled() ? "Start 3-month free trial" : "Create specialist practice";
+}
+
+export function specialistSignupNav() {
+  return specialistBillingEnabled() ? "Start 3-month trial" : "Specialist signup";
+}
+
+export function specialistHeaderCta() {
+  return specialistBillingEnabled() ? "Specialist trial" : "Specialist signup";
 }

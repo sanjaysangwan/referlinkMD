@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { logoutAction } from "@/app/actions/auth";
 import { Brand } from "@/components/brand";
-import { formatTrialEnd, SPECIALIST_MONTHLY_USD } from "@/lib/billing";
+import { formatTrialEnd, SPECIALIST_MONTHLY_USD, specialistBillingEnabled } from "@/lib/billing";
 import { can, privilegeLabel, roleLabel } from "@/lib/rbac";
 import { clinicianName, initials } from "@/lib/format";
 import type { Privilege, SessionUser } from "@/lib/types";
@@ -95,7 +95,9 @@ export function AppShell({
               </Link>
             ))}
           </div>
-          {user.organizationType === "SPECIALIST" && user.billing.status === "trial" ? (
+          {specialistBillingEnabled() &&
+          user.organizationType === "SPECIALIST" &&
+          user.billing.status === "trial" ? (
             <div className="border-b border-line bg-mist/70 px-4 py-2 text-sm text-ink md:px-10">
               Specialist trial · {user.billing.daysLeftInTrial} days left
               {user.billing.trialEndsAt ? ` · ends ${formatTrialEnd(user.billing.trialEndsAt)}` : ""}.

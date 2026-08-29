@@ -4,7 +4,7 @@ Phase-one prototype of a **primary care → specialist referral** product.
 
 A PCP practice sends a patient. The specialist practice is notified by **text and/or phone**. Each side can chart referral patterns over time. Logins are split by portal (PCP vs specialist) and by role (**physician, midlevel, office manager, staff**), with privileges enforced on the server, not only in the nav.
 
-**Pricing:** primary care signup is **free**. Specialty practices get a **3-month trial**, then **$49/month** for the practice.
+**Pricing:** primary care and specialty signups are **free** while we grow the network. The 3-month specialist trial → **$49/month** model is still in the codebase; set `SPECIALIST_BILLING_ENABLED=true` to turn it on without a rewrite.
 
 This build uses **synthetic clinic data only**. Do not enter real PHI.
 
@@ -40,9 +40,9 @@ Portal: `/login/pcp`
 | Midlevel | Avery Kim, NP | `avery.kim@summitcardio.health` |
 | Office manager | Sam Ortiz | `sam.ortiz@summitcardio.health` |
 | Staff | Riley Brooks | `riley.brooks@summitcardio.health` |
-| Physician (trial ended) | Iris Vale, MD | `iris.vale@riverbendpulm.health` |
+| Physician (Riverbend Pulmonology) | Iris Vale, MD | `iris.vale@riverbendpulm.health` |
 
-Portal: `/login/specialist` · Summit is on the 3-month trial. Iris Vale shows the $49/month paywall.
+Portal: `/login/specialist`. Billing UI is hidden by default. Iris Vale is seeded past trial so the $49/month paywall can be demoed when `SPECIALIST_BILLING_ENABLED=true`.
 
 ## What each role can do
 
@@ -66,6 +66,7 @@ Sending a referral fans out SMS and voice alerts to specialist users who opted i
 
 ```
 AUTH_SECRET=
+SPECIALIST_BILLING_ENABLED=false
 TWILIO_ACCOUNT_SID=
 TWILIO_AUTH_TOKEN=
 TWILIO_FROM_NUMBER=

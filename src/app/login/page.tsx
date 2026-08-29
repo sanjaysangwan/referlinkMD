@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Brand } from "@/components/brand";
+import { SPECIALIST_MONTHLY_USD, SPECIALIST_TRIAL_MONTHS, specialistBillingEnabled } from "@/lib/billing";
 
 export default function LoginIndex() {
   return (
@@ -32,7 +33,9 @@ export default function LoginIndex() {
             </div>
             <h2 className="mt-2 text-2xl">Specialist practice</h2>
             <p className="mt-2 text-sm text-ink-soft">
-              3 months free, then $49/month. Receive alerts and work the inbound pool.
+              {specialistBillingEnabled()
+                ? `${SPECIALIST_TRIAL_MONTHS} months free, then $${SPECIALIST_MONTHLY_USD}/month. Receive alerts and work the inbound pool.`
+                : "Free to join. Receive alerts and work the inbound pool."}
             </p>
           </Link>
         </div>
