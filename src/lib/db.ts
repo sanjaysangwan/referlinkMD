@@ -9,11 +9,17 @@ import type {
   User,
 } from "./types";
 
-const globalForStore = globalThis as unknown as { __harborStore?: Store };
+const globalForStore = globalThis as unknown as {
+  __harborStore?: Store;
+  __harborVersion?: number;
+};
+
+const STORE_VERSION = 2;
 
 function getStore(): Store {
-  if (!globalForStore.__harborStore) {
+  if (!globalForStore.__harborStore || globalForStore.__harborVersion !== STORE_VERSION) {
     globalForStore.__harborStore = createSeed();
+    globalForStore.__harborVersion = STORE_VERSION;
   }
   return globalForStore.__harborStore;
 }
@@ -22,6 +28,7 @@ export const db = {
   store: getStore,
   reset() {
     globalForStore.__harborStore = createSeed();
+    globalForStore.__harborVersion = STORE_VERSION;
     return globalForStore.__harborStore!;
   },
   users(): User[] {

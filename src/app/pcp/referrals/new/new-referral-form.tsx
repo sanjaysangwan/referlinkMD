@@ -5,6 +5,39 @@ import { createReferralAction, type ReferralState } from "@/app/actions/referral
 import { SubmitButton } from "@/components/submit-button";
 import type { Organization, Patient } from "@/lib/types";
 
+function Choice({
+  name,
+  value,
+  checked,
+  onChange,
+  title,
+  subtitle,
+}: {
+  name: string;
+  value: string;
+  checked?: boolean;
+  onChange?: () => void;
+  title: string;
+  subtitle?: string;
+}) {
+  return (
+    <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-line bg-paper px-3 py-2.5 has-[:checked]:border-harbor has-[:checked]:bg-mist/70">
+      <input
+        type="radio"
+        name={name}
+        value={value}
+        defaultChecked={checked}
+        onChange={onChange}
+        className="mt-1"
+      />
+      <span>
+        <span className="block text-sm font-medium">{title}</span>
+        {subtitle ? <span className="block text-xs text-ink-soft">{subtitle}</span> : null}
+      </span>
+    </label>
+  );
+}
+
 export function NewReferralForm({
   patients,
   specialists,
@@ -15,72 +48,86 @@ export function NewReferralForm({
   showClinical: boolean;
 }) {
   const [state, action] = useActionState<ReferralState, FormData>(createReferralAction, null);
-  const [specialty, setSpecialty] = useState(specialists[0]?.specialty || "");
+  const specialties = [...new Set(specialists.map((s) => s.specialty).filter(Boolean))] as string[];
+  const [specialty, setSpecialty] = useState(specialties[0] || "");
   const filtered = useMemo(
     () => specialists.filter((s) => !specialty || s.specialty === specialty),
     [specialists, specialty],
   );
-  const specialties = [...new Set(specialists.map((s) => s.specialty).filter(Boolean))] as string[];
 
   return (
-    <form action={action} className="space-y-5 rounded-3xl border border-line bg-white p-6 md:p-8">
-      <label className="block">
-        <span className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-soft">Patient</span>
-        <select
-          name="patientId"
-          required
-          className="mt-1 w-full rounded-xl border border-line bg-paper px-3 py-2.5"
-        >
-          <option value="">Select a chart</option>
-          {patients.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name} · {p.mrn} · {p.insurance}
-            </option>
+    <form action={action} className="space-y-6 rounded-3xl border border-line bg-white p-6 md:p-8">
+      <fieldset className="space-y-2">
+        <legend className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-soft">
+          Patient
+        </legend>
+        <div className="grid gap-2 md:grid-cols-2">
+          {patients.slice(0, 8).map((p, i) => (
+            <Choice
+              key={p.id}
+              name="patientId"
+              value={p.id}
+              checked={i === 0}
+              title={p.name}
+              subtitle={`${p.mrn} · ${p.insurance}`}
+            />
           ))}
-        </select>
-      </label>
+        </div>
+      </fieldset>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <label className="block">
-          <span className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-soft">
-            Specialty
-          </span>
-          <select
-            value={specialty}
-            onChange={(e) => setSpecialty(e.target.value)}
-            className="mt-1 w-full rounded-xl border border-line bg-paper px-3 py-2.5"
-          >
-            {specialties.map((s) => (
-              <option key={s}>{s}</option>
-            ))}
-          </select>
-        </label>
-        <label className="block">
-          <span className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-soft">
-            Specialist practice
-          </span>
-          <select
+      <fieldset className="space-y-2">
+        <legend className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-soft">
+          Specialty
+        </legend>
+        <div className="flex flex-wrap gap-2">
+          {specialties.map((s) => (
+            <label
+              key={s}
+              className="cursor-pointer rounded-full border border-line bg-paper px-3 py-1.5 text-sm has-[:checked]:border-harbor has-[:checked]:bg-mist"
+            >
+              <input
+                type="radio"
+                className="sr-only"
+                name="specialtyFilter"
+                value={s}
+                defaultChecked={s === specialty}
+                onChange={() => setSpecialty(s)}
+              />
+              {s}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset key={specialty} className="space-y-2">
+        <legend className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-soft">
+          Specialist practice
+        </legend>
+        {filtered.map((s, i) => (
+          <Choice
+            key={s.id}
             name="specialistOrganizationId"
-            required
-            className="mt-1 w-full rounded-xl border border-line bg-paper px-3 py-2.5"
-          >
-            {filtered.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name} · {s.city}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+            value={s.id}
+            checked={i === 0}
+            title={s.name}
+            subtitle={s.city}
+          />
+        ))}
+      </fieldset>
 
-      <label className="block">
-        <span className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-soft">Urgency</span>
-        <select name="urgency" className="mt-1 w-full rounded-xl border border-line bg-paper px-3 py-2.5">
-          <option value="ROUTINE">Routine</option>
-          <option value="SOON">Soon (within 2 weeks)</option>
-          <option value="URGENT">Urgent — text and phone the specialist</option>
-        </select>
-      </label>
+      <fieldset className="space-y-2">
+        <legend className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-soft">
+          Urgency
+        </legend>
+        <Choice name="urgency" value="ROUTINE" checked title="Routine" subtitle="Standard routing" />
+        <Choice name="urgency" value="SOON" title="Soon" subtitle="Within two weeks" />
+        <Choice
+          name="urgency"
+          value="URGENT"
+          title="Urgent"
+          subtitle="Text and phone the specialist practice"
+        />
+      </fieldset>
 
       <label className="block">
         <span className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-soft">
@@ -90,8 +137,8 @@ export function NewReferralForm({
           name="reason"
           required
           rows={3}
+          defaultValue="New syncope with bifascicular block, needs cardiology this week."
           className="mt-1 w-full rounded-xl border border-line bg-paper px-3 py-2.5"
-          placeholder="Why this patient needs specialty care"
         />
       </label>
 
@@ -103,8 +150,8 @@ export function NewReferralForm({
           <textarea
             name="clinicalSummary"
             rows={4}
+            defaultValue="BP 148/92. ECG with bifascicular block. Patient reports two near-syncopal episodes."
             className="mt-1 w-full rounded-xl border border-line bg-paper px-3 py-2.5"
-            placeholder="Pertinent history, meds, studies. Hidden from staff logins."
           />
         </label>
       ) : (

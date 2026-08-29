@@ -186,7 +186,6 @@ export function createSeed(): Store {
     { userId: "user_riley", smsEnabled: false, voiceEnabled: false, afterHoursVoice: false },
   ];
 
-  const riversideClinicians = ["user_elena", "user_jordan"] as const;
   const patientSeed: Array<Omit<Patient, "id" | "mrn" | "pcpOrganizationId">> = [
     { name: "Amara Lewis", dob: "1968-03-12", sex: "F", pcpUserId: "user_elena", insurance: "Blue Ridge PPO" },
     { name: "Thomas Nguyen", dob: "1959-11-02", sex: "M", pcpUserId: "user_elena", insurance: "Medicare" },
@@ -403,11 +402,11 @@ export function createSeed(): Store {
     }
   }
 
-  // 12 months of Riverside volume, heavier toward Elena
-  for (let day = 12; day <= 350; day += 6) {
+  // 12 months of Riverside volume, heavier toward Elena.
+  // Step by 5 so the clinician split is not locked to multiples of 3.
+  for (let day = 5; day <= 350; day += 5) {
     const patient = patients[day % patients.length];
-    const clinician =
-      day % 5 === 0 ? "user_jordan" : riversideClinicians[day % 3 === 0 ? 1 : 0];
+    const clinician = day % 4 === 0 ? "user_jordan" : "user_elena";
     addReferral({
       daysAgo: day,
       patient,
