@@ -1,3 +1,4 @@
+import { trialEndFrom } from "./billing";
 import type {
   AlertLog,
   AlertPreferences,
@@ -32,6 +33,7 @@ export function createSeed(): Store {
       type: "PCP",
       city: "Stillwater",
       phone: "+15552001001",
+      subscriptionStatus: "free",
     },
     {
       id: "org_oakpine",
@@ -39,6 +41,7 @@ export function createSeed(): Store {
       type: "PCP",
       city: "Harborview",
       phone: "+15552001002",
+      subscriptionStatus: "free",
     },
     {
       id: "org_summit",
@@ -47,6 +50,8 @@ export function createSeed(): Store {
       specialty: "Cardiology",
       city: "Stillwater",
       phone: "+15553002001",
+      subscriptionStatus: "trial",
+      trialEndsAt: trialEndFrom(),
     },
     {
       id: "org_clearwater",
@@ -55,6 +60,8 @@ export function createSeed(): Store {
       specialty: "Orthopedics",
       city: "Cedar Falls",
       phone: "+15553002002",
+      subscriptionStatus: "active",
+      subscribedAt: daysAgo(200).toISOString(),
     },
     {
       id: "org_northshore",
@@ -63,6 +70,8 @@ export function createSeed(): Store {
       specialty: "Gastroenterology",
       city: "Harborview",
       phone: "+15553002003",
+      subscriptionStatus: "active",
+      subscribedAt: daysAgo(140).toISOString(),
     },
     {
       id: "org_lakeside",
@@ -71,6 +80,8 @@ export function createSeed(): Store {
       specialty: "Dermatology",
       city: "Stillwater",
       phone: "+15553002004",
+      subscriptionStatus: "active",
+      subscribedAt: daysAgo(90).toISOString(),
     },
     {
       id: "org_apex",
@@ -79,6 +90,18 @@ export function createSeed(): Store {
       specialty: "Neurology",
       city: "Riverbend",
       phone: "+15553002005",
+      subscriptionStatus: "active",
+      subscribedAt: daysAgo(60).toISOString(),
+    },
+    {
+      id: "org_riverbendpulm",
+      name: "Riverbend Pulmonology",
+      type: "SPECIALIST",
+      specialty: "Pulmonology",
+      city: "Riverbend",
+      phone: "+15553002006",
+      subscriptionStatus: "trial",
+      trialEndsAt: daysAgo(4).toISOString(),
     },
   ];
 
@@ -173,6 +196,16 @@ export function createSeed(): Store {
       organizationId: "org_oakpine",
       phone: "+15553330001",
     },
+    {
+      id: "user_iris",
+      email: "iris.vale@riverbendpulm.health",
+      passwordHash: PASSWORD_HASH,
+      name: "Iris Vale",
+      credentials: "MD",
+      role: "MD",
+      organizationId: "org_riverbendpulm",
+      phone: "+15552220009",
+    },
   ];
 
   const alertPreferences: AlertPreferences[] = [
@@ -184,6 +217,7 @@ export function createSeed(): Store {
     { userId: "user_avery", smsEnabled: true, voiceEnabled: false, afterHoursVoice: false },
     { userId: "user_sam", smsEnabled: true, voiceEnabled: true, afterHoursVoice: true },
     { userId: "user_riley", smsEnabled: false, voiceEnabled: false, afterHoursVoice: false },
+    { userId: "user_iris", smsEnabled: true, voiceEnabled: true, afterHoursVoice: true },
   ];
 
   const patientSeed: Array<Omit<Patient, "id" | "mrn" | "pcpOrganizationId">> = [

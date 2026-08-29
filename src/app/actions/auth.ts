@@ -1,10 +1,12 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { loginWithPassword, logout } from "@/lib/auth";
+import { loginWithPassword, logout, signupPractice } from "@/lib/auth";
 import { DEMO_PASSWORD } from "@/lib/rbac";
+import type { OrgType, Role } from "@/lib/types";
 
 export type LoginState = { error?: string } | null;
+export type SignupState = { error?: string } | null;
 
 export async function loginAction(
   _prev: LoginState,
@@ -50,4 +52,31 @@ export async function demoLoginAction(formData: FormData) {
 export async function logoutAction() {
   await logout();
   redirect("/");
+}
+
+const ROLES: Role[] = ["MD", "MIDLEVEL", "OFFICE_MANAGER", "STAFF"];
+
+export async function signupAction(
+  _prev: SignupState,
+  formData: FormData,
+): Promise<SignupState> {
+  const portal: OrgType = formData.get("portal") === "specialist" ? "SPECIALIST" : "PCP";
+  const roleRaw = String(formData.get("role") || "MD");
+  const role = ROLES.includes(roleRaw as Role) ? (roleRaw as Role) : "MD";
+
+  const result = await signupPractice({
+    portal,
+    practiceName: String(formData.get("practiceName") || ""),
+    city: String(formData.get("city") || ""),
+    phone: String(formData.get("phone") || ""),
+    specialty: String(formData.get("specialty") || ""),
+    name: String(formData.get("name") || ""),
+    credentials: String(formData.get("credentials") || ""),
+    role,
+    email: String(formData.get("email") || ""),
+    password: String(formData.get("password") || ""),
+  });
+
+  if ("error" in result) return result;
+  redirect(portal === "PCP" ? "/pcp" : "/specialist");
 }

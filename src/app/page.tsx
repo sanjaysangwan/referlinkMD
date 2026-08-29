@@ -7,14 +7,17 @@ export default function HomePage() {
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <Brand subtitle="Clinical referrals" />
         <div className="flex gap-3 text-sm">
+          <Link className="rounded-full px-4 py-2 text-ink-soft hover:text-ink" href="/signup/pcp">
+            Free PCP signup
+          </Link>
           <Link className="rounded-full px-4 py-2 text-ink-soft hover:text-ink" href="/login/pcp">
-            PCP sign in
+            Sign in
           </Link>
           <Link
             className="rounded-full bg-ink px-4 py-2 text-sand hover:bg-brand-deep"
-            href="/login/specialist"
+            href="/signup/specialist"
           >
-            Specialist sign in
+            Specialist trial
           </Link>
         </div>
       </header>
@@ -34,18 +37,46 @@ export default function HomePage() {
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
-            href="/login/pcp"
+            href="/signup/pcp"
             className="rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white hover:bg-brand-deep"
           >
-            Enter primary care
+            Create a free PCP practice
           </Link>
           <Link
-            href="/login/specialist"
+            href="/signup/specialist"
             className="rounded-full border border-ink/15 bg-white px-6 py-3 text-sm font-semibold text-ink hover:border-ink/40"
           >
-            Enter specialty care
+            Start a 3-month specialist trial
           </Link>
         </div>
+      </section>
+
+      <section className="mx-auto grid max-w-6xl gap-6 px-6 pb-8 md:grid-cols-2">
+        <article className="rounded-3xl border border-line bg-white p-8 shadow-[var(--shadow)]">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand">Primary care</p>
+          <h2 className="mt-3 text-3xl">Free to sign up</h2>
+          <p className="mt-2 text-4xl font-[family-name:var(--font-fraunces)]">$0</p>
+          <p className="mt-3 text-sm leading-6 text-ink-soft">
+            The practice that starts the referral never pays. Create the workspace, invite MD,
+            midlevel, office manager, and staff, and send patients.
+          </p>
+          <Link href="/signup/pcp" className="mt-6 inline-block text-sm font-semibold text-brand">
+            Open a free PCP account
+          </Link>
+        </article>
+        <article className="rounded-3xl border border-line bg-white p-8 shadow-[var(--shadow)]">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand">Specialty care</p>
+          <h2 className="mt-3 text-3xl">3 months free, then $49/month</h2>
+          <p className="mt-2 text-4xl font-[family-name:var(--font-fraunces)]">$49</p>
+          <p className="mt-3 text-sm leading-6 text-ink-soft">
+            One price for the whole specialist practice after the trial — not per clinician.
+            Alerts, queue, and pool analytics stay on during the trial. When it ends, inbound
+            work pauses until the practice subscribes.
+          </p>
+          <Link href="/signup/specialist" className="mt-6 inline-block text-sm font-semibold text-brand">
+            Start the specialist trial
+          </Link>
+        </article>
       </section>
 
       <section className="mx-auto grid max-w-6xl gap-6 px-6 pb-20 md:grid-cols-3">

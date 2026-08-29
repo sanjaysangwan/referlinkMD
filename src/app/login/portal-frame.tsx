@@ -41,6 +41,13 @@ export function PortalFrame({
             <Link className="font-semibold text-brand" href={other}>
               {portal === "pcp" ? "Specialist portal" : "PCP portal"}
             </Link>
+            {" · "}
+            <Link
+              className="font-semibold text-brand"
+              href={portal === "pcp" ? "/signup/pcp" : "/signup/specialist"}
+            >
+              {portal === "pcp" ? "Free signup" : "Start 3-month trial"}
+            </Link>
           </p>
           <div className="mt-8">
             <LoginForm portal={portal} />

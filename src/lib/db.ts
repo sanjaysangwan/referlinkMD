@@ -1,3 +1,4 @@
+import { billingFor, specialistHasAccess } from "./billing";
 import { createSeed } from "./seed";
 import type {
   AlertLog,
@@ -14,7 +15,7 @@ const globalForStore = globalThis as unknown as {
   __referlinkVersion?: number;
 };
 
-const STORE_VERSION = 4;
+const STORE_VERSION = 5;
 
 function getStore(): Store {
   if (!globalForStore.__referlinkStore || globalForStore.__referlinkVersion !== STORE_VERSION) {
@@ -51,6 +52,24 @@ export const db = {
   },
   specialistOrganizations() {
     return getStore().organizations.filter((o) => o.type === "SPECIALIST");
+  },
+  openSpecialistOrganizations() {
+    return this.specialistOrganizations().filter((o) => specialistHasAccess(billingFor(o)));
+  },
+  insertOrganization(org: Organization) {
+    getStore().organizations.push(org);
+    return org;
+  },
+  insertUser(user: User) {
+    getStore().users.push(user);
+    return user;
+  },
+  updateOrganization(id: string, patch: Partial<Organization>) {
+    const store = getStore();
+    const idx = store.organizations.findIndex((o) => o.id === id);
+    if (idx < 0) return null;
+    store.organizations[idx] = { ...store.organizations[idx], ...patch };
+    return store.organizations[idx];
   },
   patientsForOrg(organizationId: string): Patient[] {
     return getStore().patients.filter((p) => p.pcpOrganizationId === organizationId);

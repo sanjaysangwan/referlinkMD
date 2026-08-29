@@ -4,6 +4,8 @@ Phase-one prototype of a **primary care → specialist referral** product.
 
 A PCP practice sends a patient. The specialist practice is notified by **text and/or phone**. Each side can chart referral patterns over time. Logins are split by portal (PCP vs specialist) and by role (**physician, midlevel, office manager, staff**), with privileges enforced on the server, not only in the nav.
 
+**Pricing:** primary care signup is **free**. Specialty practices get a **3-month trial**, then **$49/month** for the practice.
+
 This build uses **synthetic clinic data only**. Do not enter real PHI.
 
 ## Run
@@ -38,8 +40,9 @@ Portal: `/login/pcp`
 | Midlevel | Avery Kim, NP | `avery.kim@summitcardio.health` |
 | Office manager | Sam Ortiz | `sam.ortiz@summitcardio.health` |
 | Staff | Riley Brooks | `riley.brooks@summitcardio.health` |
+| Physician (trial ended) | Iris Vale, MD | `iris.vale@riverbendpulm.health` |
 
-Portal: `/login/specialist`
+Portal: `/login/specialist` · Summit is on the 3-month trial. Iris Vale shows the $49/month paywall.
 
 ## What each role can do
 

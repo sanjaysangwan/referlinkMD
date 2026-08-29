@@ -20,7 +20,7 @@ export default function LoginIndex() {
             </div>
             <h2 className="mt-2 text-2xl">PCP practice</h2>
             <p className="mt-2 text-sm text-ink-soft">
-              Refer patients, track outbound work, and read your referral pattern.
+              Free to sign up. Refer patients, track outbound work, and read your referral pattern.
             </p>
           </Link>
           <Link
@@ -32,7 +32,7 @@ export default function LoginIndex() {
             </div>
             <h2 className="mt-2 text-2xl">Specialist practice</h2>
             <p className="mt-2 text-sm text-ink-soft">
-              Receive alerts, work the inbound pool, and chart who is sending patients.
+              3 months free, then $49/month. Receive alerts and work the inbound pool.
             </p>
           </Link>
         </div>

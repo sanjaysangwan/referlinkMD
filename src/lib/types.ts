@@ -24,9 +24,20 @@ export type Privilege =
   | "VIEW_PRACTICE_ANALYTICS"
   | "MANAGE_TEAM"
   | "MANAGE_ALERTS"
+  | "MANAGE_BILLING"
   | "ACCEPT_REFERRAL"
   | "SCHEDULE_REFERRAL"
   | "VIEW_ALERT_LOG";
+
+export type SubscriptionStatus = "free" | "trial" | "active" | "past_due";
+
+export type BillingSnapshot = {
+  status: SubscriptionStatus;
+  monthlyPrice: number;
+  trialEndsAt?: string;
+  daysLeftInTrial?: number;
+  subscribedAt?: string;
+};
 
 export type Organization = {
   id: string;
@@ -35,6 +46,9 @@ export type Organization = {
   specialty?: string;
   city: string;
   phone: string;
+  subscriptionStatus: "free" | "trial" | "active";
+  trialEndsAt?: string;
+  subscribedAt?: string;
 };
 
 export type User = {
@@ -110,6 +124,7 @@ export type SessionUser = {
   specialty?: string;
   phone: string;
   privileges: Privilege[];
+  billing: BillingSnapshot;
 };
 
 export type Store = {

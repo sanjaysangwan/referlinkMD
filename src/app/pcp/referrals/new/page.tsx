@@ -9,7 +9,7 @@ export default async function NewReferralPage() {
   if (!can(user, "CREATE_REFERRAL")) redirect("/pcp");
 
   const patients = db.patientsForOrg(user.organizationId);
-  const specialists = db.specialistOrganizations();
+  const specialists = db.openSpecialistOrganizations();
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">

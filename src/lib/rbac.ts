@@ -32,6 +32,7 @@ const SPECIALIST_PRIVILEGES: Record<Role, Privilege[]> = {
     "VIEW_ANALYTICS",
     "VIEW_PRACTICE_ANALYTICS",
     "MANAGE_ALERTS",
+    "MANAGE_BILLING",
     "VIEW_ALERT_LOG",
   ],
   MIDLEVEL: [
@@ -47,6 +48,7 @@ const SPECIALIST_PRIVILEGES: Record<Role, Privilege[]> = {
     "VIEW_PRACTICE_ANALYTICS",
     "MANAGE_TEAM",
     "MANAGE_ALERTS",
+    "MANAGE_BILLING",
     "VIEW_ALERT_LOG",
   ],
   STAFF: ["SCHEDULE_REFERRAL"],
@@ -93,6 +95,8 @@ export function privilegeLabel(privilege: Privilege): string {
       return "Schedule incoming referrals";
     case "VIEW_ALERT_LOG":
       return "View alert delivery log";
+    case "MANAGE_BILLING":
+      return "Manage practice subscription";
   }
 }
 
@@ -149,7 +153,7 @@ export const DEMO_ACCOUNTS = {
       name: "Sam Ortiz",
       credentials: "CMPE",
       role: "OFFICE_MANAGER" as const,
-      note: "Queue, scheduling, alerts, and pool analytics",
+      note: "Queue, scheduling, alerts, billing, and pool analytics",
     },
     {
       email: "riley.brooks@summitcardio.health",
@@ -157,6 +161,13 @@ export const DEMO_ACCOUNTS = {
       credentials: "CSR",
       role: "STAFF" as const,
       note: "Schedule visits; no clinical or analytics",
+    },
+    {
+      email: "iris.vale@riverbendpulm.health",
+      name: "Iris Vale",
+      credentials: "MD",
+      role: "MD" as const,
+      note: "Trial ended — paywall until $49/month",
     },
   ],
 } as const;
