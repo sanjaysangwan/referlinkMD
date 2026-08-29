@@ -46,7 +46,7 @@ export function ReferralTable({
             return (
               <tr key={r.id} className="border-t border-line hover:bg-sand/30">
                 <td className="px-4 py-3">
-                  <Link className="font-semibold text-harbor" href={`${hrefBase}/${r.id}`}>
+                  <Link className="font-semibold text-brand" href={`${hrefBase}/${r.id}`}>
                     {r.displayId}
                   </Link>
                 </td>

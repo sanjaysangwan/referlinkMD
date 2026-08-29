@@ -16,7 +16,7 @@ export default async function TeamPage({ orgType }: { orgType: OrgType }) {
   return (
     <div className="mx-auto max-w-4xl space-y-8">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-harbor">Directory</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">Directory</p>
         <h1 className="mt-2 text-4xl">Team and privileges</h1>
         <p className="mt-2 text-ink-soft">
           Office managers can see who holds which door. Role changes in production would go

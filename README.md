@@ -1,4 +1,4 @@
-# Harbor
+# ReferLink
 
 Phase-one prototype of a **primary care → specialist referral** product.
 
@@ -17,7 +17,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Demo sign-in
 
-Password for every roster account: `HarborDemo1!`
+Password for every roster account: `ReferLinkDemo1!`
 
 ### Primary care — Riverside Family Medicine
 

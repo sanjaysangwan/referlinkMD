@@ -13,7 +13,7 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "Harbor — Clinical referrals that arrive",
+  title: "ReferLink — Clinical referrals that arrive",
   description:
     "Primary care refers. Specialists are alerted by text or phone. Practices see their patterns.",
 };

@@ -1,1 +1,1 @@
-export const SESSION_COOKIE = "harbor_session";
+export const SESSION_COOKIE = "referlink_session";

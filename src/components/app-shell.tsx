@@ -73,7 +73,7 @@ export function AppShell({
                   {roleLabel(user.role)}
                 </div>
               </div>
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-harbor text-xs font-semibold text-sand">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand text-xs font-semibold text-sand">
                 {initials(user.name)}
               </div>
               <form action={logoutAction}>

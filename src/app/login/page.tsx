@@ -8,14 +8,14 @@ export default function LoginIndex() {
         <Brand subtitle="Choose a portal" />
         <h1 className="mt-8 text-4xl">Who is signing in?</h1>
         <p className="mt-3 max-w-lg text-ink-soft">
-          Harbor keeps primary care and specialty workspaces separate so privileges stay honest.
+          ReferLink keeps primary care and specialty workspaces separate so privileges stay honest.
         </p>
         <div className="mt-10 grid gap-4 md:grid-cols-2">
           <Link
             href="/login/pcp"
-            className="rounded-3xl border border-line bg-sand/50 p-6 hover:border-harbor"
+            className="rounded-3xl border border-line bg-sand/50 p-6 hover:border-brand"
           >
-            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-harbor">
+            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-brand">
               Primary care
             </div>
             <h2 className="mt-2 text-2xl">PCP practice</h2>
@@ -25,9 +25,9 @@ export default function LoginIndex() {
           </Link>
           <Link
             href="/login/specialist"
-            className="rounded-3xl border border-line bg-mist/50 p-6 hover:border-harbor"
+            className="rounded-3xl border border-line bg-mist/50 p-6 hover:border-brand"
           >
-            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-harbor">
+            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-brand">
               Specialty care
             </div>
             <h2 className="mt-2 text-2xl">Specialist practice</h2>

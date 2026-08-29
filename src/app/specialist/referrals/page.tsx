@@ -14,7 +14,7 @@ export default async function SpecialistReferrals() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-harbor">Pool</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">Pool</p>
         <h1 className="mt-2 text-4xl">Referrals into this practice</h1>
         <p className="mt-2 text-ink-soft">
           Midlevels see unassigned work plus their own panel. Physicians and operations see the full pool.

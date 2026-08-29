@@ -3,8 +3,8 @@ import { statusLabel, urgencyLabel } from "@/lib/format";
 
 const statusClass: Record<ReferralStatus, string> = {
   DRAFT: "bg-sand text-ink-soft",
-  SUBMITTED: "bg-mist text-harbor-deep",
-  ALERTED: "bg-[#e8f1ee] text-harbor-deep",
+  SUBMITTED: "bg-mist text-brand-deep",
+  ALERTED: "bg-[#e8f1ee] text-brand-deep",
   ACCEPTED: "bg-[#e7f3ea] text-ok",
   SCHEDULED: "bg-[#e7eef8] text-[#2a4d7a]",
   COMPLETED: "bg-mist text-ink-soft",
@@ -35,7 +35,7 @@ export function UrgencyPill({ urgency }: { urgency: Urgency }) {
 
 export function RolePill({ label }: { label: string }) {
   return (
-    <span className="inline-flex rounded-full bg-mist px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-harbor-deep">
+    <span className="inline-flex rounded-full bg-mist px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-brand-deep">
       {label}
     </span>
   );

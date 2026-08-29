@@ -18,7 +18,7 @@ export default async function SpecialistHome() {
     <div className="mx-auto max-w-6xl space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-harbor">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">
             {user.organizationName}
           </p>
           <h1 className="mt-2 text-4xl">Inbound queue</h1>

@@ -33,7 +33,7 @@ export default async function SpecialistAnalytics({
     <div className="mx-auto max-w-6xl space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-harbor">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">
             Referral pool
           </p>
           <h1 className="mt-2 text-4xl">Who is sending you patients</h1>
@@ -45,13 +45,13 @@ export default async function SpecialistAnalytics({
           <div className="flex rounded-full border border-line bg-white p-1 text-sm">
             <Link
               href="/specialist/analytics?scope=self"
-              className={`rounded-full px-4 py-1.5 ${scope === "self" ? "bg-harbor text-white" : "text-ink-soft"}`}
+              className={`rounded-full px-4 py-1.5 ${scope === "self" ? "bg-brand text-white" : "text-ink-soft"}`}
             >
               Assigned to me
             </Link>
             <Link
               href="/specialist/analytics?scope=practice"
-              className={`rounded-full px-4 py-1.5 ${scope === "practice" ? "bg-harbor text-white" : "text-ink-soft"}`}
+              className={`rounded-full px-4 py-1.5 ${scope === "practice" ? "bg-brand text-white" : "text-ink-soft"}`}
             >
               Full pool
             </Link>

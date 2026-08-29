@@ -47,7 +47,7 @@ export async function createReferralAction(
   const now = new Date().toISOString();
   const referral: Referral = {
     id: id("ref"),
-    displayId: `HB-${seq}`,
+    displayId: `RL-${seq}`,
     patientId,
     referringUserId: user.id,
     referringOrganizationId: user.organizationId,

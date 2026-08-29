@@ -16,7 +16,7 @@ export default async function PcpReferrals() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-harbor">Outbound</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">Outbound</p>
         <h1 className="mt-2 text-4xl">Referrals from this practice</h1>
         <p className="mt-2 text-ink-soft">
           {user.role === "MD" || user.role === "MIDLEVEL"

@@ -3,8 +3,8 @@
 :root {
   --ink: #102033;
   --ink-soft: #3d5164;
-  --harbor: #1b6b63;
-  --harbor-deep: #134e48;
+  --brand: #1b6b63;
+  --brand-deep: #134e48;
   --sea: #2f8f85;
   --sand: #f3ece1;
   --paper: #fbf8f3;
@@ -20,8 +20,8 @@
 @theme inline {
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
-  --color-harbor: var(--harbor);
-  --color-harbor-deep: var(--harbor-deep);
+  --color-brand: var(--brand);
+  --color-brand-deep: var(--brand-deep);
   --color-sea: var(--sea);
   --color-sand: var(--sand);
   --color-paper: var(--paper);
@@ -66,7 +66,7 @@ textarea {
   font: inherit;
 }
 
-.harbor-grid {
+.brand-grid {
   background-image:
     radial-gradient(circle at 1px 1px, rgba(16, 32, 51, 0.05) 1px, transparent 0);
   background-size: 22px 22px;

@@ -27,11 +27,11 @@ export default async function PcpReferralDetail({
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <Link href="/pcp/referrals" className="text-sm text-harbor">
+      <Link href="/pcp/referrals" className="text-sm text-brand">
         ← Outbound
       </Link>
       {query.sent ? (
-        <div className="rounded-3xl border border-harbor/20 bg-mist p-5">
+        <div className="rounded-3xl border border-brand/20 bg-mist p-5">
           <h2 className="text-xl">Specialist practice notified</h2>
           <p className="mt-1 text-sm text-ink-soft">
             {dest?.name} received {alerts.length} alert{alerts.length === 1 ? "" : "s"} (text and/or phone)
@@ -43,7 +43,7 @@ export default async function PcpReferralDetail({
       <div className="rounded-3xl border border-line bg-white p-6 md:p-8">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-harbor">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand">
               {referral.displayId}
             </p>
             <h1 className="mt-2 text-4xl">{patient?.name}</h1>

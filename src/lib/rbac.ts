@@ -96,7 +96,7 @@ export function privilegeLabel(privilege: Privilege): string {
   }
 }
 
-export const DEMO_PASSWORD = "HarborDemo1!";
+export const DEMO_PASSWORD = "ReferLinkDemo1!";
 
 export const DEMO_ACCOUNTS = {
   pcp: [

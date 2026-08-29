@@ -11,7 +11,7 @@ export default function HomePage() {
             PCP sign in
           </Link>
           <Link
-            className="rounded-full bg-ink px-4 py-2 text-sand hover:bg-harbor-deep"
+            className="rounded-full bg-ink px-4 py-2 text-sand hover:bg-brand-deep"
             href="/login/specialist"
           >
             Specialist sign in
@@ -19,15 +19,15 @@ export default function HomePage() {
         </div>
       </header>
 
-      <section className="harbor-grid mx-auto max-w-6xl px-6 pb-10 pt-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-harbor">
+      <section className="brand-grid mx-auto max-w-6xl px-6 pb-10 pt-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-brand">
           Phase one prototype
         </p>
         <h1 className="mt-4 max-w-3xl text-5xl leading-[1.05] text-ink md:text-6xl">
           The handoff between primary care and specialty should not go quiet.
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-8 text-ink-soft">
-          Harbor is a referral workspace for clinics. A PCP sends a patient.
+          ReferLink is a referral workspace for clinics. A PCP sends a patient.
           The specialist practice is alerted by text or phone. Each side can
           see its own patterns over time — with privileges that match MD,
           midlevel, office manager, and staff.
@@ -35,7 +35,7 @@ export default function HomePage() {
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
             href="/login/pcp"
-            className="rounded-full bg-harbor px-6 py-3 text-sm font-semibold text-white hover:bg-harbor-deep"
+            className="rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white hover:bg-brand-deep"
           >
             Enter primary care
           </Link>
@@ -56,7 +56,7 @@ export default function HomePage() {
           },
           {
             title: "Alerts that land",
-            body: "When a referral is sent, Harbor fans out SMS and voice alerts to the specialist team according to each person’s preferences.",
+            body: "When a referral is sent, ReferLink fans out SMS and voice alerts to the specialist team according to each person’s preferences.",
           },
           {
             title: "Patterns, not just a queue",

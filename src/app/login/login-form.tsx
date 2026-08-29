@@ -25,7 +25,7 @@ export function LoginForm({
             name="email"
             type="email"
             autoComplete="username"
-            className="mt-1 w-full rounded-xl border border-line bg-white px-3 py-2.5 outline-none ring-harbor/30 focus:ring-2"
+            className="mt-1 w-full rounded-xl border border-line bg-white px-3 py-2.5 outline-none ring-brand/30 focus:ring-2"
             placeholder={accounts[0].email}
           />
         </label>
@@ -37,13 +37,13 @@ export function LoginForm({
             name="password"
             type="password"
             autoComplete="current-password"
-            className="mt-1 w-full rounded-xl border border-line bg-white px-3 py-2.5 outline-none ring-harbor/30 focus:ring-2"
+            className="mt-1 w-full rounded-xl border border-line bg-white px-3 py-2.5 outline-none ring-brand/30 focus:ring-2"
           />
         </label>
         {state?.error ? (
           <p className="rounded-xl bg-[#f8e8e4] px-3 py-2 text-sm text-coral">{state.error}</p>
         ) : null}
-        <SubmitButton className="w-full rounded-full bg-harbor py-3 text-sm font-semibold text-white hover:bg-harbor-deep disabled:opacity-60">
+        <SubmitButton className="w-full rounded-full bg-brand py-3 text-sm font-semibold text-white hover:bg-brand-deep disabled:opacity-60">
           Sign in
         </SubmitButton>
       </form>
@@ -60,7 +60,7 @@ export function LoginForm({
               <input type="hidden" name="email" value={account.email} />
               <button
                 type="submit"
-                className="flex w-full items-start justify-between rounded-2xl border border-line bg-white px-4 py-3 text-left hover:border-harbor/40 hover:bg-mist/40"
+                className="flex w-full items-start justify-between rounded-2xl border border-line bg-white px-4 py-3 text-left hover:border-brand/40 hover:bg-mist/40"
               >
                 <span>
                   <span className="block text-sm font-medium">

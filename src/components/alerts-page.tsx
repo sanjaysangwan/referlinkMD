@@ -24,12 +24,12 @@ export default async function AlertsPage({
   return (
     <div className="mx-auto max-w-3xl space-y-8">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-harbor">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">
           Notifications
         </p>
         <h1 className="mt-2 text-4xl">Text and phone alerts</h1>
         <p className="mt-2 text-ink-soft">
-          Phase one uses a Twilio-shaped adapter. Without credentials, Harbor records a
+          Phase one uses a Twilio-shaped adapter. Without credentials, ReferLink records a
           delivered mock so the referral flow is still demonstrable. Wire{" "}
           <code className="text-xs">TWILIO_*</code> env vars for live SMS and voice.
         </p>
@@ -75,7 +75,7 @@ export default async function AlertsPage({
             className="h-4 w-4"
           />
         </label>
-        <SubmitButton className="rounded-full bg-harbor px-5 py-2.5 text-sm font-semibold text-white">
+        <SubmitButton className="rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white">
           Save alert preferences
         </SubmitButton>
       </form>

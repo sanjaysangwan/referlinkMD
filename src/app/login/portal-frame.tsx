@@ -18,7 +18,7 @@ export function PortalFrame({
     <div className="grid min-h-screen lg:grid-cols-[1.05fr_0.95fr]">
       <section
         className={`relative hidden flex-col justify-between p-12 text-sand lg:flex ${
-          portal === "pcp" ? "bg-ink" : "bg-harbor-deep"
+          portal === "pcp" ? "bg-ink" : "bg-brand-deep"
         }`}
       >
         <Brand light subtitle={kicker} />
@@ -38,7 +38,7 @@ export function PortalFrame({
           <h2 className="text-3xl">{portal === "pcp" ? "Primary care sign in" : "Specialist sign in"}</h2>
           <p className="mt-2 text-sm text-ink-soft">
             Need the other door?{" "}
-            <Link className="font-semibold text-harbor" href={other}>
+            <Link className="font-semibold text-brand" href={other}>
               {portal === "pcp" ? "Specialist portal" : "PCP portal"}
             </Link>
           </p>

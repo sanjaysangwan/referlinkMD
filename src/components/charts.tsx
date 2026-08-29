@@ -70,7 +70,7 @@ export function BarsChart({
               <span>{row.count}</span>
             </div>
             <div className="h-2.5 overflow-hidden rounded-full bg-sand">
-              <div className="h-full rounded-full bg-harbor" style={{ width: `${width}%` }} />
+              <div className="h-full rounded-full bg-brand" style={{ width: `${width}%` }} />
             </div>
           </div>
         );

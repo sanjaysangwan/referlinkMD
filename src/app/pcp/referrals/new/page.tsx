@@ -14,10 +14,10 @@ export default async function NewReferralPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-harbor">New outbound</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">New outbound</p>
         <h1 className="mt-2 text-4xl">Refer a patient</h1>
         <p className="mt-2 text-ink-soft">
-          On send, Harbor texts — and can call — the specialist practice according to their alert settings.
+          On send, ReferLink texts — and can call — the specialist practice according to their alert settings.
         </p>
       </div>
       <NewReferralForm

@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { loginWithPassword, logout } from "@/lib/auth";
+import { DEMO_PASSWORD } from "@/lib/rbac";
 
 export type LoginState = { error?: string } | null;
 
@@ -34,7 +35,7 @@ export async function loginAction(
 export async function demoLoginAction(formData: FormData) {
   const email = String(formData.get("email") || "");
   const portal = String(formData.get("portal") || "pcp");
-  const result = await loginWithPassword(email, "HarborDemo1!");
+  const result = await loginWithPassword(email, DEMO_PASSWORD);
   if ("error" in result) {
     redirect(`/login/${portal}?error=demo`);
   }

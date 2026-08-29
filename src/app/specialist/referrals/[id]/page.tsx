@@ -29,7 +29,7 @@ export default async function SpecialistReferralDetail({
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <Link href="/specialist" className="text-sm text-harbor">
+      <Link href="/specialist" className="text-sm text-brand">
         ← Queue
       </Link>
       {query.error === "privilege" ? (
@@ -41,7 +41,7 @@ export default async function SpecialistReferralDetail({
       <div className="rounded-3xl border border-line bg-white p-6 md:p-8">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-harbor">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand">
               {referral.displayId} · {referral.specialty}
             </p>
             <h1 className="mt-2 text-4xl">{patient?.name}</h1>
@@ -77,7 +77,7 @@ export default async function SpecialistReferralDetail({
               <form action={updateReferralStatusAction}>
                 <input type="hidden" name="referralId" value={referral.id} />
                 <input type="hidden" name="status" value="ACCEPTED" />
-                <SubmitButton className="rounded-full bg-harbor px-5 py-2.5 text-sm font-semibold text-white">
+                <SubmitButton className="rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white">
                   Accept to my panel
                 </SubmitButton>
               </form>

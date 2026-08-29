@@ -21,7 +21,7 @@ function Choice({
   subtitle?: string;
 }) {
   return (
-    <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-line bg-paper px-3 py-2.5 has-[:checked]:border-harbor has-[:checked]:bg-mist/70">
+    <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-line bg-paper px-3 py-2.5 has-[:checked]:border-brand has-[:checked]:bg-mist/70">
       <input
         type="radio"
         name={name}
@@ -83,7 +83,7 @@ export function NewReferralForm({
           {specialties.map((s) => (
             <label
               key={s}
-              className="cursor-pointer rounded-full border border-line bg-paper px-3 py-1.5 text-sm has-[:checked]:border-harbor has-[:checked]:bg-mist"
+              className="cursor-pointer rounded-full border border-line bg-paper px-3 py-1.5 text-sm has-[:checked]:border-brand has-[:checked]:bg-mist"
             >
               <input
                 type="radio"
@@ -164,7 +164,7 @@ export function NewReferralForm({
         <p className="rounded-xl bg-[#f8e8e4] px-3 py-2 text-sm text-coral">{state.error}</p>
       ) : null}
 
-      <SubmitButton className="rounded-full bg-harbor px-6 py-3 text-sm font-semibold text-white hover:bg-harbor-deep disabled:opacity-60">
+      <SubmitButton className="rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white hover:bg-brand-deep disabled:opacity-60">
         Send referral and alert specialist
       </SubmitButton>
     </form>

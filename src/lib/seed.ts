@@ -11,7 +11,7 @@ import type {
 } from "./types";
 
 const PASSWORD_HASH =
-  "$2b$10$ClOqienb6Ej4uW4JJKnfb.lP4Azpm0m4stV34HdCJ/X1H3/DuY/Ba";
+  "$2b$10$ASrbuoYo7e7NJ0W8p249XOBMvye9JeIeYkwhXhVbxoBpoQORHdcj2";
 
 function iso(date: Date) {
   return date.toISOString();
@@ -346,7 +346,7 @@ export function createSeed(): Store {
 
     const referral: Referral = {
       id: `ref_${seq}`,
-      displayId: `HB-${seq}`,
+      displayId: `RL-${seq}`,
       patientId: opts.patient.id,
       referringUserId: opts.referringUserId,
       referringOrganizationId: opts.referringOrganizationId,
@@ -377,7 +377,7 @@ export function createSeed(): Store {
             recipientUserId: rid,
             channel: "SMS",
             to: user.phone,
-            message: `Harbor: New ${urgency.toLowerCase()} ${dest.specialty} referral ${referral.displayId} from ${organizations.find((o) => o.id === opts.referringOrganizationId)?.name}. Open the specialist queue to review.`,
+            message: `ReferLink: New ${urgency.toLowerCase()} ${dest.specialty} referral ${referral.displayId} from ${organizations.find((o) => o.id === opts.referringOrganizationId)?.name}. Open ReferLink to review.`,
             status: "DELIVERED",
             createdAt: iso(new Date(created.getTime() + 2 * 60 * 1000)),
             provider: "mock",

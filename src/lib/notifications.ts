@@ -40,7 +40,7 @@ export async function notifySpecialistPractice(referral: Referral, referringOrgN
   const sent: AlertLog[] = [];
   for (const user of recipients) {
     const pref = db.preferencesFor(user.id);
-    const smsBody = `Harbor: New ${referral.urgency.toLowerCase()} ${referral.specialty} referral ${referral.displayId} from ${referringOrgName}. Open Harbor to review.`;
+    const smsBody = `ReferLink: New ${referral.urgency.toLowerCase()} ${referral.specialty} referral ${referral.displayId} from ${referringOrgName}. Open ReferLink to review.`;
     const voiceBody = `New ${referral.urgency.toLowerCase()} referral ${referral.displayId} is waiting in the ${specialistOrg.name} queue.`;
 
     if (pref.smsEnabled) {

@@ -33,7 +33,7 @@ export default async function PcpAnalytics({
     <div className="mx-auto max-w-6xl space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-harbor">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">
             Referral pattern
           </p>
           <h1 className="mt-2 text-4xl">
@@ -47,13 +47,13 @@ export default async function PcpAnalytics({
           <div className="flex rounded-full border border-line bg-white p-1 text-sm">
             <Link
               href="/pcp/analytics?scope=self"
-              className={`rounded-full px-4 py-1.5 ${scope === "self" ? "bg-harbor text-white" : "text-ink-soft"}`}
+              className={`rounded-full px-4 py-1.5 ${scope === "self" ? "bg-brand text-white" : "text-ink-soft"}`}
             >
               My panel
             </Link>
             <Link
               href="/pcp/analytics?scope=practice"
-              className={`rounded-full px-4 py-1.5 ${scope === "practice" ? "bg-harbor text-white" : "text-ink-soft"}`}
+              className={`rounded-full px-4 py-1.5 ${scope === "practice" ? "bg-brand text-white" : "text-ink-soft"}`}
             >
               Practice
             </Link>
