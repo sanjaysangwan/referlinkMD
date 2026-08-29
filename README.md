@@ -70,4 +70,16 @@ TWILIO_FROM_NUMBER=
 
 ## Stack
 
-Next.js App Router, TypeScript, Tailwind, signed httpOnly sessions, in-memory store (swap point for Postgres), Recharts. Built so the domain (orgs, roles, referrals, notifications) can move onto a real database and identity provider without rewriting the product surface.
+Next.js App Router, TypeScript, Tailwind, signed httpOnly sessions, in-memory store (swap point for Postgres). The product surface is built so orgs, roles, referrals, and notifications can move onto Postgres, real auth, and live Twilio without a rewrite.
+
+## Proof-of-concept hosting
+
+Cheap ways to run the next slice (Twilio + Postgres + real auth) **before** production are in [docs/poc-hosting.md](docs/poc-hosting.md).
+
+Short version:
+
+- **$0 internal demo:** Vercel Hobby + Supabase Free + Twilio trial (Hobby is personal/non-commercial; Supabase Free pauses after a week idle).
+- **~$5–20/month to show a clinic:** Railway Hobby (app + Postgres) + Better Auth in that database + Twilio trial then pay-as-you-go. This is the plan we recommend for a live walkthrough.
+- **~$45–60/month staging:** Vercel Pro + Supabase Pro + Twilio usage.
+
+None of these plans are HIPAA. Synthetic data only until a host will sign a BAA.
