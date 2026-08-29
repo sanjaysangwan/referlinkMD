@@ -14,7 +14,7 @@ const globalForStore = globalThis as unknown as {
   __harborVersion?: number;
 };
 
-const STORE_VERSION = 2;
+const STORE_VERSION = 3;
 
 function getStore(): Store {
   if (!globalForStore.__harborStore || globalForStore.__harborVersion !== STORE_VERSION) {

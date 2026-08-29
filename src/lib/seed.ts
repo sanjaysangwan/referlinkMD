@@ -324,8 +324,7 @@ export function createSeed(): Store {
       ];
     const created = daysAgo(opts.daysAgo, 8 + (seq % 9));
     const status =
-      opts.status ??
-      statuses[(seq + opts.daysAgo) % (opts.daysAgo < 4 ? 5 : statuses.length)];
+      opts.status ?? statuses[seq % statuses.length];
     const urgency = urgencies[seq % urgencies.length];
     const reasonList = reasons[dest.specialty];
     const reason = reasonList[seq % reasonList.length];
