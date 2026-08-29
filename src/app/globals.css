@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #102033;
+  --ink-soft: #3d5164;
+  --harbor: #1b6b63;
+  --harbor-deep: #134e48;
+  --sea: #2f8f85;
+  --sand: #f3ece1;
+  --paper: #fbf8f3;
+  --mist: #e4eee9;
+  --line: #d7cfc3;
+  --coral: #c45c4a;
+  --gold: #b8893d;
+  --ok: #2f7d4a;
+  --white: #fffcf8;
+  --shadow: 0 18px 50px rgba(16, 32, 51, 0.08);
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-harbor: var(--harbor);
+  --color-harbor-deep: var(--harbor-deep);
+  --color-sea: var(--sea);
+  --color-sand: var(--sand);
+  --color-paper: var(--paper);
+  --color-mist: var(--mist);
+  --color-line: var(--line);
+  --color-coral: var(--coral);
+  --color-gold: var(--gold);
+  --color-ok: var(--ok);
+  --color-white: var(--white);
+  --font-sans: var(--font-figtree);
+  --font-display: var(--font-fraunces);
+}
+
+* {
+  border-color: var(--line);
+}
+
+html,
+body {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+body {
+  font-family: var(--font-figtree), system-ui, sans-serif;
+}
+
+h1,
+h2,
+.display {
+  font-family: var(--font-fraunces), Georgia, serif;
+  letter-spacing: -0.03em;
+}
+
+::selection {
+  background: #cde6e1;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.harbor-grid {
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(16, 32, 51, 0.05) 1px, transparent 0);
+  background-size: 22px 22px;
+}
+
+.mark {
+  width: 34px;
+  height: 34px;
+}
