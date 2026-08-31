@@ -29,7 +29,7 @@ export default async function AlertsPage({
         </p>
         <h1 className="mt-2 text-4xl">Text and phone alerts</h1>
         <p className="mt-2 text-ink-soft">
-          Phase one uses a Twilio-shaped adapter. Without credentials, ReferLink records a
+          Phase one uses a Twilio-shaped adapter. Without credentials, ReferMDLink records a
           delivered mock so the referral flow is still demonstrable. Wire{" "}
           <code className="text-xs">TWILIO_*</code> env vars for live SMS and voice.
         </p>

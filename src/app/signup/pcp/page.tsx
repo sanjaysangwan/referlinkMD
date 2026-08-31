@@ -26,7 +26,7 @@ export default function PcpSignup() {
           </div>
           <h2 className="text-3xl">Create a free PCP practice</h2>
           <p className="mt-2 text-sm text-ink-soft">
-            Already on ReferLink?{" "}
+            Already on ReferMDLink?{" "}
             <Link className="font-semibold text-brand" href="/login/pcp">
               Sign in
             </Link>

@@ -6,7 +6,7 @@ export default function NotFound() {
       <h1 className="text-4xl">That chart is not on this link</h1>
       <p className="mt-3 text-ink-soft">The referral or page is missing, or you do not have access.</p>
       <Link href="/" className="mt-6 text-sm font-semibold text-brand">
-        Back to ReferLink
+        Back to ReferMDLink
       </Link>
     </div>
   );

@@ -1,6 +1,6 @@
-# ReferLink proof-of-concept hosting
+# ReferMDLink proof-of-concept hosting
 
-ReferLink’s next slice is **Twilio + Postgres + real auth**. This note is the cheap way to run that stack for a clinic demo **before** production (no real PHI, no HIPAA BAA).
+ReferMDLink’s next slice is **Twilio + Postgres + real auth**. This note is the cheap way to run that stack for a clinic demo **before** production (no real PHI, no HIPAA BAA).
 
 Prices below are list prices as of August 2026. Confirm on the vendor pages before you buy.
 
@@ -38,7 +38,7 @@ Sign up: [vercel.com](https://vercel.com) → Import this repo → add env vars.
 - Postgres 500 MB, 50,000 monthly active users, social + email auth.
 - Two active projects. **Pauses after 1 week of no traffic** — click unpause before a demo.
 - No automatic backups on Free. Fine for seed data; not fine for anything you cannot re-seed.
-- Auth lives next to the data (good for a POC). ReferLink roles (MD / midlevel / office manager / staff) stay in our own tables.
+- Auth lives next to the data (good for a POC). ReferMDLink roles (MD / midlevel / office manager / staff) stay in our own tables.
 
 Sign up: [supabase.com](https://supabase.com) → New project → copy the Postgres URI and auth keys.
 
@@ -62,9 +62,9 @@ Best when: you will share the URL with a PCP or specialist office.
 - $5/month **includes $5 of usage**. A small Next.js service + a small Postgres often stays inside that credit.
 - If you blow past $5 of CPU/RAM/disk, you pay the overage (roughly $20/vCPU-month and $10/GB-RAM-month). Cap spend in the dashboard.
 - New accounts also get a **$5 trial for 30 days** with no card.
-- There is a $0 “Free” plan with **$1/month** credit — enough to poke at a deploy, not enough to keep ReferLink + Postgres always on.
+- There is a $0 “Free” plan with **$1/month** credit — enough to poke at a deploy, not enough to keep ReferMDLink + Postgres always on.
 
-Auth: run **Better Auth** (or Auth.js) against the same Postgres. No Clerk bill, users stay in our database, ReferLink’s role matrix does not have to be rebuilt.
+Auth: run **Better Auth** (or Auth.js) against the same Postgres. No Clerk bill, users stay in our database, ReferMDLink’s role matrix does not have to be rebuilt.
 
 Twilio: same as Plan A. Budget **$5–15/month** once you leave trial (number + a few hundred texts/calls).
 
@@ -92,7 +92,7 @@ Neon Launch (usage-based, often ~$5+ if the database sleeps) is a cheaper Postgr
 | --- | --- |
 | **Render Free** web | Spins down after 15 minutes; cold start is ugly in a live demo. Free Postgres **expires in 30 days**. Paid web + paid Postgres is ~$14/month — more than Railway Hobby for the same job. |
 | **Fly.io** | No free tier for new accounts. Cheap at small size, more ops (Machines, volumes, IPv4). Better later if we need always-on near the clinic. |
-| **Clerk** | Fast UI, generous MAU free tier, but ReferLink already has clinic-specific roles. Extra vendor and a steep paid curve if MAU grows. Use only if we want hosted login UI tomorrow and will migrate later. |
+| **Clerk** | Fast UI, generous MAU free tier, but ReferMDLink already has clinic-specific roles. Extra vendor and a steep paid curve if MAU grows. Use only if we want hosted login UI tomorrow and will migrate later. |
 | **Neon Free alone** | Excellent serverless Postgres (0.5 GB, scale-to-zero, branching). Pair it with Vercel if we do **not** want Supabase Auth. Cold starts after idle. |
 | **Netlify** | Fine for static sites; Next.js App Router + server actions is a Vercel/Railway/Render problem. |
 

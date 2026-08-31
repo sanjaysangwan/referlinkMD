@@ -1,4 +1,5 @@
 import { trialEndFrom } from "./billing";
+import { APP_NAME, REFERRAL_ID_PREFIX } from "./constants";
 import type {
   AlertLog,
   AlertPreferences,
@@ -12,7 +13,7 @@ import type {
 } from "./types";
 
 const PASSWORD_HASH =
-  "$2b$10$ASrbuoYo7e7NJ0W8p249XOBMvye9JeIeYkwhXhVbxoBpoQORHdcj2";
+  "$2b$10$PCof.kWj3Xn/AVjZgMvc2.15D35rfT88YjiAkiWJB1QYbuOK/Fs.2";
 
 function iso(date: Date) {
   return date.toISOString();
@@ -380,7 +381,7 @@ export function createSeed(): Store {
 
     const referral: Referral = {
       id: `ref_${seq}`,
-      displayId: `RL-${seq}`,
+      displayId: `${REFERRAL_ID_PREFIX}-${seq}`,
       patientId: opts.patient.id,
       referringUserId: opts.referringUserId,
       referringOrganizationId: opts.referringOrganizationId,
@@ -411,7 +412,7 @@ export function createSeed(): Store {
             recipientUserId: rid,
             channel: "SMS",
             to: user.phone,
-            message: `ReferLink: New ${urgency.toLowerCase()} ${dest.specialty} referral ${referral.displayId} from ${organizations.find((o) => o.id === opts.referringOrganizationId)?.name}. Open ReferLink to review.`,
+            message: `${APP_NAME}: New ${urgency.toLowerCase()} ${dest.specialty} referral ${referral.displayId} from ${organizations.find((o) => o.id === opts.referringOrganizationId)?.name}. Open ${APP_NAME} to review.`,
             status: "DELIVERED",
             createdAt: iso(new Date(created.getTime() + 2 * 60 * 1000)),
             provider: "mock",

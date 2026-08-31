@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Figtree, Fraunces } from "next/font/google";
+import { APP_NAME } from "@/lib/constants";
 import "./globals.css";
 
 const figtree = Figtree({
@@ -13,7 +14,7 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "ReferLink — Clinical referrals that arrive",
+  title: `${APP_NAME} — Clinical referrals that arrive`,
   description:
     "Primary care refers. Specialists are alerted by text or phone. Practices see their patterns.",
 };

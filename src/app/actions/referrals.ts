@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
+import { REFERRAL_ID_PREFIX } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { notifySpecialistPractice } from "@/lib/notifications";
 import { can } from "@/lib/rbac";
@@ -47,7 +48,7 @@ export async function createReferralAction(
   const now = new Date().toISOString();
   const referral: Referral = {
     id: id("ref"),
-    displayId: `RL-${seq}`,
+    displayId: `${REFERRAL_ID_PREFIX}-${seq}`,
     patientId,
     referringUserId: user.id,
     referringOrganizationId: user.organizationId,

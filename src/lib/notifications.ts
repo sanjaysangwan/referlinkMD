@@ -1,3 +1,4 @@
+import { APP_NAME } from "./constants";
 import { db } from "./db";
 import type { AlertChannel, AlertLog, Referral, User } from "./types";
 
@@ -40,7 +41,7 @@ export async function notifySpecialistPractice(referral: Referral, referringOrgN
   const sent: AlertLog[] = [];
   for (const user of recipients) {
     const pref = db.preferencesFor(user.id);
-    const smsBody = `ReferLink: New ${referral.urgency.toLowerCase()} ${referral.specialty} referral ${referral.displayId} from ${referringOrgName}. Open ReferLink to review.`;
+    const smsBody = `${APP_NAME}: New ${referral.urgency.toLowerCase()} ${referral.specialty} referral ${referral.displayId} from ${referringOrgName}. Open ${APP_NAME} to review.`;
     const voiceBody = `New ${referral.urgency.toLowerCase()} referral ${referral.displayId} is waiting in the ${specialistOrg.name} queue.`;
 
     if (pref.smsEnabled) {
