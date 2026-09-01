@@ -36,7 +36,7 @@ export default function HomePage() {
           Phase one prototype
         </p>
         <h1 className="mt-4 max-w-3xl text-5xl leading-[1.05] text-ink md:text-6xl">
-          The handoff between primary care and specialty should not go quiet.
+          The handoff between primary team and specialist should not be a burden.
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-8 text-ink-soft">
           ReferLinkMD is a referral workspace for clinics. A PCP sends a patient.
