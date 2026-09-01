@@ -8,12 +8,14 @@ export default function PcpSignup() {
       <section className="hidden flex-col justify-between bg-ink p-12 text-sand lg:flex">
         <Brand light subtitle="Primary care" />
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/50">Always free</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/50">
+            For the primary team
+          </p>
           <h1 className="mt-3 max-w-md text-5xl leading-[1.05] text-white">
-            Referrals should not cost the practice that starts them.
+            Keep the patient in view after you refer.
           </h1>
           <p className="mt-5 max-w-md text-white/75">
-            Primary care signs up at no charge. Send patients, track patterns, and keep clinical
+            Send the patient to specialty care, follow the handoff, and keep clinical
             notes with the roles you already have.
           </p>
         </div>
@@ -24,7 +26,7 @@ export default function PcpSignup() {
           <div className="mb-8 lg:hidden">
             <Brand subtitle="Primary care" />
           </div>
-          <h2 className="text-3xl">Create a free PCP practice</h2>
+          <h2 className="text-3xl">Create a primary care practice</h2>
           <p className="mt-2 text-sm text-ink-soft">
             Already on ReferLinkMD?{" "}
             <Link className="font-semibold text-brand" href="/login/pcp">

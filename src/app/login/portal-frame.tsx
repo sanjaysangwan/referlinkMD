@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Brand } from "@/components/brand";
-import { specialistSignupNav } from "@/lib/billing";
 import { LoginForm } from "./login-form";
 
 export function PortalFrame({
@@ -47,7 +46,7 @@ export function PortalFrame({
               className="font-semibold text-brand"
               href={portal === "pcp" ? "/signup/pcp" : "/signup/specialist"}
             >
-              {portal === "pcp" ? "Free signup" : specialistSignupNav()}
+              {portal === "pcp" ? "Primary care signup" : "Specialist signup"}
             </Link>
           </p>
           <div className="mt-8">
