@@ -1,4 +1,4 @@
-# ReferMDLink
+# ReferLinkMD
 
 Phase-one prototype of a **primary care → specialist referral** product.
 
@@ -19,7 +19,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Demo sign-in
 
-Password for every roster account: `ReferMDLinkDemo1!`
+Password for every roster account: `ReferLinkMDDemo1!`
 
 ### Primary care — Riverside Family Medicine
 

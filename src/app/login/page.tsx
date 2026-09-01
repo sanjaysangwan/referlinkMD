@@ -9,7 +9,7 @@ export default function LoginIndex() {
         <Brand subtitle="Choose a portal" />
         <h1 className="mt-8 text-4xl">Who is signing in?</h1>
         <p className="mt-3 max-w-lg text-ink-soft">
-          ReferMDLink keeps primary care and specialty workspaces separate so privileges stay honest.
+          ReferLinkMD keeps primary care and specialty workspaces separate so privileges stay honest.
         </p>
         <div className="mt-10 grid gap-4 md:grid-cols-2">
           <Link

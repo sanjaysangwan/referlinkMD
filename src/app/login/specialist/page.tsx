@@ -4,7 +4,7 @@ import { PortalFrame } from "../portal-frame";
 export default function SpecialistLogin() {
   const copy = specialistBillingEnabled()
     ? `Text and phone alerts land when a PCP sends a patient. ${SPECIALIST_TRIAL_MONTHS} months free for the specialty practice, then $${SPECIALIST_MONTHLY_USD}/month. Primary care never pays.`
-    : "Text and phone alerts land when a PCP sends a patient. Specialty practices are free on ReferMDLink while we grow the network.";
+    : "Text and phone alerts land when a PCP sends a patient. Specialty practices are free on ReferLinkMD while we grow the network.";
 
   return (
     <PortalFrame

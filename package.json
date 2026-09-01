@@ -1,8 +1,8 @@
 {
-  "name": "refermdlink",
+  "name": "referlinkmd",
   "version": "0.1.0",
   "private": true,
-  "description": "ReferMDLink — PCP to specialist referrals with role-based access and SMS/phone alerts",
+  "description": "ReferLinkMD — PCP to specialist referrals with role-based access and SMS/phone alerts",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

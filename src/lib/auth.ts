@@ -73,7 +73,7 @@ export type SignupInput = {
 
 export async function signupPractice(input: SignupInput) {
   if (db.userByEmail(input.email)) {
-    return { error: "That email is already on ReferMDLink." as const };
+    return { error: "That email is already on ReferLinkMD." as const };
   }
   if (input.password.length < 8) {
     return { error: "Use a password of at least 8 characters." as const };

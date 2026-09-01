@@ -1,6 +1,6 @@
 import { APP_NAME } from "@/lib/constants";
 
-export function ReferMDLinkMark({ className = "mark" }: { className?: string }) {
+export function ReferLinkMDMark({ className = "mark" }: { className?: string }) {
   return (
     <svg
       className={className}
@@ -25,7 +25,7 @@ export function Brand({
 }) {
   return (
     <div className="flex items-center gap-2.5">
-      <ReferMDLinkMark />
+      <ReferLinkMDMark />
       <div className="leading-tight">
         <div className={`text-[17px] font-semibold tracking-tight ${light ? "text-white" : "text-ink"}`}>
           {APP_NAME}

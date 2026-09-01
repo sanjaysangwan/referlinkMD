@@ -11,26 +11,26 @@ import type {
 } from "./types";
 
 const globalForStore = globalThis as unknown as {
-  __refermdlinkStore?: Store;
-  __refermdlinkVersion?: number;
+  __referlinkmdStore?: Store;
+  __referlinkmdVersion?: number;
 };
 
-const STORE_VERSION = 6;
+const STORE_VERSION = 7;
 
 function getStore(): Store {
-  if (!globalForStore.__refermdlinkStore || globalForStore.__refermdlinkVersion !== STORE_VERSION) {
-    globalForStore.__refermdlinkStore = createSeed();
-    globalForStore.__refermdlinkVersion = STORE_VERSION;
+  if (!globalForStore.__referlinkmdStore || globalForStore.__referlinkmdVersion !== STORE_VERSION) {
+    globalForStore.__referlinkmdStore = createSeed();
+    globalForStore.__referlinkmdVersion = STORE_VERSION;
   }
-  return globalForStore.__refermdlinkStore;
+  return globalForStore.__referlinkmdStore;
 }
 
 export const db = {
   store: getStore,
   reset() {
-    globalForStore.__refermdlinkStore = createSeed();
-    globalForStore.__refermdlinkVersion = STORE_VERSION;
-    return globalForStore.__refermdlinkStore!;
+    globalForStore.__referlinkmdStore = createSeed();
+    globalForStore.__referlinkmdVersion = STORE_VERSION;
+    return globalForStore.__referlinkmdStore!;
   },
   users(): User[] {
     return getStore().users;

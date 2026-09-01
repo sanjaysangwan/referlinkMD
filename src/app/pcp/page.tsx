@@ -25,7 +25,7 @@ export default async function PcpHome() {
           <h1 className="mt-2 text-4xl">Good day, {clinicianName(user.name, user.credentials)}.</h1>
           <p className="mt-2 max-w-xl text-ink-soft">
             You are signed in as {roleLabel(user.role).toLowerCase()}. This primary care practice
-            is free on ReferMDLink.
+            is free on ReferLinkMD.
           </p>
         </div>
         {can(user, "CREATE_REFERRAL") ? (

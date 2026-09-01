@@ -39,7 +39,7 @@ export default function HomePage() {
           The handoff between primary care and specialty should not go quiet.
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-8 text-ink-soft">
-          ReferMDLink is a referral workspace for clinics. A PCP sends a patient.
+          ReferLinkMD is a referral workspace for clinics. A PCP sends a patient.
           The specialist practice is alerted by text or phone. Each side can
           see its own patterns over time — with privileges that match MD,
           midlevel, office manager, and staff.
@@ -108,7 +108,7 @@ export default function HomePage() {
           },
           {
             title: "Alerts that land",
-            body: "When a referral is sent, ReferMDLink fans out SMS and voice alerts to the specialist team according to each person’s preferences.",
+            body: "When a referral is sent, ReferLinkMD fans out SMS and voice alerts to the specialist team according to each person’s preferences.",
           },
           {
             title: "Patterns, not just a queue",

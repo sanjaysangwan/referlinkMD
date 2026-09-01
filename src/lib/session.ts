@@ -5,7 +5,7 @@ import { SESSION_COOKIE } from "./constants";
 const MAX_AGE_SECONDS = 60 * 60 * 12;
 
 function secret() {
-  return process.env.AUTH_SECRET || "refermdlink-prototype-secret-change-in-prod";
+  return process.env.AUTH_SECRET || "referlinkmd-prototype-secret-change-in-prod";
 }
 
 function sign(value: string) {

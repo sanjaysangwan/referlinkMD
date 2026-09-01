@@ -13,7 +13,7 @@ import type {
 } from "./types";
 
 const PASSWORD_HASH =
-  "$2b$10$PCof.kWj3Xn/AVjZgMvc2.15D35rfT88YjiAkiWJB1QYbuOK/Fs.2";
+  "$2b$10$DRTSkYSzz5dQG5IRUGKEY.UxKWA/EPO0Ec6MaTK/S9v1AeIYFIGM2";
 
 function iso(date: Date) {
   return date.toISOString();

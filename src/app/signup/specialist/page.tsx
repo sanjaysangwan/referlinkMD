@@ -44,7 +44,7 @@ export default function SpecialistSignup() {
           </div>
           <h2 className="text-3xl">{billingOn ? "Start a specialist trial" : "Create a specialist practice"}</h2>
           <p className="mt-2 text-sm text-ink-soft">
-            Already on ReferMDLink?{" "}
+            Already on ReferLinkMD?{" "}
             <Link className="font-semibold text-brand" href="/login/specialist">
               Sign in
             </Link>
