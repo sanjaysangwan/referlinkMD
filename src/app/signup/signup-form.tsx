@@ -19,10 +19,8 @@ const SPECIALTIES = [
 
 export function SignupForm({
   portal,
-  billingEnabled = false,
 }: {
   portal: "pcp" | "specialist";
-  billingEnabled?: boolean;
 }) {
   const [state, action] = useActionState<SignupState, FormData>(signupAction, null);
 
@@ -120,11 +118,7 @@ export function SignupForm({
         <p className="rounded-xl bg-[#f8e8e4] px-3 py-2 text-sm text-coral">{state.error}</p>
       ) : null}
       <SubmitButton className="w-full rounded-full bg-brand py-3 text-sm font-semibold text-white hover:bg-brand-deep disabled:opacity-60">
-        {portal === "pcp"
-          ? "Create free practice"
-          : billingEnabled
-            ? "Start 3-month free trial"
-            : "Create specialist practice"}
+        {portal === "pcp" ? "Create primary care practice" : "Create specialist practice"}
       </SubmitButton>
     </form>
   );
