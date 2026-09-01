@@ -33,16 +33,16 @@ export default function HomePage() {
 
       <section className="brand-grid mx-auto max-w-6xl px-6 pb-10 pt-8">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-brand">
-          Phase one prototype
+          Clinical referral workspace
         </p>
         <h1 className="mt-4 max-w-3xl text-5xl leading-[1.05] text-ink md:text-6xl">
-          The handoff between primary care and specialty should not go quiet.
+          Referrals should arrive — not disappear.
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-8 text-ink-soft">
-          ReferLinkMD is a referral workspace for clinics. A PCP sends a patient.
-          The specialist practice is alerted by text or phone. Each side can
-          see its own patterns over time — with privileges that match MD,
-          midlevel, office manager, and staff.
+          ReferLinkMD is the workspace clinics use after a referral leaves the
+          office. A PCP sends a patient. The specialist practice is alerted by
+          text or phone. Each side can see its own patterns over time — with
+          privileges that match physician, midlevel, office manager, and staff.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
@@ -63,10 +63,10 @@ export default function HomePage() {
       <section className="mx-auto grid max-w-6xl gap-6 px-6 pb-8 md:grid-cols-2">
         <article className="rounded-3xl border border-line bg-white p-8 shadow-[var(--shadow)]">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand">Primary care</p>
-          <h2 className="mt-3 text-3xl">Free to sign up</h2>
+          <h2 className="mt-3 text-3xl">Always free for primary care</h2>
           <p className="mt-3 text-sm leading-6 text-ink-soft">
-            The practice that starts the referral never pays. Create the workspace, invite MD,
-            midlevel, office manager, and staff, and send patients.
+            The practice that starts the referral never pays. Create the workspace, invite
+            physician, midlevel, office manager, and staff, and send patients.
           </p>
           <Link href="/signup/pcp" className="mt-6 inline-block text-sm font-semibold text-brand">
             Open a free PCP account
@@ -103,16 +103,16 @@ export default function HomePage() {
       <section className="mx-auto grid max-w-6xl gap-6 px-6 pb-20 md:grid-cols-3">
         {[
           {
-            title: "Role-true logins",
+            title: "Roles that match the clinic",
             body: "Separate PCP and specialist portals. Physician, midlevel, office manager, and staff each see a different slice of the work.",
           },
           {
             title: "Alerts that land",
-            body: "When a referral is sent, ReferLinkMD fans out SMS and voice alerts to the specialist team according to each person’s preferences.",
+            body: "When a referral is sent, ReferLinkMD fans out text and phone alerts to the specialist team according to each person’s preferences.",
           },
           {
             title: "Patterns, not just a queue",
-            body: "PCPs chart where their patients go. Specialists chart who is sending them work — volume, urgency, and conversion over twelve months.",
+            body: "Primary care charts where patients go. Specialists chart who is sending them work — volume, urgency, and conversion over twelve months.",
           },
         ].map((card) => (
           <article key={card.title} className="rounded-3xl border border-line bg-white p-6 shadow-[var(--shadow)]">

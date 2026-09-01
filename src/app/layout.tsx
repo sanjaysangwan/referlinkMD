@@ -14,9 +14,9 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: `${APP_NAME} — Clinical referrals that arrive`,
+  title: `${APP_NAME} — Referrals that arrive`,
   description:
-    "Primary care refers. Specialists are alerted by text or phone. Practices see their patterns.",
+    "A clinical referral workspace. Primary care sends a patient. Specialists are alerted by text or phone. Both sides see their patterns.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
