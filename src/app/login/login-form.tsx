@@ -7,8 +7,10 @@ import { DEMO_ACCOUNTS, DEMO_PASSWORD, roleLabel } from "@/lib/rbac";
 
 export function LoginForm({
   portal,
+  formError,
 }: {
   portal: "pcp" | "specialist";
+  formError?: string;
 }) {
   const [state, action] = useActionState<LoginState, FormData>(loginAction, null);
   const accounts = DEMO_ACCOUNTS[portal];
@@ -37,11 +39,15 @@ export function LoginForm({
             name="password"
             type="password"
             autoComplete="current-password"
+            defaultValue={DEMO_PASSWORD}
             className="mt-1 w-full rounded-xl border border-line bg-white px-3 py-2.5 outline-none ring-brand/30 focus:ring-2"
           />
         </label>
-        {state?.error ? (
-          <p className="rounded-xl bg-[#f8e8e4] px-3 py-2 text-sm text-coral">{state.error}</p>
+        {state?.error || formError === "demo" ? (
+          <p className="rounded-xl bg-[#f8e8e4] px-3 py-2 text-sm text-coral">
+            {state?.error ||
+              `Demo sign-in failed. Use ${DEMO_PASSWORD} and a roster email from this portal.`}
+          </p>
         ) : null}
         <SubmitButton className="w-full rounded-full bg-brand py-3 text-sm font-semibold text-white hover:bg-brand-deep disabled:opacity-60">
           Sign in

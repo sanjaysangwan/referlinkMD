@@ -8,11 +8,13 @@ export function PortalFrame({
   title,
   kicker,
   copy,
+  formError,
 }: {
   portal: "pcp" | "specialist";
   title: string;
   kicker: string;
   copy: string;
+  formError?: string;
 }) {
   const other = portal === "pcp" ? "/login/specialist" : "/login/pcp";
   return (
@@ -51,7 +53,7 @@ export function PortalFrame({
             </Link>
           </p>
           <div className="mt-8">
-            <LoginForm portal={portal} />
+            <LoginForm portal={portal} formError={formError} />
           </div>
         </div>
       </section>

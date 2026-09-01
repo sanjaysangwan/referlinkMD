@@ -15,7 +15,7 @@ const globalForStore = globalThis as unknown as {
   __referlinkmdVersion?: number;
 };
 
-const STORE_VERSION = 7;
+const STORE_VERSION = 8;
 
 function getStore(): Store {
   if (!globalForStore.__referlinkmdStore || globalForStore.__referlinkmdVersion !== STORE_VERSION) {

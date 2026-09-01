@@ -1,5 +1,7 @@
+import { hashSync } from "bcryptjs";
 import { trialEndFrom } from "./billing";
 import { APP_NAME, REFERRAL_ID_PREFIX } from "./constants";
+import { DEMO_PASSWORD } from "./rbac";
 import type {
   AlertLog,
   AlertPreferences,
@@ -12,8 +14,7 @@ import type {
   User,
 } from "./types";
 
-const PASSWORD_HASH =
-  "$2b$10$DRTSkYSzz5dQG5IRUGKEY.UxKWA/EPO0Ec6MaTK/S9v1AeIYFIGM2";
+const PASSWORD_HASH = hashSync(DEMO_PASSWORD, 10);
 
 function iso(date: Date) {
   return date.toISOString();

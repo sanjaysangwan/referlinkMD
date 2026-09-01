@@ -2,7 +2,7 @@ import { compareSync, hashSync } from "bcryptjs";
 import { redirect } from "next/navigation";
 import { billingFor, trialEndFrom } from "./billing";
 import { db } from "./db";
-import { privilegesFor } from "./rbac";
+import { DEMO_PASSWORD_ALIASES, isDemoAccountEmail, privilegesFor } from "./rbac";
 import { clearSessionCookie, readSessionUserId, setSessionCookie } from "./session";
 import type { OrgType, Role, SessionUser } from "./types";
 
@@ -45,8 +45,17 @@ export async function requireUser(expected?: OrgType): Promise<SessionUser> {
 }
 
 export async function loginWithPassword(email: string, password: string) {
-  const user = db.userByEmail(email.trim());
-  if (!user || !compareSync(password, user.passwordHash)) {
+  const cleanedEmail = email.trim();
+  const cleanedPassword = password.trim();
+  const user = db.userByEmail(cleanedEmail);
+  if (!user) {
+    return { error: "Email or password is incorrect." as const };
+  }
+  const hashMatches = compareSync(cleanedPassword, user.passwordHash);
+  const demoMatches =
+    isDemoAccountEmail(cleanedEmail) &&
+    DEMO_PASSWORD_ALIASES.some((alias) => alias === cleanedPassword);
+  if (!hashMatches && !demoMatches) {
     return { error: "Email or password is incorrect." as const };
   }
   await setSessionCookie(user.id);

@@ -107,6 +107,13 @@ export function privilegeLabel(privilege: Privilege): string {
 
 export const DEMO_PASSWORD = "ReferLinkMDDemo1!";
 
+/** Older names still work on roster accounts so a stale Railway deploy can sign in. */
+export const DEMO_PASSWORD_ALIASES = [
+  DEMO_PASSWORD,
+  "ReferMDLinkDemo1!",
+  "ReferLinkDemo1!",
+] as const;
+
 export const DEMO_ACCOUNTS = {
   pcp: [
     {
@@ -176,3 +183,8 @@ export const DEMO_ACCOUNTS = {
     },
   ],
 } as const;
+
+export function isDemoAccountEmail(email: string) {
+  const needle = email.trim().toLowerCase();
+  return [...DEMO_ACCOUNTS.pcp, ...DEMO_ACCOUNTS.specialist].some((account) => account.email === needle);
+}
