@@ -6,7 +6,7 @@ A PCP practice sends a patient. The specialist practice is notified by **text an
 
 **Pricing:** primary care and specialty signups are **free** while we grow the network. The 3-month specialist trial → **$49/month** model is still in the codebase; set `SPECIALIST_BILLING_ENABLED=true` to turn it on without a rewrite.
 
-This build uses **synthetic clinic data only**. Do not enter real PHI.
+This build uses **SQLite + Better Auth** with **synthetic clinic data only**. Do not enter real PHI.
 
 ## Run
 
@@ -15,7 +15,9 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+The first start creates `data/referlinkmd.db`, the **patient** table, and seeds demo clinics. Open [http://localhost:3000](http://localhost:3000).
+
+To re-seed from scratch, delete `data/referlinkmd.db*` and run `npm run db:seed` (or just start the app again).
 
 ## Demo sign-in
 
@@ -74,7 +76,7 @@ TWILIO_FROM_NUMBER=
 
 ## Stack
 
-Next.js App Router, TypeScript, Tailwind, signed httpOnly sessions, in-memory store (swap point for Postgres). The product surface is built so orgs, roles, referrals, and notifications can move onto Postgres, real auth, and live Twilio without a rewrite.
+Next.js App Router, TypeScript, Tailwind, **Better Auth** (email/password sessions), SQLite via Drizzle (swap point for Postgres). Organizations, patients, referrals, and notifications live in the database so they can move onto Postgres, hosted auth, and live Twilio without a rewrite.
 
 ## Proof-of-concept hosting
 

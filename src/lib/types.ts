@@ -54,7 +54,6 @@ export type Organization = {
 export type User = {
   id: string;
   email: string;
-  passwordHash: string;
   name: string;
   credentials: string;
   role: Role;
