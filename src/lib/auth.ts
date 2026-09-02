@@ -1,36 +1,38 @@
-import { compareSync, hashSync } from "bcryptjs";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { auth } from "./better-auth";
 import { billingFor, trialEndFrom } from "./billing";
 import { db } from "./db";
+import { ensureDatabase } from "./database";
 import { privilegesFor } from "./rbac";
-import { clearSessionCookie, readSessionUserId, setSessionCookie } from "./session";
 import type { OrgType, Role, SessionUser } from "./types";
 
 export function toSessionUser(userId: string): SessionUser | null {
-  const user = db.userById(userId);
-  if (!user) return null;
-  const org = db.organizationById(user.organizationId);
+  const member = db.userById(userId);
+  if (!member) return null;
+  const org = db.organizationById(member.organizationId);
   if (!org) return null;
   return {
-    id: user.id,
-    email: user.email,
-    name: user.name,
-    credentials: user.credentials,
-    role: user.role,
+    id: member.id,
+    email: member.email,
+    name: member.name,
+    credentials: member.credentials,
+    role: member.role,
     organizationId: org.id,
     organizationName: org.name,
     organizationType: org.type,
     specialty: org.specialty,
-    phone: user.phone,
-    privileges: privilegesFor(org.type, user.role),
+    phone: member.phone,
+    privileges: privilegesFor(org.type, member.role),
     billing: billingFor(org),
   };
 }
 
 export async function getCurrentUser() {
-  const id = await readSessionUserId();
-  if (!id) return null;
-  return toSessionUser(id);
+  await ensureDatabase();
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user?.id) return null;
+  return toSessionUser(session.user.id);
 }
 
 export async function requireUser(expected?: OrgType): Promise<SessionUser> {
@@ -45,17 +47,32 @@ export async function requireUser(expected?: OrgType): Promise<SessionUser> {
 }
 
 export async function loginWithPassword(email: string, password: string) {
-  const user = db.userByEmail(email.trim());
-  if (!user || !compareSync(password, user.passwordHash)) {
+  await ensureDatabase();
+  try {
+    await auth.api.signInEmail({
+      body: { email: email.trim().toLowerCase(), password },
+      headers: await headers(),
+    });
+  } catch {
     return { error: "Email or password is incorrect." as const };
   }
-  await setSessionCookie(user.id);
-  const session = toSessionUser(user.id)!;
-  return { user: session };
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user?.id) {
+    return { error: "Email or password is incorrect." as const };
+  }
+  const user = toSessionUser(session.user.id);
+  if (!user) {
+    return { error: "Email or password is incorrect." as const };
+  }
+  return { user };
 }
 
 export async function logout() {
-  await clearSessionCookie();
+  try {
+    await auth.api.signOut({ headers: await headers() });
+  } catch {
+    // Already signed out.
+  }
 }
 
 export type SignupInput = {
@@ -72,6 +89,7 @@ export type SignupInput = {
 };
 
 export async function signupPractice(input: SignupInput) {
+  await ensureDatabase();
   if (db.userByEmail(input.email)) {
     return { error: "That email is already on ReferLinkMD." as const };
   }
@@ -86,7 +104,6 @@ export async function signupPractice(input: SignupInput) {
   }
 
   const orgId = `org_${Math.random().toString(36).slice(2, 10)}`;
-  const userId = `user_${Math.random().toString(36).slice(2, 10)}`;
   const now = new Date();
 
   db.insertOrganization({
@@ -96,27 +113,43 @@ export async function signupPractice(input: SignupInput) {
     specialty: input.portal === "SPECIALIST" ? input.specialty?.trim() : undefined,
     city: input.city.trim() || "—",
     phone: input.phone.trim() || "",
-    // Always record the specialist trial clock so flipping
-    // SPECIALIST_BILLING_ENABLED later does not need a data migration.
     subscriptionStatus: input.portal === "PCP" ? "free" : "trial",
     trialEndsAt: input.portal === "SPECIALIST" ? trialEndFrom(now) : undefined,
   });
 
-  db.insertUser({
-    id: userId,
-    email: input.email.trim().toLowerCase(),
-    passwordHash: hashSync(input.password, 10),
-    name: input.name.trim(),
-    credentials: input.credentials.trim() || (input.role === "MD" ? "MD" : "—"),
-    role: input.role,
-    organizationId: orgId,
-    phone: input.phone.trim() || "+15550000000",
-  });
-
-  if (input.portal === "SPECIALIST") {
-    db.updatePreferences(userId, { smsEnabled: true, voiceEnabled: true, afterHoursVoice: true });
+  try {
+    await auth.api.signUpEmail({
+      body: {
+        email: input.email.trim().toLowerCase(),
+        password: input.password,
+        name: input.name.trim(),
+        organizationId: orgId,
+        role: input.role,
+        credentials: input.credentials.trim() || (input.role === "MD" ? "MD" : "—"),
+        phone: input.phone.trim() || "+15550000000",
+      },
+      headers: await headers(),
+    });
+  } catch {
+    return { error: "Could not create that account. Try a different email." as const };
   }
 
-  await setSessionCookie(userId);
-  return { user: toSessionUser(userId)! };
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user?.id) {
+    return { error: "Could not create that account. Try a different email." as const };
+  }
+
+  if (input.portal === "SPECIALIST") {
+    db.updatePreferences(session.user.id, {
+      smsEnabled: true,
+      voiceEnabled: true,
+      afterHoursVoice: true,
+    });
+  }
+
+  const user = toSessionUser(session.user.id);
+  if (!user) {
+    return { error: "Could not create that account. Try a different email." as const };
+  }
+  return { user };
 }

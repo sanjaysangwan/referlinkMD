@@ -1,5 +1,6 @@
 import { trialEndFrom } from "./billing";
 import { APP_NAME, REFERRAL_ID_PREFIX } from "./constants";
+import { DEMO_PASSWORD } from "./rbac";
 import type {
   AlertLog,
   AlertPreferences,
@@ -11,9 +12,6 @@ import type {
   Urgency,
   User,
 } from "./types";
-
-const PASSWORD_HASH =
-  "$2b$10$DRTSkYSzz5dQG5IRUGKEY.UxKWA/EPO0Ec6MaTK/S9v1AeIYFIGM2";
 
 function iso(date: Date) {
   return date.toISOString();
@@ -110,7 +108,6 @@ export function createSeed(): Store {
     {
       id: "user_elena",
       email: "elena.vasquez@riverside.health",
-      passwordHash: PASSWORD_HASH,
       name: "Elena Vasquez",
       credentials: "MD",
       role: "MD",
@@ -120,7 +117,6 @@ export function createSeed(): Store {
     {
       id: "user_jordan",
       email: "jordan.hale@riverside.health",
-      passwordHash: PASSWORD_HASH,
       name: "Jordan Hale",
       credentials: "PA-C",
       role: "MIDLEVEL",
@@ -130,7 +126,6 @@ export function createSeed(): Store {
     {
       id: "user_priya",
       email: "priya.shah@riverside.health",
-      passwordHash: PASSWORD_HASH,
       name: "Priya Shah",
       credentials: "CMPE",
       role: "OFFICE_MANAGER",
@@ -140,7 +135,6 @@ export function createSeed(): Store {
     {
       id: "user_marcus",
       email: "marcus.chen@riverside.health",
-      passwordHash: PASSWORD_HASH,
       name: "Marcus Chen",
       credentials: "CMA",
       role: "STAFF",
@@ -150,7 +144,6 @@ export function createSeed(): Store {
     {
       id: "user_nathan",
       email: "nathan.cole@summitcardio.health",
-      passwordHash: PASSWORD_HASH,
       name: "Nathan Cole",
       credentials: "MD",
       role: "MD",
@@ -160,7 +153,6 @@ export function createSeed(): Store {
     {
       id: "user_avery",
       email: "avery.kim@summitcardio.health",
-      passwordHash: PASSWORD_HASH,
       name: "Avery Kim",
       credentials: "NP",
       role: "MIDLEVEL",
@@ -170,7 +162,6 @@ export function createSeed(): Store {
     {
       id: "user_sam",
       email: "sam.ortiz@summitcardio.health",
-      passwordHash: PASSWORD_HASH,
       name: "Sam Ortiz",
       credentials: "CMPE",
       role: "OFFICE_MANAGER",
@@ -180,7 +171,6 @@ export function createSeed(): Store {
     {
       id: "user_riley",
       email: "riley.brooks@summitcardio.health",
-      passwordHash: PASSWORD_HASH,
       name: "Riley Brooks",
       credentials: "CSR",
       role: "STAFF",
@@ -190,7 +180,6 @@ export function createSeed(): Store {
     {
       id: "user_oak_md",
       email: "helen.cho@oakpine.health",
-      passwordHash: PASSWORD_HASH,
       name: "Helen Cho",
       credentials: "MD",
       role: "MD",
@@ -200,7 +189,6 @@ export function createSeed(): Store {
     {
       id: "user_iris",
       email: "iris.vale@riverbendpulm.health",
-      passwordHash: PASSWORD_HASH,
       name: "Iris Vale",
       credentials: "MD",
       role: "MD",
@@ -494,4 +482,80 @@ export function createSeed(): Store {
     alerts,
     alertPreferences,
   };
+}
+
+export async function persistSeed(db: typeof import("./database").drizzleDb) {
+  const { hashPassword } = await import("better-auth/crypto");
+  const { createLocalAccountIssuer } = await import("@better-auth/core/db");
+  const schema = await import("./schema");
+  const store = createSeed();
+  const now = new Date();
+  const password = await hashPassword(DEMO_PASSWORD);
+  const issuer = createLocalAccountIssuer("credential");
+
+  db.transaction((tx) => {
+    for (const org of store.organizations) {
+      tx.insert(schema.organization)
+        .values({
+          ...org,
+          specialty: org.specialty ?? null,
+          trialEndsAt: org.trialEndsAt ?? null,
+          subscribedAt: org.subscribedAt ?? null,
+        })
+        .run();
+    }
+    for (const member of store.users) {
+      tx.insert(schema.user)
+        .values({
+          id: member.id,
+          name: member.name,
+          email: member.email,
+          emailVerified: true,
+          createdAt: now,
+          updatedAt: now,
+          organizationId: member.organizationId,
+          role: member.role,
+          credentials: member.credentials,
+          phone: member.phone,
+        })
+        .run();
+      tx.insert(schema.account)
+        .values({
+          id: `acct_${member.id}`,
+          issuer,
+          accountId: member.id,
+          providerId: "credential",
+          userId: member.id,
+          password,
+          createdAt: now,
+          updatedAt: now,
+        })
+        .run();
+    }
+    for (const pref of store.alertPreferences) {
+      tx.insert(schema.alertPreference).values(pref).run();
+    }
+    for (const person of store.patients) {
+      tx.insert(schema.patient)
+        .values({
+          ...person,
+          createdAt: now.toISOString(),
+          updatedAt: now.toISOString(),
+        })
+        .run();
+    }
+    for (const item of store.referrals) {
+      tx.insert(schema.referral)
+        .values({
+          ...item,
+          assignedSpecialistUserId: item.assignedSpecialistUserId ?? null,
+          acceptedAt: item.acceptedAt ?? null,
+          scheduledAt: item.scheduledAt ?? null,
+        })
+        .run();
+    }
+    for (const item of store.alerts) {
+      tx.insert(schema.alertLog).values(item).run();
+    }
+  });
 }

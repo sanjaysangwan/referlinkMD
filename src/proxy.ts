@@ -4,7 +4,9 @@ import { SESSION_COOKIE } from "@/lib/constants";
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const session = request.cookies.get(SESSION_COOKIE)?.value;
+  const session =
+    request.cookies.get(SESSION_COOKIE)?.value ||
+    request.cookies.get(`__Secure-${SESSION_COOKIE}`)?.value;
   const isApp = pathname.startsWith("/pcp") || pathname.startsWith("/specialist");
 
   if (isApp && !session) {
