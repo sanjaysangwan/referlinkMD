@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function MfaSetupPage() {
+function MfaSetupForm() {
   const router = useRouter();
   const params = useSearchParams();
   const [qr, setQr] = useState("");
@@ -75,5 +75,13 @@ export default function MfaSetupPage() {
         </button>
       </form>
     </main>
+  );
+}
+
+export default function MfaSetupPage() {
+  return (
+    <Suspense fallback={<main className="mx-auto max-w-lg px-6 py-16"><p role="status">Loading security setup...</p></main>}>
+      <MfaSetupForm />
+    </Suspense>
   );
 }
