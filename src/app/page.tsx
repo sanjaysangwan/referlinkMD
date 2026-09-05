@@ -1,103 +1,54 @@
 import Link from "next/link";
-import { Brand } from "@/components/brand";
+import { APP_NAME } from "@/lib/brand";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-paper">
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <Brand subtitle="Clinical referrals" />
-        <div className="flex gap-3 text-sm">
-          <Link className="rounded-full px-4 py-2 text-ink-soft hover:text-ink" href="/signup/pcp">
-            Primary care signup
-          </Link>
-          <Link className="rounded-full px-4 py-2 text-ink-soft hover:text-ink" href="/login/pcp">
-            Sign in
-          </Link>
-          <Link
-            className="rounded-full bg-ink px-4 py-2 text-sand hover:bg-brand-deep"
-            href="/signup/specialist"
-          >
-            Specialist signup
-          </Link>
-        </div>
-      </header>
+    <main className="mx-auto flex min-h-screen max-w-5xl flex-col justify-center px-6 py-16">
+      <p className="sans text-sm font-medium tracking-[0.16em] text-teal-800">{APP_NAME}</p>
+      <h1 className="mt-3 max-w-3xl text-5xl leading-tight font-medium text-[#0f1c2e]">
+        Peer-to-peer consults. A practice asks. A clinician answers.
 
-      <section className="brand-grid mx-auto max-w-6xl px-6 pb-10 pt-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-brand">
-          Phase one prototype
-        </p>
-        <h1 className="mt-4 max-w-3xl text-5xl leading-[1.05] text-ink md:text-6xl">
-          The handoff between primary team and specialist should not be a burden.
-        </h1>
-        <p className="mt-6 max-w-2xl text-lg leading-8 text-ink-soft">
-          ReferLinkMD keeps the patient in view after a referral leaves the office.
-          The primary team sends the patient. The specialist practice is alerted by
-          text or phone so care can continue. Each side can see how that handoff is
-          going — with privileges that match physician, midlevel, office manager,
-          and staff.
-        </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link
-            href="/signup/pcp"
-            className="rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white hover:bg-brand-deep"
-          >
-            Join as primary care
-          </Link>
-          <Link
-            href="/signup/specialist"
-            className="rounded-full border border-ink/15 bg-white px-6 py-3 text-sm font-semibold text-ink hover:border-ink/40"
-          >
-            Join as specialty care
-          </Link>
-        </div>
-      </section>
-
-      <section className="mx-auto grid max-w-6xl gap-6 px-6 pb-8 md:grid-cols-2">
-        <article className="rounded-3xl border border-line bg-white p-8 shadow-[var(--shadow)]">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand">Primary care</p>
-          <h2 className="mt-3 text-3xl">Stay with the patient after you refer</h2>
-          <p className="mt-3 text-sm leading-6 text-ink-soft">
-            The primary team starts the handoff, invites physician, midlevel, office
-            manager, and staff, and can still see where each patient is going.
+      </h1>
+      <p className="sans mt-5 max-w-2xl text-lg leading-relaxed text-[#3d4a5c]">
+        {APP_NAME} lets a practice request a consult by texting a secure link to any clinician&apos;s
+        mobile. Every physician is labeled the same. Who is primary vs consulting depends on the
+        patient — not a PCP/specialist directory. Patient information is limited to name, date of
+        birth, and phone. There is no note writing.
+      </p>
+      <div className="mt-10 flex flex-wrap gap-3">
+        <Link href="/login" className="sans rounded-full bg-teal-800 px-6 py-3 text-sm font-semibold text-white">
+          Sign in
+        </Link>
+        <Link
+          href="/login?mode=create"
+          className="sans rounded-full border border-[#cfc6b6] bg-white px-6 py-3 text-sm font-semibold text-[#0f1c2e]"
+        >
+          Create a practice
+        </Link>
+      </div>
+      <section className="mt-16 grid gap-4 md:grid-cols-3">
+        <article className="chart-card p-6">
+          <h2 className="text-2xl">Request</h2>
+          <p className="sans mt-2 text-sm leading-relaxed text-[#3d4a5c]">
+            Physician, APP, or office staff enters patient identifiers and the consulting
+            clinician&apos;s cell number.
           </p>
-          <Link href="/signup/pcp" className="mt-6 inline-block text-sm font-semibold text-brand">
-            Open a primary care workspace
-          </Link>
         </article>
-        <article className="rounded-3xl border border-line bg-white p-8 shadow-[var(--shadow)]">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand">Specialty care</p>
-          <h2 className="mt-3 text-3xl">Know when a patient is on the way</h2>
-          <p className="mt-3 text-sm leading-6 text-ink-soft">
-            When a referral is sent, the specialist team is alerted by text or phone.
-            The inbound queue and care patterns stay in one place for the whole practice.
+        <article className="chart-card p-6">
+          <h2 className="text-2xl">Secure text</h2>
+          <p className="sans mt-2 text-sm leading-relaxed text-[#3d4a5c]">
+            SMS never includes patient name, DOB, or phone — only a 24-hour link and the requesting
+            clinician&apos;s public name.
           </p>
-          <Link href="/signup/specialist" className="mt-6 inline-block text-sm font-semibold text-brand">
-            Open a specialty workspace
-          </Link>
+        </article>
+        <article className="chart-card p-6">
+          <h2 className="text-2xl">Consultant</h2>
+          <p className="sans mt-2 text-sm leading-relaxed text-[#3d4a5c]">
+            New clinicians set up a minimum account. Existing users sign in. Then patient identifiers
+            appear on the portal.
+          </p>
         </article>
       </section>
-
-      <section className="mx-auto grid max-w-6xl gap-6 px-6 pb-20 md:grid-cols-3">
-        {[
-          {
-            title: "Roles that match the care team",
-            body: "Separate primary care and specialist portals. Physician, midlevel, office manager, and staff each see the slice of the patient’s handoff they are responsible for.",
-          },
-          {
-            title: "Alerts that reach the next clinician",
-            body: "When a patient is referred, ReferLinkMD sends text and phone alerts to the specialist team according to each person’s preferences, so care does not stall.",
-          },
-          {
-            title: "The patient’s path, not just a queue",
-            body: "Primary teams see where their patients go. Specialists see who is entrusting them with care — urgency and how the handoff continues over twelve months.",
-          },
-        ].map((card) => (
-          <article key={card.title} className="rounded-3xl border border-line bg-white p-6 shadow-[var(--shadow)]">
-            <h2 className="text-2xl">{card.title}</h2>
-            <p className="mt-3 text-sm leading-6 text-ink-soft">{card.body}</p>
-          </article>
-        ))}
-      </section>
-    </div>
+    </main>
   );
 }

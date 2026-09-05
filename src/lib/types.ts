@@ -1,137 +1,51 @@
-export type OrgType = "PCP" | "SPECIALIST";
+export type PracticeRole = "physician" | "app" | "office_manager";
 
-export type Role = "MD" | "MIDLEVEL" | "OFFICE_MANAGER" | "STAFF";
+export type UserStatus = "invited" | "active" | "disabled";
 
-export type Urgency = "ROUTINE" | "SOON" | "URGENT";
+export type MembershipStatus = "invited" | "active" | "revoked";
 
-export type ReferralStatus =
-  | "DRAFT"
-  | "SUBMITTED"
-  | "ALERTED"
-  | "ACCEPTED"
-  | "SCHEDULED"
-  | "COMPLETED"
-  | "DECLINED";
+export type ConsultStatus =
+  | "pending_consultant"
+  | "awaiting_view"
+  | "viewed"
+  | "declined"
+  | "completed"
+  | "expired";
 
-export type AlertChannel = "SMS" | "VOICE";
+export type AuditAction =
+  | "login_success"
+  | "login_failure"
+  | "consult_created"
+  | "consult_viewed"
+  | "patient_viewed"
+  | "invite_sent"
+  | "account_created"
+  | "practice_updated"
+  | "sms_sent"
+  | "role_changed"
+  | "token_consumed"
+  | "password_changed"
+  | "mfa_enabled";
 
-export type AlertDeliveryStatus = "QUEUED" | "SENT" | "DELIVERED" | "FAILED";
+export interface SessionUser {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  npi: string | null;
+  mobilePhone: string | null;
+  practiceId: string | null;
+  practiceName: string | null;
+  practiceLogo: string | null;
+  role: PracticeRole | null;
+  isPracticeCreator: boolean;
+  mustChangePassword: boolean;
+  mfaEnabled: boolean;
+}
 
 export type Privilege =
-  | "CREATE_REFERRAL"
-  | "VIEW_CLINICAL"
-  | "VIEW_ANALYTICS"
-  | "VIEW_PRACTICE_ANALYTICS"
-  | "MANAGE_TEAM"
-  | "MANAGE_ALERTS"
-  | "MANAGE_BILLING"
-  | "ACCEPT_REFERRAL"
-  | "SCHEDULE_REFERRAL"
-  | "VIEW_ALERT_LOG";
-
-export type SubscriptionStatus = "free" | "trial" | "active" | "past_due";
-
-export type BillingSnapshot = {
-  status: SubscriptionStatus;
-  monthlyPrice: number;
-  trialEndsAt?: string;
-  daysLeftInTrial?: number;
-  subscribedAt?: string;
-};
-
-export type Organization = {
-  id: string;
-  name: string;
-  type: OrgType;
-  specialty?: string;
-  city: string;
-  phone: string;
-  subscriptionStatus: "free" | "trial" | "active";
-  trialEndsAt?: string;
-  subscribedAt?: string;
-};
-
-export type User = {
-  id: string;
-  email: string;
-  passwordHash: string;
-  name: string;
-  credentials: string;
-  role: Role;
-  organizationId: string;
-  phone: string;
-};
-
-export type AlertPreferences = {
-  userId: string;
-  smsEnabled: boolean;
-  voiceEnabled: boolean;
-  afterHoursVoice: boolean;
-};
-
-export type Patient = {
-  id: string;
-  mrn: string;
-  name: string;
-  dob: string;
-  sex: "F" | "M";
-  pcpOrganizationId: string;
-  pcpUserId: string;
-  insurance: string;
-};
-
-export type Referral = {
-  id: string;
-  displayId: string;
-  patientId: string;
-  referringUserId: string;
-  referringOrganizationId: string;
-  specialistOrganizationId: string;
-  assignedSpecialistUserId?: string;
-  specialty: string;
-  reason: string;
-  clinicalSummary: string;
-  urgency: Urgency;
-  status: ReferralStatus;
-  createdAt: string;
-  updatedAt: string;
-  acceptedAt?: string;
-  scheduledAt?: string;
-};
-
-export type AlertLog = {
-  id: string;
-  referralId: string;
-  organizationId: string;
-  recipientUserId: string;
-  channel: AlertChannel;
-  to: string;
-  message: string;
-  status: AlertDeliveryStatus;
-  createdAt: string;
-  provider: "mock" | "twilio";
-};
-
-export type SessionUser = {
-  id: string;
-  email: string;
-  name: string;
-  credentials: string;
-  role: Role;
-  organizationId: string;
-  organizationName: string;
-  organizationType: OrgType;
-  specialty?: string;
-  phone: string;
-  privileges: Privilege[];
-  billing: BillingSnapshot;
-};
-
-export type Store = {
-  organizations: Organization[];
-  users: User[];
-  patients: Patient[];
-  referrals: Referral[];
-  alerts: AlertLog[];
-  alertPreferences: AlertPreferences[];
-};
+  | "createConsult"
+  | "viewPatientIdentifiers"
+  | "manageUsers"
+  | "viewPracticeQueue"
+  | "viewConsultingInbox";

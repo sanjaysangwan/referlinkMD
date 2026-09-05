@@ -1,89 +1,42 @@
 # ReferLinkMD
 
-Phase-one prototype of a **primary care → specialist referral** product.
+Peer-to-peer consults for physician practices. **Primary team** requests a consult; **consulting team** receives a PHI-free SMS and views patient name, DOB, and phone after login. There is no note writing. Clinician name, NPI, and mobile are treated as public professional information.
 
-A PCP practice sends a patient. The specialist practice is notified by **text and/or phone**. Each side can chart referral patterns over time. Logins are split by portal (PCP vs specialist) and by role (**physician, midlevel, office manager, staff**), with privileges enforced on the server, not only in the nav.
+This is a HIPAA-ready **proof of concept** with synthetic patients only. It is not a HIPAA certification.
 
-**Pricing:** primary care and specialty signups are **free** while we grow the network. The 3-month specialist trial → **$49/month** model is still in the codebase; set `SPECIALIST_BILLING_ENABLED=true` to turn it on without a rewrite.
-
-This build uses **synthetic clinic data only**. Do not enter real PHI.
-
-## Run
+## Demo
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open http://localhost:3000
 
-## Demo sign-in
+Password for seeded accounts: `demo1234`  
+Authenticator secret (all demo accounts): `JBSWY3DPEHPK3PXP`
 
-Password for every roster account: `ReferLinkMDDemo1!`
-
-### Primary care — Riverside Family Medicine
-
-| Role | Name | Email |
+| Practice | Role | Email |
 | --- | --- | --- |
-| Physician | Elena Vasquez, MD | `elena.vasquez@riverside.health` |
-| Midlevel | Jordan Hale, PA-C | `jordan.hale@riverside.health` |
-| Office manager | Priya Shah | `priya.shah@riverside.health` |
-| Staff | Marcus Chen | `marcus.chen@riverside.health` |
+| Harbor Family Medicine | Physician | elena@referlink.demo |
+| Harbor Family Medicine | APP | jordan@referlink.demo |
+| Harbor Family Medicine | Office manager | priya@referlink.demo |
+| Riverside Internal Medicine | Physician | david@referlink.demo |
+| Riverside Internal Medicine | APP | amina@referlink.demo |
 
-Portal: `/login/pcp`
+David already has a seeded inbound consult from Harbor. Request a consult to `(555) 010-0999` to try the new-consultant signup link (see **Demo inbox**).
 
-### Specialty care — Summit Cardiology
+## Data
 
-| Role | Name | Email |
-| --- | --- | --- |
-| Physician | Nathan Cole, MD | `nathan.cole@summitcardio.health` |
-| Midlevel | Avery Kim, NP | `avery.kim@summitcardio.health` |
-| Office manager | Sam Ortiz | `sam.ortiz@summitcardio.health` |
-| Staff | Riley Brooks | `riley.brooks@summitcardio.health` |
-| Physician (Riverbend Pulmonology) | Iris Vale, MD | `iris.vale@riverbendpulm.health` |
+Postgres schema: [db/schema.sql](db/schema.sql). Local runtime is PGlite (Postgres in-process) under `data/referlink`. Optional `docker-compose.yml` runs Postgres 16 for a later RDS-shaped deploy.
 
-Portal: `/login/specialist`. Billing UI is hidden by default. Iris Vale is seeded past trial so the $49/month paywall can be demoed when `SPECIALIST_BILLING_ENABLED=true`.
+SMS and invite email are written to the in-app **Demo inbox**. Message bodies never include patient name, DOB, or phone.
 
-## What each role can do
+## Security in this POC
 
-**PCP**
-
-- Physician: create referrals with clinical notes, own + practice analytics, personal alert settings
-- Midlevel: create referrals with clinical notes, own analytics, personal alert settings
-- Office manager: practice analytics, team directory, alert settings — no clinical create or notes
-- Staff: send administrative referrals — no analytics, no clinical summary
-
-**Specialist**
-
-- Physician: accept/decline, full pool analytics, alerts, alert log
-- Midlevel: accept/decline, assigned-panel analytics, alerts
-- Office manager: schedule, pool analytics, team, alerts, alert log
-- Staff: schedule only — no clinical notes, no analytics
-
-## Alerts
-
-Sending a referral fans out SMS and voice alerts to specialist users who opted in (urgent referrals trigger voice when enabled). The notifier is a Twilio-shaped adapter. Without Twilio env vars it **records a delivered mock** so the flow is still visible in the referral’s alert trail.
-
-```
-AUTH_SECRET=
-SPECIALIST_BILLING_ENABLED=false
-TWILIO_ACCOUNT_SID=
-TWILIO_AUTH_TOKEN=
-TWILIO_FROM_NUMBER=
-```
-
-## Stack
-
-Next.js App Router, TypeScript, Tailwind, signed httpOnly sessions, in-memory store (swap point for Postgres). The product surface is built so orgs, roles, referrals, and notifications can move onto Postgres, real auth, and live Twilio without a rewrite.
-
-## Proof-of-concept hosting
-
-Cheap ways to run the next slice (Twilio + Postgres + real auth) **before** production are in [docs/poc-hosting.md](docs/poc-hosting.md).
-
-Short version:
-
-- **$0 internal demo:** Vercel Hobby + Supabase Free + Twilio trial (Hobby is personal/non-commercial; Supabase Free pauses after a week idle).
-- **~$5–20/month to show a clinic:** Railway Hobby (app + Postgres) + Better Auth in that database + Twilio trial then pay-as-you-go. This is the plan we recommend for a live walkthrough.
-- **~$45–60/month staging:** Vercel Pro + Supabase Pro + Twilio usage.
-
-None of these plans are HIPAA. Synthetic data only until a host will sign a BAA.
+- Argon2id password hashes
+- TOTP MFA
+- 15-minute idle session
+- Access tokens stored as SHA-256 hashes
+- Audit log without extra PHI in metadata
+- `is_synthetic=true` required in demo

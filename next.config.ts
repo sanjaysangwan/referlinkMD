@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  reactStrictMode: true,
+  serverExternalPackages: ["@electric-sql/pglite", "hash-wasm"],
 };
 
 export default nextConfig;

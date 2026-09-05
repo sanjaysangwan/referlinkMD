@@ -1,118 +1,170 @@
-import Link from "next/link";
-import { logoutAction } from "@/app/actions/auth";
-import { Brand } from "@/components/brand";
-import { formatTrialEnd, SPECIALIST_MONTHLY_USD, specialistBillingEnabled } from "@/lib/billing";
-import { can, privilegeLabel, roleLabel } from "@/lib/rbac";
-import { clinicianName, initials } from "@/lib/format";
-import type { Privilege, SessionUser } from "@/lib/types";
+"use client";
 
-type NavItem = {
-  href: string;
-  label: string;
-  privilege?: Privilege;
-};
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { Menu, X } from "lucide-react";
+import { ROLE_LABEL } from "@/lib/privileges";
+import type { SessionUser } from "@/lib/types";
+import { PracticeMark } from "@/components/practice-mark";
+import { APP_NAME } from "@/lib/brand";
+
+function NewBadge({ count }: { count: number }) {
+  if (count < 1) return null;
+  return (
+    <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] leading-none font-bold text-white">
+      {count > 99 ? "99+" : count}
+    </span>
+  );
+}
+
+type NavLink = { href: string; label: string; badge: boolean; match: string[] };
+
+function Brand({ session }: { session: SessionUser }) {
+  return (
+    <div className="flex min-w-0 items-center gap-3">
+      <PracticeMark name={session.practiceName ?? APP_NAME} logo={session.practiceLogo} size={40} />
+      <div className="min-w-0">
+        <p className="sans text-xs font-semibold tracking-[0.12em] text-teal-800">{APP_NAME}</p>
+        <Link href="/consults" className="block truncate rounded text-lg leading-tight hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-800" aria-label={`${session.practiceName ?? APP_NAME} home`}>{session.practiceName ?? APP_NAME}</Link>
+        <p className="sans truncate text-xs text-[#5b6573]">
+          {session.firstName || session.lastName
+            ? `${session.firstName} ${session.lastName}`.trim()
+            : session.email}
+          {session.role ? ` · ${ROLE_LABEL[session.role]}` : ""}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function NavItems({
+  links,
+  pathname,
+  newCount,
+  onLogout,
+}: {
+  links: NavLink[];
+  pathname: string;
+  newCount: number;
+  onLogout: () => void;
+}) {
+  return (
+    <div className="sans flex flex-col gap-1">
+      {links.map((l) => {
+        const active = l.match.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+        return (
+          <Link
+            key={l.href}
+            href={l.href}
+            className={`flex items-center justify-between rounded-xl px-4 py-3 text-base font-semibold ${
+              active ? "bg-teal-800 text-white" : "text-[#0f1c2e] hover:bg-[#efe8dc]"
+            }`}
+          >
+            <span>{l.label}</span>
+            {l.badge ? <NewBadge count={newCount} /> : null}
+          </Link>
+        );
+      })}
+      <button
+        type="button"
+        onClick={onLogout}
+        className="rounded-xl px-4 py-3 text-left text-base font-semibold text-[#5b6573] hover:bg-[#efe8dc]"
+      >
+        Sign out
+      </button>
+    </div>
+  );
+}
 
 export function AppShell({
-  user,
+  session,
   children,
-  nav,
-  eyebrow,
 }: {
-  user: SessionUser;
+  session: SessionUser;
   children: React.ReactNode;
-  nav: NavItem[];
-  eyebrow: string;
 }) {
-  const items = nav.filter((item) => !item.privilege || can(user, item.privilege));
-  const home = user.organizationType === "PCP" ? "/pcp" : "/specialist";
+  const pathname = usePathname();
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [newCount, setNewCount] = useState(0);
+
+  function loadCount() {
+    void fetch("/api/inbox/count")
+      .then((r) => r.json())
+      .then((d) => {
+        if (typeof d.newCount === "number") setNewCount(d.newCount);
+      });
+  }
+
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    loadCount();
+    const id = window.setInterval(loadCount, 60_000);
+    return () => window.clearInterval(id);
+  }, [pathname]);
+
+  async function logout() {
+    setOpen(false);
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/login");
+    router.refresh();
+  }
+
+  const links: NavLink[] = [
+    { href: "/consults", label: "Home", badge: true, match: ["/consults", "/inbox"] },
+    {
+      href: session.isPracticeCreator ? "/team" : "/settings",
+      label: "Setting",
+      badge: false,
+      match: ["/team", "/settings"],
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-paper">
-      <div className="flex min-h-screen">
-        <aside className="hidden w-[248px] shrink-0 border-r border-line bg-[#f7f1e8] md:flex md:flex-col">
-          <div className="border-b border-line px-5 py-5">
-            <Link href={home}>
-              <Brand subtitle={eyebrow} />
-            </Link>
-          </div>
-          <nav className="flex flex-1 flex-col gap-1 px-3 py-4">
-            {items.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="rounded-lg px-3 py-2 text-sm text-ink-soft hover:bg-white hover:text-ink"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="border-t border-line p-4">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-soft">
-              Your access
-            </div>
-            <ul className="mt-2 space-y-1 text-[12px] text-ink-soft">
-              {user.privileges.slice(0, 4).map((p) => (
-                <li key={p}>· {privilegeLabel(p)}</li>
-              ))}
-            </ul>
+    <div className="min-h-screen overflow-x-hidden">
+      <div className="sans bg-amber-100 px-4 py-2 text-center text-xs font-medium text-amber-950">
+        DEMO — synthetic patients only. SMS never includes patient name, DOB, or phone.
+      </div>
+      <div className="lg:flex lg:items-start">
+        <aside className="hidden lg:sticky lg:top-0 lg:flex lg:h-[calc(100dvh-2.5rem)] lg:w-64 lg:shrink-0 lg:flex-col lg:border-r lg:border-[#e4ddd0] lg:bg-[#fffdf8]">
+          <div className="flex h-full flex-col gap-8 px-4 py-6">
+            <Brand session={session} />
+            <nav className="flex-1">
+              <NavItems links={links} pathname={pathname} newCount={newCount} onLogout={logout} />
+            </nav>
           </div>
         </aside>
-        <div className="flex min-w-0 flex-1 flex-col">
-          <header className="flex items-center justify-between gap-4 border-b border-line bg-white/80 px-4 py-3 backdrop-blur md:px-8">
-            <div className="md:hidden">
-              <Brand />
-            </div>
-            <div className="hidden text-sm text-ink-soft md:block">
-              {user.organizationName}
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="text-right leading-tight">
-                <div className="text-sm font-medium">
-                  {clinicianName(user.name, user.credentials)}
-                </div>
-                <div className="text-[11px] uppercase tracking-[0.12em] text-ink-soft">
-                  {roleLabel(user.role)}
-                </div>
-              </div>
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand text-xs font-semibold text-sand">
-                {initials(user.name)}
-              </div>
-              <form action={logoutAction}>
-                <button className="text-sm text-ink-soft hover:text-ink" type="submit">
-                  Sign out
-                </button>
-              </form>
-            </div>
-          </header>
-          <div className="flex gap-2 overflow-x-auto border-b border-line px-4 py-2 md:hidden">
-            {items.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="whitespace-nowrap rounded-full bg-white px-3 py-1 text-xs text-ink-soft"
+
+        <div className="min-w-0 flex-1">
+          <header className="sticky top-0 z-40 border-b border-[#e4ddd0] bg-[#fffdf8] lg:hidden">
+            <div className="flex items-center justify-between gap-3 px-4 py-3">
+              <Brand session={session} />
+              <button
+                type="button"
+                className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#0f1c2e] hover:bg-[#efe8dc]"
+                aria-label={open ? "Close menu" : "Open menu"}
+                aria-expanded={open}
+                onClick={() => setOpen((v) => !v)}
               >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-          {specialistBillingEnabled() &&
-          user.organizationType === "SPECIALIST" &&
-          user.billing.status === "trial" ? (
-            <div className="border-b border-line bg-mist/70 px-4 py-2 text-sm text-ink md:px-10">
-              Specialist trial · {user.billing.daysLeftInTrial} days left
-              {user.billing.trialEndsAt ? ` · ends ${formatTrialEnd(user.billing.trialEndsAt)}` : ""}.
-              Then ${SPECIALIST_MONTHLY_USD}/month for the practice.
-              {can(user, "MANAGE_BILLING") ? (
-                <>
-                  {" "}
-                  <Link className="font-semibold text-brand" href="/specialist/billing">
-                    Billing
-                  </Link>
-                </>
-              ) : null}
+                {open ? <X size={22} /> : <Menu size={22} />}
+                {!open ? (
+                  <span className="absolute top-0.5 right-0.5">
+                    <NewBadge count={newCount} />
+                  </span>
+                ) : null}
+              </button>
             </div>
-          ) : null}
-          <main className="flex-1 px-4 py-8 md:px-10">{children}</main>
+            {open ? (
+              <nav className="border-t border-[#e4ddd0] px-2 py-2">
+                <NavItems links={links} pathname={pathname} newCount={newCount} onLogout={logout} />
+              </nav>
+            ) : null}
+          </header>
+          <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">{children}</div>
         </div>
       </div>
     </div>
