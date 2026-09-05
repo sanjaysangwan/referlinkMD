@@ -1,11 +1,11 @@
-import type { PgliteDatabase } from "drizzle-orm/pglite";
+import type { Db } from "./index";
 import { eq } from "drizzle-orm";
 import { users } from "./schema";
 import * as schema from "./schema";
 import { encryptSecret, hashPassword } from "@/lib/crypto";
 import { DEMO_MFA_SECRET, DEMO_PASSWORD } from "@/lib/env";
 
-type Db = PgliteDatabase<typeof schema>;
+
 
 const IDS = {
   harbor: "a1000000-0000-4000-8000-000000000001",
