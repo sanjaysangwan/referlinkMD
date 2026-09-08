@@ -127,14 +127,19 @@ export async function removeFavoriteConsultant(
   consultantUserId: string,
 ): Promise<boolean> {
   const db = await getDb();
-  const removed = await db
-    .delete(favoriteConsultants)
+  const [existing] = await db
+    .select({ id: favoriteConsultants.id })
+    .from(favoriteConsultants)
     .where(
       and(
         eq(favoriteConsultants.ownerUserId, ownerUserId),
         eq(favoriteConsultants.consultantUserId, consultantUserId),
       ),
     )
-    .returning({ id: favoriteConsultants.id });
-  return removed.length > 0;
+    .limit(1);
+  if (!existing) return false;
+  await db
+    .delete(favoriteConsultants)
+    .where(eq(favoriteConsultants.id, existing.id));
+  return true;
 }
