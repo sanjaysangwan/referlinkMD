@@ -138,7 +138,7 @@ export function ConsultsHome({
       {canRequest && inboxReady ? (
         <section>
           <h2 className="mb-3 text-2xl">Request a consult</h2>
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] lg:items-start">
+          <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
             <FavoriteConsultantsPicker
               settingsHref={settingsHref}
               onSelect={(f) => {
@@ -155,9 +155,9 @@ export function ConsultsHome({
                 }
               }}
             />
-            <div>
+            <div className="min-w-0">
               {!formOpen ? (
-                <div className="sans chart-card p-5">
+                <div className="sans chart-card h-fit w-full p-5">
                   <button
                     type="button"
                     className="text-sm font-semibold text-teal-900 underline-offset-2 hover:underline"

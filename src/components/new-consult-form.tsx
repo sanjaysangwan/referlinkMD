@@ -102,7 +102,7 @@ export const NewConsultForm = forwardRef<NewConsultFormHandle>(function NewConsu
   }
 
   return (
-    <form onSubmit={submit} className="sans chart-card max-w-xl space-y-4 p-6">
+    <form onSubmit={submit} className="sans chart-card w-full space-y-4 p-6">
       <label className={label}>
         Consulting clinician name
         <input

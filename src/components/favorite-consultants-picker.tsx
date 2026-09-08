@@ -31,7 +31,7 @@ export function FavoriteConsultantsPicker({
   }, []);
 
   return (
-    <aside className="sans chart-card h-fit p-5">
+    <aside className="sans chart-card h-fit w-full p-5">
       <h3 className="font-serif text-lg">Favorite consultants</h3>
       {favorites.length ? (
         <ul className="mt-3 -mx-2">
