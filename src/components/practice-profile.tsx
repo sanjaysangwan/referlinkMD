@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { formatPhone } from "@/lib/phone";
 import { fileToSmallLogo } from "@/lib/practice-logo-file";
 import { PracticeMark } from "@/components/practice-mark";
+import { PhoneField } from "@/components/phone-field";
 
 const field = "mt-1 w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2 text-sm";
 const label = "block text-xs font-semibold tracking-wide text-[#5b6573] uppercase";
@@ -100,19 +100,15 @@ export function PracticeProfile() {
       <div className="grid gap-3 md:grid-cols-2">
         <label className={label}>
           Phone
-          <input
-            className={field}
-            value={phone.startsWith("+") ? formatPhone(phone) : phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
+          <div className="mt-1">
+            <PhoneField value={phone} onChange={setPhone} />
+          </div>
         </label>
         <label className={label}>
           Fax
-          <input
-            className={field}
-            value={fax.startsWith("+") ? formatPhone(fax) : fax}
-            onChange={(e) => setFax(e.target.value)}
-          />
+          <div className="mt-1">
+            <PhoneField value={fax} onChange={setFax} />
+          </div>
         </label>
       </div>
       <label className={label}>

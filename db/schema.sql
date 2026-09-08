@@ -16,6 +16,9 @@ CREATE TABLE IF NOT EXISTS users (
   mobile_phone text UNIQUE,
   mobile_verified_at timestamptz,
   mfa_secret_encrypted text,
+  mfa_method text CHECK (mfa_method IS NULL OR mfa_method IN ('totp', 'sms')),
+  mfa_sms_code_hash text,
+  mfa_sms_code_expires_at timestamptz,
   mfa_enabled_at timestamptz,
   must_change_password boolean NOT NULL DEFAULT false,
   status text NOT NULL CHECK (status IN ('invited', 'active', 'disabled')),
@@ -168,4 +171,12 @@ CREATE TABLE IF NOT EXISTS demo_outbox (
   template_key text NOT NULL,
   body text NOT NULL,
   created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS favorite_consultants (
+  id uuid PRIMARY KEY,
+  owner_user_id uuid NOT NULL REFERENCES users(id),
+  consultant_user_id uuid NOT NULL REFERENCES users(id),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (owner_user_id, consultant_user_id)
 );

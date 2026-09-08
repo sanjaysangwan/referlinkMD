@@ -32,6 +32,13 @@ export default function ConsultLinkPage() {
         return;
       }
       setConsultingName(d.consultingName ?? "");
+      if (d.prefillFirstName || d.prefillLastName) {
+        setForm((f) => ({
+          ...f,
+          firstName: d.prefillFirstName || f.firstName,
+          lastName: d.prefillLastName || f.lastName,
+        }));
+      }
       if (!d.needsSignup && d.consultId) {
         const view = await fetch(`/api/consults/${d.consultId}`);
         if (view.ok) {

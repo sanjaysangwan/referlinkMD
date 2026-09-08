@@ -1,0 +1,16 @@
+node_modules
+.next
+.git
+.cursor
+data
+*.log
+.env
+.env.*
+!.env.example
+deploy.env
+Dockerfile*
+docker-compose*.yml
+README.md
+tsconfig.tsbuildinfo
+**/*.md
+.DS_Store

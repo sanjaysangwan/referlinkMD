@@ -10,6 +10,7 @@ import { decryptSecret, verifyPassword } from "@/lib/crypto";
 import { requestMeta } from "@/lib/request";
 import { isDemo } from "@/lib/env";
 import { APP_NAME } from "@/lib/brand";
+import { issueSmsMfaCode, maskPhone, resolveMfaMethod } from "@/lib/mfa";
 
 const schema = z.object({
   email: z.string().email(),
@@ -107,8 +108,25 @@ export async function POST(request: Request) {
 
   await clearSession();
   await createMfaPending(user.id);
+
+  const mfaMethod = resolveMfaMethod(user);
   let demoCode: string | undefined;
-  if (isDemo() && user.mfaSecretEncrypted) {
+  let maskedMobile: string | undefined;
+
+  if (mfaMethod === "sms") {
+    if (!user.mobilePhone) {
+      return NextResponse.json(
+        { error: "SMS MFA is enabled but no mobile number is on file. Contact support." },
+        { status: 400 },
+      );
+    }
+    const issued = await issueSmsMfaCode({ userId: user.id, phone: user.mobilePhone });
+    if (!issued.ok) {
+      return NextResponse.json({ error: issued.error }, { status: issued.status });
+    }
+    demoCode = issued.demoCode;
+    maskedMobile = maskPhone(user.mobilePhone);
+  } else if (isDemo() && user.mfaSecretEncrypted) {
     const totp = new TOTP({
       issuer: APP_NAME,
       label: user.email,
@@ -119,6 +137,12 @@ export async function POST(request: Request) {
     });
     demoCode = totp.generate();
   }
-  return NextResponse.json({ ok: true, mfaRequired: true, demoCode });
-}
 
+  return NextResponse.json({
+    ok: true,
+    mfaRequired: true,
+    mfaMethod,
+    demoCode,
+    maskedMobile,
+  });
+}

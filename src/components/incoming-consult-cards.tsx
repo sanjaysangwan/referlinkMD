@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatPhone } from "@/lib/phone";
-import { PracticeMark } from "@/components/practice-mark";
+import { MobilePhoneText } from "@/components/phone-field";
 
 type Row = {
   id: string;
@@ -49,35 +49,45 @@ export function IncomingConsultCards({ showIdentifiers }: { showIdentifiers: boo
   return (
     <section className="mb-8">
       <h2 className="text-2xl">Waiting for you</h2>
-      <p className="sans mt-1 mb-4 text-sm text-[#3d4a5c]">Consults sent to you that still need to be resolved.</p>
-      <ul className="space-y-3">
-        {rows.map((r) => (
-          <li key={r.id}>
-            <Link href={`/consults/${r.id}`} className="chart-card flex items-start gap-4 p-5 hover:border-teal-800">
-              <PracticeMark name={r.practiceName} logo={r.practiceLogo} size={44} />
-              <div className="min-w-0 flex-1">
-                <p className="font-serif text-xl">
-                  {r.patient.firstName} {r.patient.lastName}
+      <p className="sans mt-1 mb-4 text-sm text-[#3d4a5c]">
+        Consults sent to you that still need to be resolved.
+      </p>
+      <ul className="sans chart-card divide-y divide-[#ebe4d8] px-4 py-1">
+        {rows.map((r) => {
+          const patientName = `${r.patient.firstName} ${r.patient.lastName}`.trim();
+          const line2Parts = [
+            r.practiceName,
+            r.requestedBy || null,
+            new Date(r.createdAt).toLocaleString(),
+            r.status.replaceAll("_", " "),
+          ].filter(Boolean);
+
+          return (
+            <li key={r.id}>
+              <Link
+                href={`/consults/${r.id}`}
+                className="block py-3 hover:bg-[#f5f0e8] focus-visible:bg-[#f5f0e8] focus-visible:outline-none"
+              >
+                <p className="text-base font-medium text-teal-900">{patientName}</p>
+                <p className="mt-0.5 text-sm text-[#5b6573]">
+                  {showIdentifiers && r.patient.dob ? (
+                    <>
+                      DOB {r.patient.dob}
+                      {r.patient.contactPhone ? (
+                        <>
+                          {" · "}
+                          <MobilePhoneText phone={formatPhone(r.patient.contactPhone)} />
+                        </>
+                      ) : null}
+                      {" · "}
+                    </>
+                  ) : null}
+                  {line2Parts.join(" · ")}
                 </p>
-                {showIdentifiers && r.patient.dob ? (
-                  <p className="sans mt-1 text-sm text-[#3d4a5c]">
-                    DOB {r.patient.dob}
-                    {r.patient.contactPhone ? ` · ${formatPhone(r.patient.contactPhone)}` : ""}
-                  </p>
-                ) : (
-                  <p className="sans mt-1 text-xs text-[#5b6573]">Open to see patient identifiers</p>
-                )}
-                <p className="sans mt-2 text-sm text-[#3d4a5c]">
-                  {r.practiceName}
-                  {r.requestedBy ? ` · ${r.requestedBy}` : ""}
-                </p>
-                <p className="sans mt-1 text-xs text-[#5b6573]">
-                  {new Date(r.createdAt).toLocaleString()} · {r.status.replaceAll("_", " ")}
-                </p>
-              </div>
-            </Link>
-          </li>
-        ))}
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </section>
   );

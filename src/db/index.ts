@@ -5,7 +5,7 @@ import { drizzle as localDrizzle, type PgliteDatabase } from "drizzle-orm/pglite
 import { drizzle as postgresDrizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import * as schema from "./schema";
-import { MIGRATION_002_SQL, MIGRATION_003_SQL, MIGRATION_004_SQL, MIGRATION_005_SQL, MIGRATION_006_SQL, MIGRATION_007_SQL, MIGRATION_008_SQL, SCHEMA_SQL } from "./sql";
+import { MIGRATION_002_SQL, MIGRATION_003_SQL, MIGRATION_004_SQL, MIGRATION_005_SQL, MIGRATION_006_SQL, MIGRATION_007_SQL, MIGRATION_008_SQL, MIGRATION_009_SQL, MIGRATION_010_SQL, SCHEMA_SQL } from "./sql";
 import { backfillPracticeProfile, seedIfEmpty } from "./seed";
 
 export type Db = PgliteDatabase<typeof schema> | NodePgDatabase<typeof schema>;
@@ -19,6 +19,8 @@ const migrations = [
   { id: "006", sql: MIGRATION_006_SQL },
   { id: "007", sql: MIGRATION_007_SQL },
   { id: "008", sql: MIGRATION_008_SQL },
+  { id: "009", sql: MIGRATION_009_SQL },
+  { id: "010", sql: MIGRATION_010_SQL },
 ];
 
 type Query = (sql: string, params?: string[]) => Promise<{ rows: Record<string, unknown>[] }>;

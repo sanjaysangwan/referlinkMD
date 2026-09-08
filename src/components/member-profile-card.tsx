@@ -5,15 +5,16 @@ import { useRouter } from "next/navigation";
 import { formatPhone } from "@/lib/phone";
 import { ROLE_LABEL } from "@/lib/privileges";
 import type { SessionUser } from "@/lib/types";
+import { PhoneField, MobilePhoneText } from "@/components/phone-field";
 
 const field = "mt-1 w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2 text-sm";
 const label = "block text-xs font-semibold tracking-wide text-[#5b6573] uppercase";
 
-function Row({ caption, value }: { caption: string; value: string }) {
+function Row({ caption, value }: { caption: string; value: React.ReactNode }) {
   return (
     <div>
       <p className="text-[11px] font-semibold tracking-wide text-[#5b6573] uppercase">{caption}</p>
-      <p className="mt-1 text-base text-[#0f1c2e]">{value || "—"}</p>
+      <div className="mt-1 text-base text-[#0f1c2e]">{value || "—"}</div>
     </div>
   );
 }
@@ -68,11 +69,9 @@ export function MemberProfileCard({ session }: { session: SessionUser }) {
           </label>
           <label className={label}>
             Mobile
-            <input
-              className={field}
-              value={mobilePhone.startsWith("+") ? formatPhone(mobilePhone) : mobilePhone}
-              onChange={(e) => setMobilePhone(e.target.value)}
-            />
+            <div className="mt-1">
+              <PhoneField mobile value={mobilePhone} onChange={setMobilePhone} />
+            </div>
           </label>
         </div>
         {error ? <p className="text-sm text-orange-800">{error}</p> : null}
@@ -111,7 +110,12 @@ export function MemberProfileCard({ session }: { session: SessionUser }) {
         {session.role ? <Row caption="Credential" value={ROLE_LABEL[session.role]} /> : null}
         {session.practiceName ? <Row caption="Practice" value={session.practiceName} /> : null}
         <Row caption="NPI" value={session.npi ?? ""} />
-        <Row caption="Mobile" value={session.mobilePhone ? formatPhone(session.mobilePhone) : ""} />
+        <Row
+          caption="Mobile"
+          value={
+            session.mobilePhone ? <MobilePhoneText phone={formatPhone(session.mobilePhone)} /> : ""
+          }
+        />
       </div>
       <button
         type="button"

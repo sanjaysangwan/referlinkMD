@@ -5,8 +5,7 @@ import { getDb } from "@/db";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { can } from "@/lib/privileges";
-import { IncomingConsultCards } from "@/components/incoming-consult-cards";
-import { NewConsultForm } from "@/components/new-consult-form";
+import { ConsultsHome } from "@/components/consults-home";
 import { isDemo } from "@/lib/env";
 
 export default async function ConsultsPage() {
@@ -25,32 +24,25 @@ export default async function ConsultsPage() {
 
   return (
     <div>
-      <h1 className="text-3xl">Consult</h1>
+      <ConsultsHome
+        showIdentifiers
+        canRequest={canRequest}
+        settingsHref={settingsHref}
+      />
       {profileIncomplete ? (
-        <p className="sans mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
-          Finish your details.{" "}
+        <p className="sans mt-8 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
           <Link href={settingsHref} className="font-semibold underline underline-offset-2">
-            Open Setting
+            Add practice details, invite other users
           </Link>
         </p>
       ) : null}
-      <p className="sans mt-2 mb-6 max-w-2xl text-sm text-[#3d4a5c]">
-        Consults waiting for you, then a request if you need to send one.
-      </p>
       {isDemo() ? (
-        <p className="sans mb-6 text-xs text-[#5b6573]">
+        <p className="sans mt-8 text-xs text-[#5b6573]">
           SMS is stubbed in demo.{" "}
           <Link href="/demo/outbox" className="underline underline-offset-2">
             Open demo messages
           </Link>
         </p>
-      ) : null}
-      <IncomingConsultCards showIdentifiers />
-      {canRequest ? (
-        <section>
-          <h2 className="mb-3 text-2xl">Request a consult</h2>
-          <NewConsultForm />
-        </section>
       ) : null}
     </div>
   );

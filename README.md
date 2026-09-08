@@ -30,6 +30,17 @@ David already has a seeded inbound consult from Harbor. Request a consult to `(5
 
 Postgres schema: [db/schema.sql](db/schema.sql). Local runtime is PGlite (Postgres in-process) under `data/referlink`. Optional `docker-compose.yml` runs Postgres 16 for a later RDS-shaped deploy.
 
+## Low-cost Docker deploy (AWS Lightsail / EC2)
+
+Single host runs the Next.js app and Postgres 16:
+
+```bash
+cp deploy.env.example .env   # set POSTGRES_PASSWORD, AUTH_SECRET, APP_URL
+docker compose -f docker-compose.prod.yml --env-file .env up -d --build
+```
+
+Open `APP_URL` (host port 80 → app). Keep Postgres off the public firewall. See `Dockerfile`, `docker-compose.prod.yml`, and `deploy.env.example`.
+
 SMS and invite email are written to the in-app **Demo inbox**. Message bodies never include patient name, DOB, or phone.
 
 ## Security in this POC

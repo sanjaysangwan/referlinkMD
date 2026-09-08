@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { formatPhone } from "@/lib/phone";
 import { fileToSmallLogo } from "@/lib/practice-logo-file";
 import { PracticeMark } from "@/components/practice-mark";
+import { PhoneField } from "@/components/phone-field";
+import { FavoriteConsultantsManager } from "@/components/favorite-consultants";
 import { isDemo } from "@/lib/env";
 import Link from "next/link";
 import type { PracticeRole, SessionUser } from "@/lib/types";
@@ -167,7 +168,7 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
   }
 
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-4xl">
       <header className="mb-6 flex items-center gap-4">
         <PracticeMark name={name || "Practice"} logo={logo} size={72} />
         <div className="min-w-0 flex-1">
@@ -212,19 +213,15 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
           <div className="grid gap-3 md:grid-cols-2">
             <label className={label}>
               Phone
-              <input
-                className={field}
-                value={phone.startsWith("+") ? formatPhone(phone) : phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
+              <div className="mt-1">
+                <PhoneField value={phone} onChange={setPhone} />
+              </div>
             </label>
             <label className={label}>
               Fax
-              <input
-                className={field}
-                value={fax.startsWith("+") ? formatPhone(fax) : fax}
-                onChange={(e) => setFax(e.target.value)}
-              />
+              <div className="mt-1">
+                <PhoneField value={fax} onChange={setFax} />
+              </div>
             </label>
           </div>
           <label className={label}>
@@ -294,11 +291,13 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
                   </label>
                   <label className={label}>
                     Mobile
-                    <input
-                      className={field}
-                      value={form.mobilePhone.startsWith("+") ? formatPhone(form.mobilePhone) : form.mobilePhone}
-                      onChange={(e) => setForm({ ...form, mobilePhone: e.target.value })}
-                    />
+                    <div className="mt-1">
+                      <PhoneField
+                        mobile
+                        value={form.mobilePhone}
+                        onChange={(mobilePhone) => setForm({ ...form, mobilePhone })}
+                      />
+                    </div>
                   </label>
                   {m.id !== session.id ? (
                     <label className={`${label} md:col-span-2`}>
@@ -325,6 +324,10 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
           ))}
         </ul>
       </article>
+
+      <div className="mb-6">
+        <FavoriteConsultantsManager />
+      </div>
 
       <form onSubmit={invite} className="sans chart-card space-y-3 p-6">
         <h2 className="font-serif text-xl">Invite member</h2>

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { accessTokens, consults, users } from "@/db/schema";
 import { getDb } from "@/db";
 import { sha256Hex } from "@/lib/crypto";
@@ -20,11 +20,19 @@ export async function GET(_request: Request, context: { params: Promise<{ token:
     return NextResponse.json({ error: "This link is invalid or expired." }, { status: 400 });
   }
 
-  const [user] = await db
+  const [activeUser] = await db
     .select()
     .from(users)
     .where(and(eq(users.mobilePhone, row.token.consultingPhone), eq(users.status, "active")))
     .limit(1);
+
+  const [stubUser] = activeUser
+    ? [null]
+    : await db
+        .select()
+        .from(users)
+        .where(and(eq(users.mobilePhone, row.token.consultingPhone), eq(users.status, "invited")))
+        .limit(1);
 
   const { ip, userAgent } = await requestMeta();
   await writeAudit({
@@ -33,13 +41,20 @@ export async function GET(_request: Request, context: { params: Promise<{ token:
     resourceId: row.token.id,
     ip,
     userAgent,
-    metadata: { stage: "landing", hasAccount: Boolean(user) },
+    metadata: { stage: "landing", hasAccount: Boolean(activeUser) },
   });
+
+  const prefillName = stubUser
+    ? `${stubUser.firstName} ${stubUser.lastName}`.trim()
+    : row.consult.consultingName;
 
   return NextResponse.json({
     ok: true,
     consultId: row.consult.id,
-    needsSignup: !user,
+    needsSignup: !activeUser,
     consultingName: row.consult.consultingName,
+    prefillFirstName: stubUser?.firstName ?? "",
+    prefillLastName: stubUser?.lastName ?? "",
+    prefillDisplayName: prefillName,
   });
 }

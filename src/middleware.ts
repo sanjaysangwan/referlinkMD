@@ -56,6 +56,8 @@ export const config = {
     "/api/me",
     "/api/me/:path*",
     "/api/invites",
+    "/api/favorites",
+    "/api/favorites/:path*",
     "/api/outbox/:path*",
     "/api/auth/password",
     "/api/auth/mfa/setup",

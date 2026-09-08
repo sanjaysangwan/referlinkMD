@@ -26,6 +26,8 @@ export function LoginForm() {
   const [role, setRole] = useState<PracticeRole>("physician");
   const [code, setCode] = useState("");
   const [mfa, setMfa] = useState(false);
+  const [mfaMethod, setMfaMethod] = useState<"totp" | "sms">("totp");
+  const [maskedMobile, setMaskedMobile] = useState("");
   const [demoCode, setDemoCode] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -94,6 +96,8 @@ export function LoginForm() {
     }
     if (data.mfaRequired) {
       setMfa(true);
+      setMfaMethod(data.mfaMethod === "sms" ? "sms" : "totp");
+      setMaskedMobile(data.maskedMobile ?? "");
       setDemoCode(data.demoCode ?? "");
       if (data.demoCode) setCode(data.demoCode);
       return;
@@ -126,7 +130,7 @@ export function LoginForm() {
       {mfa ? (
         <>
           <label className={label}>
-            Authenticator code
+            {mfaMethod === "sms" ? "SMS code" : "Authenticator code"}
             <input
               className={field}
               value={code}
@@ -135,14 +139,53 @@ export function LoginForm() {
               autoComplete="one-time-code"
             />
           </label>
-          <p className="mt-2 text-xs text-[#5b6573]">
-            Demo accounts share authenticator secret <span className="font-mono">{DEMO_MFA_SECRET}</span>
-            {demoCode ? (
-              <>
-                . Current demo code: <span className="font-mono font-semibold">{demoCode}</span>
-              </>
-            ) : null}
-          </p>
+          {mfaMethod === "sms" ? (
+            <p className="mt-2 text-xs text-[#5b6573]">
+              Code sent to {maskedMobile || "your mobile"}
+              {demoCode ? (
+                <>
+                  . Demo code: <span className="font-mono font-semibold">{demoCode}</span> (also in
+                  Demo inbox)
+                </>
+              ) : null}
+            </p>
+          ) : (
+            <p className="mt-2 text-xs text-[#5b6573]">
+              Demo accounts share authenticator secret <span className="font-mono">{DEMO_MFA_SECRET}</span>
+              {demoCode ? (
+                <>
+                  . Current demo code: <span className="font-mono font-semibold">{demoCode}</span>
+                </>
+              ) : null}
+            </p>
+          )}
+          {mfaMethod === "sms" ? (
+            <button
+              type="button"
+              disabled={busy}
+              className="mt-2 text-sm text-teal-900 underline-offset-2 hover:underline"
+              onClick={async () => {
+                setBusy(true);
+                setError("");
+                const res = await fetch("/api/auth/mfa", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ resend: true }),
+                });
+                const data = await res.json();
+                setBusy(false);
+                if (!res.ok) {
+                  setError(data.error ?? "Could not resend code.");
+                  return;
+                }
+                setDemoCode(data.demoCode ?? "");
+                if (data.demoCode) setCode(data.demoCode);
+                if (data.maskedMobile) setMaskedMobile(data.maskedMobile);
+              }}
+            >
+              Resend SMS code
+            </button>
+          ) : null}
         </>
       ) : (
         <>
