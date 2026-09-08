@@ -7,7 +7,7 @@ export function isDemo(): boolean {
 }
 
 export function appUrl(): string {
-  return process.env.APP_URL ?? "http://localhost:3000";
+  return process.env.APP_URL ?? "http://localhost:4000";
 }
 
 export function authSecret(): string {

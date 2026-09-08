@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { formatPhone } from "@/lib/phone";
+import { PhoneField } from "@/components/phone-field";
 
 const field = "mt-1 w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2 text-sm";
 const label = "block text-xs font-semibold tracking-wide text-[#5b6573] uppercase";
@@ -73,11 +73,9 @@ export function UserProfile() {
         </label>
         <label className={label}>
           Mobile
-          <input
-            className={field}
-            value={mobilePhone.startsWith("+") ? formatPhone(mobilePhone) : mobilePhone}
-            onChange={(e) => setMobilePhone(e.target.value)}
-          />
+          <div className="mt-1">
+            <PhoneField mobile value={mobilePhone} onChange={setMobilePhone} />
+          </div>
         </label>
       </div>
       {error ? <p className="text-sm text-orange-800">{error}</p> : null}

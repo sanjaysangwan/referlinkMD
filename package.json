@@ -4,7 +4,7 @@
   "private": true,
   "description": "Peer-to-peer physician consults. PHI is patient name, DOB, and phone only.",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 4000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { formatPhone } from "@/lib/phone";
+import { MobilePhoneText } from "@/components/phone-field";
 import type { PracticeRole } from "@/lib/types";
 
 type Member = {
@@ -75,7 +76,8 @@ export function TeamManager() {
                   {m.npi || m.mobilePhone ? (
                     <div className="text-xs text-[#5b6573]">
                       {m.npi ? `NPI ${m.npi}` : ""}
-                      {m.mobilePhone ? ` · ${formatPhone(m.mobilePhone)}` : ""}
+                      {m.npi && m.mobilePhone ? " · " : ""}
+                      {m.mobilePhone ? <MobilePhoneText phone={formatPhone(m.mobilePhone)} /> : null}
                     </div>
                   ) : null}
                 </td>

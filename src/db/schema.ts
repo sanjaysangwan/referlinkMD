@@ -21,6 +21,9 @@ export const users = pgTable("users", {
   mobilePhone: text("mobile_phone"),
   mobileVerifiedAt: timestamp("mobile_verified_at", { withTimezone: true }),
   mfaSecretEncrypted: text("mfa_secret_encrypted"),
+  mfaMethod: text("mfa_method").$type<"totp" | "sms">(),
+  mfaSmsCodeHash: text("mfa_sms_code_hash"),
+  mfaSmsCodeExpiresAt: timestamp("mfa_sms_code_expires_at", { withTimezone: true }),
   mfaEnabledAt: timestamp("mfa_enabled_at", { withTimezone: true }),
   mustChangePassword: boolean("must_change_password").notNull().default(false),
   status: text("status").notNull(),
@@ -190,8 +193,24 @@ export const demoOutbox = pgTable("demo_outbox", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const favoriteConsultants = pgTable(
+  "favorite_consultants",
+  {
+    id: uuid("id").primaryKey(),
+    ownerUserId: uuid("owner_user_id")
+      .notNull()
+      .references(() => users.id),
+    consultantUserId: uuid("consultant_user_id")
+      .notNull()
+      .references(() => users.id),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("favorite_consultants_owner_consultant_idx").on(t.ownerUserId, t.consultantUserId)],
+);
+
 export const usersRelations = relations(users, ({ many }) => ({
   memberships: many(practiceMemberships),
+  favoriteConsultants: many(favoriteConsultants, { relationName: "ownerFavorites" }),
 }));
 
 export const practicesRelations = relations(practices, ({ many }) => ({
@@ -218,4 +237,16 @@ export const consultsRelations = relations(consults, ({ one }) => ({
   }),
   requestedBy: one(users, { fields: [consults.requestedByUserId], references: [users.id] }),
   consultingUser: one(users, { fields: [consults.consultingUserId], references: [users.id] }),
+}));
+
+export const favoriteConsultantsRelations = relations(favoriteConsultants, ({ one }) => ({
+  owner: one(users, {
+    fields: [favoriteConsultants.ownerUserId],
+    references: [users.id],
+    relationName: "ownerFavorites",
+  }),
+  consultant: one(users, {
+    fields: [favoriteConsultants.consultantUserId],
+    references: [users.id],
+  }),
 }));

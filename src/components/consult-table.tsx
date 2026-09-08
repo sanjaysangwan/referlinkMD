@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatPhone } from "@/lib/phone";
 import { PracticeMark } from "@/components/practice-mark";
+import { MobilePhoneText } from "@/components/phone-field";
 
 type Row = {
   id: string;
@@ -75,7 +76,12 @@ export function ConsultTable({
                     {showIdentifiers && r.patient.dob ? (
                       <div className="text-xs text-[#5b6573]">
                         DOB {r.patient.dob}
-                        {r.patient.contactPhone ? ` · ${formatPhone(r.patient.contactPhone)}` : ""}
+                        {r.patient.contactPhone ? (
+                          <>
+                            {" · "}
+                            <MobilePhoneText phone={formatPhone(r.patient.contactPhone)} />
+                          </>
+                        ) : null}
                       </div>
                     ) : (
                       <div className="text-xs text-[#5b6573]">Identifiers limited for this role</div>
@@ -86,7 +92,9 @@ export function ConsultTable({
                       <>
                         <div className="font-medium">{r.consultingName}</div>
                         {r.consultingPhone ? (
-                          <div className="text-xs text-[#5b6573]">{formatPhone(r.consultingPhone)}</div>
+                          <div className="text-xs text-[#5b6573]">
+                            <MobilePhoneText phone={formatPhone(r.consultingPhone)} />
+                          </div>
                         ) : null}
                       </>
                     ) : (

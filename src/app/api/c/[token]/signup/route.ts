@@ -3,7 +3,7 @@ import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { accessTokens, users } from "@/db/schema";
 import { getDb } from "@/db";
-import { createSession, homePath, loadSessionUser } from "@/lib/auth";
+import { createSession, loadSessionUser } from "@/lib/auth";
 import { hashPassword, sha256Hex } from "@/lib/crypto";
 import { npiValid, bindConsultsToUser } from "@/lib/clinician";
 import { writeAudit } from "@/lib/audit";
@@ -38,23 +38,63 @@ export async function POST(request: Request, context: { params: Promise<{ token:
     return NextResponse.json({ error: "This link is invalid or expired." }, { status: 400 });
   }
 
-  const userId = crypto.randomUUID();
+  const email = parsed.data.email.toLowerCase().trim();
+  const firstName = parsed.data.firstName.trim();
+  const lastName = parsed.data.lastName.trim();
+  const npi = parsed.data.npi;
+  const passwordHash = await hashPassword(parsed.data.password);
   const now = new Date();
+
+  const [existingByPhone] = await db
+    .select()
+    .from(users)
+    .where(eq(users.mobilePhone, row.consultingPhone))
+    .limit(1);
+
+  if (existingByPhone?.status === "active") {
+    return NextResponse.json(
+      { error: "That mobile number is already registered. Sign in instead." },
+      { status: 409 },
+    );
+  }
+
+  let userId: string;
   try {
-    await db.insert(users).values({
-      id: userId,
-      email: parsed.data.email.toLowerCase().trim(),
-      passwordHash: await hashPassword(parsed.data.password),
-      firstName: parsed.data.firstName.trim(),
-      lastName: parsed.data.lastName.trim(),
-      npi: parsed.data.npi,
-      mobilePhone: row.consultingPhone,
-      mobileVerifiedAt: now,
-      mustChangePassword: false,
-      status: "active",
-    });
+    if (existingByPhone?.status === "invited") {
+      userId = existingByPhone.id;
+      await db
+        .update(users)
+        .set({
+          email,
+          passwordHash,
+          firstName,
+          lastName,
+          npi,
+          mobileVerifiedAt: now,
+          mustChangePassword: false,
+          status: "active",
+        })
+        .where(eq(users.id, userId));
+    } else {
+      userId = crypto.randomUUID();
+      await db.insert(users).values({
+        id: userId,
+        email,
+        passwordHash,
+        firstName,
+        lastName,
+        npi,
+        mobilePhone: row.consultingPhone,
+        mobileVerifiedAt: now,
+        mustChangePassword: false,
+        status: "active",
+      });
+    }
   } catch {
-    return NextResponse.json({ error: "That email or mobile number is already registered. Sign in instead." }, { status: 409 });
+    return NextResponse.json(
+      { error: "That email or mobile number is already registered. Sign in instead." },
+      { status: 409 },
+    );
   }
 
   await bindConsultsToUser(userId, row.consultingPhone);
@@ -66,7 +106,7 @@ export async function POST(request: Request, context: { params: Promise<{ token:
     resourceId: row.consultId,
     ip,
     userAgent,
-    metadata: { via: "sms_token" },
+    metadata: { via: "sms_token", adoptedStub: Boolean(existingByPhone?.status === "invited") },
   });
   await createSession(userId);
   const session = await loadSessionUser(userId);
