@@ -16,3 +16,6 @@ export function authSecret(): string {
 
 export const DEMO_PASSWORD = "demo1234";
 export const DEMO_MFA_SECRET = "JBSWY3DPEHPK3PXP";
+
+/** Password reset link lifetime. */
+export const PASSWORD_RESET_TTL_MS = 60 * 60 * 1000;

@@ -7,6 +7,7 @@ import { getSession, homePath, loadSessionUser } from "@/lib/auth";
 import { hashPassword } from "@/lib/crypto";
 import { writeAudit } from "@/lib/audit";
 import { requestMeta } from "@/lib/request";
+import { sendPasswordChangedEmail } from "@/lib/notify";
 
 const schema = z.object({
   currentPassword: z.string().min(1).optional(),
@@ -38,6 +39,13 @@ export async function POST(request: Request) {
     ip,
     userAgent,
   });
+
+  try {
+    await sendPasswordChangedEmail({ toEmail: session.email });
+  } catch (err) {
+    console.error("password changed confirmation email failed", err);
+  }
+
   const next = await loadSessionUser(session.id);
   return NextResponse.json({ ok: true, home: next ? homePath(next) : "/consults" });
 }

@@ -2,6 +2,7 @@ import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { MemberProfileCard } from "@/components/member-profile-card";
 import { FavoriteConsultantsManager } from "@/components/favorite-consultants";
+import { ChangePasswordCard } from "@/components/change-password-card";
 
 export default async function SettingsPage() {
   const session = await getSession();
@@ -13,7 +14,10 @@ export default async function SettingsPage() {
       <p className="sans mt-2 mb-6 max-w-xl text-sm text-[#3d4a5c]">Your contact details for this practice.</p>
       <div className="grid max-w-4xl gap-6 lg:grid-cols-2 lg:items-start">
         <MemberProfileCard session={session} />
-        <FavoriteConsultantsManager />
+        <div className="space-y-6">
+          <FavoriteConsultantsManager />
+          <ChangePasswordCard />
+        </div>
       </div>
     </div>
   );

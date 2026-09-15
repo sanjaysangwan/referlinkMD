@@ -4,6 +4,7 @@ import { users } from "./schema";
 import * as schema from "./schema";
 import { encryptSecret, hashPassword } from "@/lib/crypto";
 import { DEMO_MFA_SECRET, DEMO_PASSWORD } from "@/lib/env";
+import { practiceNameZipKey } from "@/lib/practice-identity";
 
 
 
@@ -100,6 +101,7 @@ export async function seedIfEmpty(db: Db): Promise<void> {
       city: "Portland",
       state: "ME",
       postalCode: "04101",
+      nameZipKey: practiceNameZipKey("Harbor Family Medicine", "04101"),
       timezone: "America/New_York",
       status: "active",
       createdByUserId: IDS.elena,
@@ -114,6 +116,7 @@ export async function seedIfEmpty(db: Db): Promise<void> {
       city: "Portland",
       state: "ME",
       postalCode: "04102",
+      nameZipKey: practiceNameZipKey("Riverside Internal Medicine", "04102"),
       timezone: "America/New_York",
       status: "active",
       createdByUserId: IDS.david,

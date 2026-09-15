@@ -6,6 +6,7 @@ import { getDb } from "@/db";
 import { getSession } from "@/lib/auth";
 import { toE164 } from "@/lib/phone";
 import { isPracticeLogoDataUrl } from "@/lib/practice-logo";
+import { normalizePostalCode, practiceNameZipKey } from "@/lib/practice-identity";
 import { writeAudit } from "@/lib/audit";
 import { requestMeta } from "@/lib/request";
 
@@ -80,9 +81,19 @@ export async function PATCH(request: Request) {
   if (parsed.data.addressLine2 !== undefined) patch.addressLine2 = parsed.data.addressLine2.trim() || null;
   if (parsed.data.city !== undefined) patch.city = parsed.data.city.trim();
   if (parsed.data.state !== undefined) patch.state = parsed.data.state.trim().toUpperCase();
-  if (parsed.data.postalCode !== undefined) patch.postalCode = parsed.data.postalCode.trim();
+  if (parsed.data.postalCode !== undefined) patch.postalCode = normalizePostalCode(parsed.data.postalCode);
 
   const db = await getDb();
+  if (parsed.data.name !== undefined || parsed.data.postalCode !== undefined) {
+    const [current] = await db.select().from(practices).where(eq(practices.id, session.practiceId)).limit(1);
+    if (current) {
+      const nextName = typeof patch.name === "string" ? patch.name : current.name;
+      const nextZip =
+        typeof patch.postalCode === "string" ? patch.postalCode : current.postalCode;
+      patch.nameZipKey = practiceNameZipKey(nextName, nextZip);
+    }
+  }
+
   await db.update(practices).set(patch).where(eq(practices.id, session.practiceId));
   const { ip, userAgent } = await requestMeta();
   await writeAudit({
