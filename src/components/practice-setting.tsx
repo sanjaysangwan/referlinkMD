@@ -6,6 +6,7 @@ import { fileToSmallLogo } from "@/lib/practice-logo-file";
 import { PracticeMark } from "@/components/practice-mark";
 import { PhoneField } from "@/components/phone-field";
 import { FavoriteConsultantsManager } from "@/components/favorite-consultants";
+import { ChangePasswordCard } from "@/components/change-password-card";
 import { isDemo } from "@/lib/env";
 import Link from "next/link";
 import type { PracticeRole, SessionUser } from "@/lib/types";
@@ -325,8 +326,9 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
         </ul>
       </article>
 
-      <div className="mb-6">
+      <div className="mb-6 space-y-6">
         <FavoriteConsultantsManager />
+        <ChangePasswordCard />
       </div>
 
       <form onSubmit={invite} className="sans chart-card space-y-3 p-6">

@@ -25,6 +25,9 @@ export type AuditAction =
   | "role_changed"
   | "token_consumed"
   | "password_changed"
+  | "password_reset_requested"
+  | "password_reset_completed"
+  | "practice_claim_requested"
   | "mfa_enabled";
 
 export interface SessionUser {

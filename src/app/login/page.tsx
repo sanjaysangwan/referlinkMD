@@ -8,10 +8,10 @@ export default function LoginPage() {
       <p className="sans text-center text-sm font-medium tracking-[0.16em] text-teal-800">
         {APP_NAME}
       </p>
-      <h1 className="mt-2 text-center text-4xl">Sign in or create a practice</h1>
+      <h1 className="mt-2 text-center text-4xl">Sign in or create a login</h1>
       <p className="sans mx-auto mt-3 max-w-xl text-center text-[#3d4a5c]">
-        New practices need only email, password, practice name, and your credential. Add staff later
-        by email — they set their own password from the invite link.
+        Start with your practice name and ZIP. If that practice already exists, contact its
+        administrator for an invite — or claim the name if the listing is incorrect.
       </p>
       <div className="mt-8">
         <Suspense>

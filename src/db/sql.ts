@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS practices (
   city text NOT NULL,
   state text NOT NULL,
   postal_code text NOT NULL,
+  name_zip_key text,
   timezone text NOT NULL DEFAULT 'America/New_York',
   status text NOT NULL CHECK (status IN ('active', 'suspended')),
   created_by_user_id uuid NOT NULL REFERENCES users(id),
@@ -184,6 +185,27 @@ CREATE TABLE IF NOT EXISTS favorite_consultants (
   created_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE (owner_user_id, consultant_user_id)
 );
+
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+  id uuid PRIMARY KEY,
+  user_id uuid NOT NULL REFERENCES users(id),
+  token_hash text NOT NULL UNIQUE,
+  expires_at timestamptz NOT NULL,
+  consumed_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS password_reset_tokens_user_idx ON password_reset_tokens (user_id, created_at DESC);
+`;
+
+/** Practice uniqueness by name + ZIP (name_zip_key). */
+export const MIGRATION_012_SQL = `
+ALTER TABLE practices ADD COLUMN IF NOT EXISTS name_zip_key text;
+UPDATE practices
+SET name_zip_key = lower(btrim(name)) || '|' || regexp_replace(coalesce(postal_code, ''), '[^0-9]', '', 'g')
+WHERE name_zip_key IS NULL OR length(btrim(name_zip_key)) = 0;
+CREATE UNIQUE INDEX IF NOT EXISTS practices_name_zip_key_unique
+  ON practices (name_zip_key)
+  WHERE status = 'active' AND name_zip_key IS NOT NULL AND length(btrim(name_zip_key)) > 1;
 `;
 
 /** Existing local PGlite DBs already applied 001; this reshapes practices. */
@@ -259,4 +281,17 @@ CREATE TABLE IF NOT EXISTS favorite_consultants (
   created_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE (owner_user_id, consultant_user_id)
 );
+`;
+
+/** Password reset links (hashed tokens, short TTL). */
+export const MIGRATION_011_SQL = `
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+  id uuid PRIMARY KEY,
+  user_id uuid NOT NULL REFERENCES users(id),
+  token_hash text NOT NULL UNIQUE,
+  expires_at timestamptz NOT NULL,
+  consumed_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS password_reset_tokens_user_idx ON password_reset_tokens (user_id, created_at DESC);
 `;

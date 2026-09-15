@@ -41,7 +41,7 @@ docker compose -f docker-compose.prod.yml --env-file .env up -d --build
 
 Open `APP_URL` (host port 80 → app). Keep Postgres off the public firewall. See `Dockerfile`, `docker-compose.prod.yml`, and `deploy.env.example`.
 
-SMS and invite email are written to the in-app **Demo inbox**. Message bodies never include patient name, DOB, or phone.
+SMS and invite/reset email are written to the in-app **Demo inbox** in demo mode. Configure `RESEND_API_KEY` or `SMTP_*` (see `.env.example`) to send real email for password resets and invites. Message bodies never include patient name, DOB, or phone.
 
 ## Security in this POC
 

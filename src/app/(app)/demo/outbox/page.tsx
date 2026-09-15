@@ -42,7 +42,7 @@ export default function DemoOutboxPage() {
               </div>
               <p className="sans mt-2 text-sm text-[#3d4a5c]">To {m.to}</p>
               <p className="mt-3 whitespace-pre-wrap text-[15px] leading-relaxed">{m.body}</p>
-              {m.body.includes("/c/") || m.body.includes("/invite/") ? (
+              {m.body.includes("/c/") || m.body.includes("/invite/") || m.body.includes("/reset/") ? (
                 <p className="sans mt-3 text-xs text-teal-900">
                   Open the path from the message, or start at the{" "}
                   <Link className="underline" href="/login">

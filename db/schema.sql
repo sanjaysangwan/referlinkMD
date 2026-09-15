@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS practices (
   city text NOT NULL,
   state text NOT NULL,
   postal_code text NOT NULL,
+  name_zip_key text,
   timezone text NOT NULL DEFAULT 'America/New_York',
   status text NOT NULL CHECK (status IN ('active', 'suspended')),
   created_by_user_id uuid NOT NULL REFERENCES users(id),
@@ -180,3 +181,13 @@ CREATE TABLE IF NOT EXISTS favorite_consultants (
   created_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE (owner_user_id, consultant_user_id)
 );
+
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+  id uuid PRIMARY KEY,
+  user_id uuid NOT NULL REFERENCES users(id),
+  token_hash text NOT NULL UNIQUE,
+  expires_at timestamptz NOT NULL,
+  consumed_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS password_reset_tokens_user_idx ON password_reset_tokens (user_id, created_at DESC);

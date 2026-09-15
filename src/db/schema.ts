@@ -45,6 +45,7 @@ export const practices = pgTable("practices", {
   city: text("city").notNull(),
   state: text("state").notNull(),
   postalCode: text("postal_code").notNull(),
+  nameZipKey: text("name_zip_key"),
   timezone: text("timezone").notNull().default("America/New_York"),
   status: text("status").notNull(),
   createdByUserId: uuid("created_by_user_id")
@@ -207,6 +208,17 @@ export const favoriteConsultants = pgTable(
   },
   (t) => [uniqueIndex("favorite_consultants_owner_consultant_idx").on(t.ownerUserId, t.consultantUserId)],
 );
+
+export const passwordResetTokens = pgTable("password_reset_tokens", {
+  id: uuid("id").primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id),
+  tokenHash: text("token_hash").notNull().unique(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  consumedAt: timestamp("consumed_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
 
 export const usersRelations = relations(users, ({ many }) => ({
   memberships: many(practiceMemberships),
