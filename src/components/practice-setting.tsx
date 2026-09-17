@@ -251,10 +251,10 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
           <p className="sans text-xs font-semibold tracking-[0.18em] text-teal-800 uppercase">Practice</p>
           <h1 className="truncate text-3xl">{name || "Practice"}</h1>
           {healthSystemName ? (
-            <p className="sans mt-1 flex items-center gap-2 text-sm text-[#5b6573]">
+            <div className="sans mt-1 flex items-center gap-2 text-sm text-[#5b6573]">
               <PracticeMark name={healthSystemName} logo={healthSystemLogo} size={20} />
               <span>{healthSystemName}</span>
-            </p>
+            </div>
           ) : null}
           {city || state ? (
             <p className="sans text-sm text-[#5b6573]">

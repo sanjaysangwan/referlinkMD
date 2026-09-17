@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { formatPhone } from "@/lib/phone";
 import { PracticeMark } from "@/components/practice-mark";
+import { groupFavoritesBySpecialty } from "@/lib/favorite-groups";
 
 export type FavoritePick = {
   id: string;
@@ -45,9 +46,6 @@ function FavoriteRowContent({
   showCell,
   healthSystemName,
   healthSystemLogo,
-  specialtyLabel,
-  starred,
-  onToggleStar,
   title,
 }: {
   name: string;
@@ -56,40 +54,40 @@ function FavoriteRowContent({
   showCell?: boolean;
   healthSystemName?: string | null;
   healthSystemLogo?: string | null;
-  specialtyLabel?: string | null;
-  starred?: boolean;
-  onToggleStar?: () => void;
   title?: string;
 }) {
   return (
     <span className="flex items-start gap-2">
-      {onToggleStar ? (
-        <button
-          type="button"
-          aria-label={starred ? "Remove personal star" : "Star as personal favorite"}
-          aria-pressed={Boolean(starred)}
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleStar();
-          }}
-          className={`mt-0.5 shrink-0 text-base leading-none ${
-            starred ? "text-teal-900" : "text-[#c4bbaa] hover:text-teal-800"
-          }`}
-        >
-          {starred ? "★" : "☆"}
-        </button>
-      ) : null}
       <PracticeMark name={healthSystemName || name} logo={healthSystemLogo} size={32} />
       <span className="min-w-0 flex-1">
         <span className="block" title={title}>
           {name}
         </span>
-        {specialtyLabel ? (
-          <span className="mt-0.5 block text-xs font-normal text-[#5b6573]">{specialtyLabel}</span>
-        ) : null}
         <FavoritePhoneLine officePhone={officePhone} mobilePhone={mobilePhone} showCell={showCell} />
       </span>
     </span>
+  );
+}
+
+function StarToggle({
+  starred,
+  onToggle,
+}: {
+  starred?: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={starred ? "Remove personal star" : "Star as personal favorite"}
+      aria-pressed={Boolean(starred)}
+      onClick={onToggle}
+      className={`mt-0.5 shrink-0 text-base leading-none ${
+        starred ? "text-teal-900" : "text-[#c4bbaa] hover:text-teal-800"
+      }`}
+    >
+      {starred ? "★" : "☆"}
+    </button>
   );
 }
 
@@ -117,8 +115,7 @@ export function FavoriteConsultantsPicker({
     () => (starredOnly ? favorites.filter((f) => f.starred) : favorites),
     [favorites, starredOnly],
   );
-  const withCell = visible.filter((f) => Boolean(f.mobilePhone));
-  const officeOnly = visible.filter((f) => !f.mobilePhone && Boolean(f.officePhone));
+  const specialtyGroups = useMemo(() => groupFavoritesBySpecialty(visible), [visible]);
 
   async function toggleStar(id: string, starred: boolean) {
     const res = await fetch(`/api/favorites/${id}/star`, {
@@ -146,66 +143,74 @@ export function FavoriteConsultantsPicker({
         </button>
       </div>
 
-      {withCell.length ? (
-        <ul className="mt-3 -mx-2 divide-y divide-[#ebe4d8]">
-          {withCell.map((f) => {
-            const name = `${f.firstName} ${f.lastName}`.trim();
-            const selected = selectedId === f.id;
-            return (
-              <li key={f.id} className="py-1 first:pt-0 last:pb-0">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedId(f.id);
-                    onSelect(f);
-                  }}
-                  aria-pressed={selected}
-                  className={`w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium focus-visible:outline-none focus-visible:bg-[#f5f0e8] hover:bg-[#f5f0e8] ${
-                    selected ? "bg-[#f5f0e8] text-teal-900" : "text-[#0f1c2e]"
-                  }`}
-                >
-                  <FavoriteRowContent
-                    name={name}
-                    officePhone={f.officePhone}
-                    mobilePhone={f.mobilePhone}
-                    showCell
-                    healthSystemName={f.healthSystemName}
-                    healthSystemLogo={f.healthSystemLogo}
-                    specialtyLabel={f.specialtyLabel}
-                    starred={f.starred}
-                    onToggleStar={() => void toggleStar(f.id, Boolean(f.starred))}
-                    title="Click to view cell phone or send text"
-                  />
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      ) : null}
-
-      {officeOnly.length ? (
-        <div className={withCell.length ? "mt-4" : "mt-3"}>
-          <p className="sans px-1 text-[11px] font-semibold tracking-wide text-[#5b6573] uppercase">
-            Office phones only
-          </p>
-          <ul className="mt-1 -mx-2 divide-y divide-[#ebe4d8]">
-            {officeOnly.map((f) => {
-              const name = `${f.firstName} ${f.lastName}`.trim();
-              return (
-                <li key={f.id} className="px-3 py-2.5 text-sm text-[#5b6573]">
-                  <FavoriteRowContent
-                    name={name}
-                    officePhone={f.officePhone}
-                    healthSystemName={f.healthSystemName}
-                    healthSystemLogo={f.healthSystemLogo}
-                    specialtyLabel={f.specialtyLabel}
-                    starred={f.starred}
-                    onToggleStar={() => void toggleStar(f.id, Boolean(f.starred))}
-                  />
-                </li>
-              );
-            })}
-          </ul>
+      {specialtyGroups.length ? (
+        <div className="mt-3 space-y-4">
+          {specialtyGroups.map((group) => (
+            <div key={group.specialty}>
+              <p className="sans px-1 text-[11px] font-semibold tracking-wide text-[#5b6573] uppercase">
+                {group.specialty}
+              </p>
+              <ul className="mt-1 -mx-2 divide-y divide-[#ebe4d8]">
+                {group.consultants.map((f) => {
+                  const name = `${f.firstName} ${f.lastName}`.trim();
+                  const hasCell = Boolean(f.mobilePhone);
+                  const selected = selectedId === f.id;
+                  if (hasCell) {
+                    return (
+                      <li key={f.id} className="flex items-start gap-1 py-1 first:pt-0 last:pb-0">
+                        <div className="pt-2.5 pl-3">
+                          <StarToggle
+                            starred={f.starred}
+                            onToggle={() => void toggleStar(f.id, Boolean(f.starred))}
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedId(f.id);
+                            onSelect(f);
+                          }}
+                          aria-pressed={selected}
+                          className={`min-w-0 flex-1 rounded-lg px-2 py-2.5 text-left text-sm font-medium focus-visible:outline-none focus-visible:bg-[#f5f0e8] hover:bg-[#f5f0e8] ${
+                            selected ? "bg-[#f5f0e8] text-teal-900" : "text-[#0f1c2e]"
+                          }`}
+                        >
+                          <FavoriteRowContent
+                            name={name}
+                            officePhone={f.officePhone}
+                            mobilePhone={f.mobilePhone}
+                            showCell
+                            healthSystemName={f.healthSystemName}
+                            healthSystemLogo={f.healthSystemLogo}
+                            title="Click to view cell phone or send text"
+                          />
+                        </button>
+                      </li>
+                    );
+                  }
+                  return (
+                    <li
+                      key={f.id}
+                      className="flex items-start gap-1 px-3 py-2.5 text-sm text-[#5b6573]"
+                    >
+                      <StarToggle
+                        starred={f.starred}
+                        onToggle={() => void toggleStar(f.id, Boolean(f.starred))}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <FavoriteRowContent
+                          name={name}
+                          officePhone={f.officePhone}
+                          healthSystemName={f.healthSystemName}
+                          healthSystemLogo={f.healthSystemLogo}
+                        />
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
         </div>
       ) : null}
 

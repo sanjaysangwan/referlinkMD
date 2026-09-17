@@ -8,6 +8,7 @@ import { hashPassword, sha256Hex } from "@/lib/crypto";
 import { npiValid, bindConsultsToUser } from "@/lib/clinician";
 import { writeAudit } from "@/lib/audit";
 import { requestMeta } from "@/lib/request";
+import { cleanupIfExpiredConsultInviteToken } from "@/lib/placeholders";
 
 const schema = z.object({
   firstName: z.string().min(1),
@@ -35,6 +36,7 @@ export async function POST(request: Request, context: { params: Promise<{ token:
     .where(eq(accessTokens.tokenHash, sha256Hex(token)))
     .limit(1);
   if (!row || row.expiresAt.getTime() < Date.now()) {
+    await cleanupIfExpiredConsultInviteToken(token);
     return NextResponse.json({ error: "This link is invalid or expired." }, { status: 400 });
   }
 

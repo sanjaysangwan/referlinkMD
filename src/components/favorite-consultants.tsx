@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { PhoneField, MobilePhoneText } from "@/components/phone-field";
 import { PracticeMark } from "@/components/practice-mark";
+import { SpecialtyFields } from "@/components/specialty-fields";
+import { groupFavoritesBySpecialty } from "@/lib/favorite-groups";
 import { formatPhone, formatPhoneInput } from "@/lib/phone";
 
 type Favorite = {
@@ -24,6 +26,8 @@ type ConsultantMatch = {
   mobilePhone: string | null;
   officePhone?: string | null;
   npi: string | null;
+  specialtyId?: string | null;
+  subspecialtyId?: string | null;
 };
 
 const field = "mt-1 w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2 text-base text-[#0f1c2e]";
@@ -54,6 +58,8 @@ export function FavoriteConsultantsManager() {
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [starredOnly, setStarredOnly] = useState(false);
   const [name, setName] = useState("");
+  const [specialtyId, setSpecialtyId] = useState("");
+  const [subspecialtyId, setSubspecialtyId] = useState("");
   const [officePhone, setOfficePhone] = useState("");
   const [mobilePhone, setMobilePhone] = useState("");
   const [busy, setBusy] = useState(false);
@@ -67,8 +73,7 @@ export function FavoriteConsultantsManager() {
     () => (starredOnly ? favorites.filter((f) => f.starred) : favorites),
     [favorites, starredOnly],
   );
-  const withCell = visible.filter((f) => Boolean(f.mobilePhone));
-  const officeOnly = visible.filter((f) => !f.mobilePhone && Boolean(f.officePhone));
+  const specialtyGroups = useMemo(() => groupFavoritesBySpecialty(visible), [visible]);
 
   const load = useCallback(async () => {
     const res = await fetch("/api/favorites");
@@ -105,7 +110,10 @@ export function FavoriteConsultantsManager() {
             ? "Select a consultant to fill their phones."
             : "No match. Enter office and/or cell below.",
         );
-      } catch {
+      } catch (err) {
+        if (controller.signal.aborted || (err instanceof DOMException && err.name === "AbortError")) {
+          return;
+        }
         if (!controller.signal.aborted) {
           setSearchStatus("Search unavailable. You can enter details manually.");
         }
@@ -119,6 +127,10 @@ export function FavoriteConsultantsManager() {
 
   async function add(e: React.FormEvent) {
     e.preventDefault();
+    if (!specialtyId) {
+      setError("Select a specialty.");
+      return;
+    }
     if (!officePhone.trim() && !mobilePhone.trim()) {
       setError("Enter at least one phone number (office or cell).");
       return;
@@ -141,7 +153,13 @@ export function FavoriteConsultantsManager() {
       const res = await fetch("/api/favorites", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, officePhone, mobilePhone }),
+        body: JSON.stringify({
+          name,
+          officePhone,
+          mobilePhone,
+          specialtyId,
+          subspecialtyId: subspecialtyId || null,
+        }),
       });
       const data = await res.json().catch(() => ({}));
       setBusy(false);
@@ -149,12 +167,18 @@ export function FavoriteConsultantsManager() {
         setError(data.error ?? "Could not add to the directory.");
         return;
       }
-      setOk(data.message ?? "Added.");
-      setName("");
-      setOfficePhone("");
-      setMobilePhone("");
-      setMatches([]);
-      setSearchStatus("");
+      const message = data.message ?? "Added.";
+      setOk(message);
+      // Keep the form when the number was already in the directory so the result is obvious.
+      if (data.status !== "exists") {
+        setName("");
+        setSpecialtyId("");
+        setSubspecialtyId("");
+        setOfficePhone("");
+        setMobilePhone("");
+        setMatches([]);
+        setSearchStatus("");
+      }
       await load();
     } catch {
       setBusy(false);
@@ -196,6 +220,8 @@ export function FavoriteConsultantsManager() {
 
   function selectMatch(person: ConsultantMatch) {
     setName(`${person.firstName} ${person.lastName}`.trim());
+    setSpecialtyId(person.specialtyId ?? "");
+    setSubspecialtyId(person.specialtyId ? (person.subspecialtyId ?? "") : "");
     setMobilePhone(formatPhoneInput(person.mobilePhone ?? ""));
     setOfficePhone(formatPhoneInput(person.officePhone ?? ""));
     setSearching(false);
@@ -228,9 +254,6 @@ export function FavoriteConsultantsManager() {
             <p className="font-medium text-[#0f1c2e]">
               {f.firstName} {f.lastName}
             </p>
-            {f.specialtyLabel ? (
-              <p className="mt-0.5 text-xs font-normal text-[#5b6573]">{f.specialtyLabel}</p>
-            ) : null}
             <FavoritePhones
               officePhone={f.officePhone}
               mobilePhone={f.mobilePhone}
@@ -255,8 +278,8 @@ export function FavoriteConsultantsManager() {
       <div>
         <h2 className="font-serif text-xl">Consultant directory</h2>
         <p className="mt-1 text-sm text-[#5b6573]">
-          Add consultants by name with office and/or cell. At least one phone is required. Cell
-          numbers can populate a new consult request.
+          Add consultants by name, specialty, and office and/or cell. Specialty and at least one
+          phone are required. Cell numbers can populate a new consult request.
         </p>
       </div>
 
@@ -270,8 +293,12 @@ export function FavoriteConsultantsManager() {
             autoComplete="off"
             onChange={(e) => {
               setName(e.target.value);
+              setSpecialtyId("");
+              setSubspecialtyId("");
               setOfficePhone("");
               setMobilePhone("");
+              setError("");
+              setOk("");
               setSearching(true);
             }}
             onFocus={() => {
@@ -312,6 +339,15 @@ export function FavoriteConsultantsManager() {
             </p>
           </div>
         ) : null}
+        <SpecialtyFields
+          specialtyRequired
+          specialtyId={specialtyId}
+          subspecialtyId={subspecialtyId}
+          onChange={({ specialtyId: nextSpec, subspecialtyId: nextSub }) => {
+            setSpecialtyId(nextSpec);
+            setSubspecialtyId(nextSub);
+          }}
+        />
         <div className="grid gap-3 sm:grid-cols-2">
           <label className={label}>
             Office
@@ -326,9 +362,17 @@ export function FavoriteConsultantsManager() {
             </div>
           </label>
         </div>
-        <p className="text-xs text-[#5b6573]">Enter at least one phone number.</p>
-        {error ? <p className="text-sm text-orange-800">{error}</p> : null}
-        {ok ? <p className="text-sm text-teal-900">{ok}</p> : null}
+        <p className="text-xs text-[#5b6573]">Specialty and at least one phone number are required.</p>
+        {error ? (
+          <p role="alert" className="rounded-lg bg-orange-50 px-3 py-2 text-sm text-orange-900">
+            {error}
+          </p>
+        ) : null}
+        {ok ? (
+          <p role="status" className="rounded-lg bg-teal-50 px-3 py-2 text-sm text-teal-950">
+            {ok}
+          </p>
+        ) : null}
         <button
           disabled={busy}
           className="rounded-full bg-[#0f1c2e] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
@@ -354,30 +398,18 @@ export function FavoriteConsultantsManager() {
               {starredOnly ? "Showing your starred list" : "Showing full practice directory"}
             </p>
           </div>
-          {withCell.length ? (
-            <div>
+          {specialtyGroups.map((group) => (
+            <div key={group.specialty}>
               <p className="text-[11px] font-semibold tracking-wide text-[#5b6573] uppercase">
-                With cell phone
+                {group.specialty}
               </p>
               <ul className="divide-y divide-[#ebe4d8]">
-                {withCell.map((f) => (
+                {group.consultants.map((f) => (
                   <FavoriteRow key={f.id} f={f} />
                 ))}
               </ul>
             </div>
-          ) : null}
-          {officeOnly.length ? (
-            <div>
-              <p className="text-[11px] font-semibold tracking-wide text-[#5b6573] uppercase">
-                Office phones only
-              </p>
-              <ul className="divide-y divide-[#ebe4d8]">
-                {officeOnly.map((f) => (
-                  <FavoriteRow key={f.id} f={f} />
-                ))}
-              </ul>
-            </div>
-          ) : null}
+          ))}
           {starredOnly && !visible.length ? (
             <p className="text-sm text-[#5b6573]">No starred consultants yet. Tap ★ on a row.</p>
           ) : null}

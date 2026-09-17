@@ -5,6 +5,7 @@ import { getDb } from "@/db";
 import { sha256Hex } from "@/lib/crypto";
 import { writeAudit } from "@/lib/audit";
 import { requestMeta } from "@/lib/request";
+import { cleanupIfExpiredConsultInviteToken } from "@/lib/placeholders";
 
 export async function GET(_request: Request, context: { params: Promise<{ token: string }> }) {
   const { token } = await context.params;
@@ -17,6 +18,7 @@ export async function GET(_request: Request, context: { params: Promise<{ token:
     .limit(1);
 
   if (!row || row.token.expiresAt.getTime() < Date.now()) {
+    await cleanupIfExpiredConsultInviteToken(token);
     return NextResponse.json({ error: "This link is invalid or expired." }, { status: 400 });
   }
 

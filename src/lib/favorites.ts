@@ -2,7 +2,6 @@ import { and, desc, eq, sql } from "drizzle-orm";
 import {
   favoriteConsultantStars,
   favoriteConsultants,
-  healthSystems,
   practiceMemberships,
   practices,
   specialties,
@@ -12,7 +11,11 @@ import {
 import { getDb } from "@/db";
 import { hashPassword, randomTempPassword } from "@/lib/crypto";
 import { parseClinicianName, pendingEmailForPhone, toE164 } from "@/lib/phone";
-import { physicianSpecialtyLabel, resolveSpecialtyLabel } from "@/lib/specialty";
+import {
+  physicianSpecialtyLabel,
+  resolveSpecialtyLabel,
+  validatePhysicianSpecialty,
+} from "@/lib/specialty";
 
 export type FavoriteConsultant = {
   id: string;
@@ -28,38 +31,38 @@ export type FavoriteConsultant = {
 
 function practiceOfficeSql() {
   return sql<string | null>`(
-    select ${practices.phone}
-    from ${practiceMemberships}
-    inner join ${practices} on ${practices.id} = ${practiceMemberships.practiceId}
-    where ${practiceMemberships.userId} = ${users.id}
-      and ${practiceMemberships.status} = 'active'
-    order by ${practiceMemberships.createdAt} desc
+    select p.phone
+    from practice_memberships pm
+    inner join practices p on p.id = pm.practice_id
+    where pm.user_id = "users"."id"
+      and pm.status = 'active'
+    order by pm.created_at desc
     limit 1
   )`;
 }
 
 function healthSystemNameSql() {
   return sql<string | null>`(
-    select ${healthSystems.name}
-    from ${practiceMemberships}
-    inner join ${practices} on ${practices.id} = ${practiceMemberships.practiceId}
-    inner join ${healthSystems} on ${healthSystems.id} = ${practices.healthSystemId}
-    where ${practiceMemberships.userId} = ${users.id}
-      and ${practiceMemberships.status} = 'active'
-    order by ${practiceMemberships.createdAt} desc
+    select hs.name
+    from practice_memberships pm
+    inner join practices p on p.id = pm.practice_id
+    inner join health_systems hs on hs.id = p.health_system_id
+    where pm.user_id = "users"."id"
+      and pm.status = 'active'
+    order by pm.created_at desc
     limit 1
   )`;
 }
 
 function healthSystemLogoSql() {
   return sql<string | null>`(
-    select ${healthSystems.logo}
-    from ${practiceMemberships}
-    inner join ${practices} on ${practices.id} = ${practiceMemberships.practiceId}
-    inner join ${healthSystems} on ${healthSystems.id} = ${practices.healthSystemId}
-    where ${practiceMemberships.userId} = ${users.id}
-      and ${practiceMemberships.status} = 'active'
-    order by ${practiceMemberships.createdAt} desc
+    select hs.logo
+    from practice_memberships pm
+    inner join practices p on p.id = pm.practice_id
+    inner join health_systems hs on hs.id = p.health_system_id
+    where pm.user_id = "users"."id"
+      and pm.status = 'active'
+    order by pm.created_at desc
     limit 1
   )`;
 }
@@ -173,6 +176,8 @@ export async function addFavoriteConsultant(input: {
   name: string;
   mobilePhone?: string;
   officePhone?: string;
+  specialtyId: string;
+  subspecialtyId?: string | null;
 }): Promise<
   | { ok: true; status: "found" | "created" | "exists"; message: string; consultant: FavoriteConsultant }
   | { ok: false; error: string; status: number }
@@ -197,7 +202,22 @@ export async function addFavoriteConsultant(input: {
     return { ok: false, error: "Enter the consultant's name.", status: 400 };
   }
 
+  const specialtyId = input.specialtyId?.trim() || "";
+  if (!specialtyId) {
+    return { ok: false, error: "Select a specialty.", status: 400 };
+  }
+  const subspecialtyId = input.subspecialtyId || null;
+
   const db = await getDb();
+  const check = await validatePhysicianSpecialty(db, { specialtyId, subspecialtyId });
+  if (!check.ok) return { ok: false, error: check.error, status: 400 };
+
+  async function applySpecialtyToExisting(userId: string) {
+    await db
+      .update(users)
+      .set({ specialtyId, subspecialtyId })
+      .where(eq(users.id, userId));
+  }
 
   if (mobile) {
     const [byPhone] = await db.select().from(users).where(eq(users.mobilePhone, mobile)).limit(1);
@@ -205,8 +225,10 @@ export async function addFavoriteConsultant(input: {
       if (byPhone.id === input.addedByUserId) {
         return { ok: false, error: "You cannot add yourself as a favorite consultant.", status: 400 };
       }
+      await applySpecialtyToExisting(byPhone.id);
       const link = await ensureFavorite(input.practiceId, input.addedByUserId, byPhone.id, office);
-      const specialty = await resolveSpecialtyLabel(db, byPhone.specialtyId, byPhone.subspecialtyId);
+      const specialty = await resolveSpecialtyLabel(db, specialtyId, subspecialtyId);
+      const displayName = `${byPhone.firstName} ${byPhone.lastName}`.trim() || "That consultant";
       const consultant: FavoriteConsultant = {
         id: byPhone.id,
         firstName: byPhone.firstName,
@@ -222,32 +244,47 @@ export async function addFavoriteConsultant(input: {
         return {
           ok: true,
           status: "exists",
-          message: "Already in the practice directory.",
+          message: `${displayName} is already in the practice directory (matched by cell phone).`,
           consultant,
         };
       }
       return {
         ok: true,
         status: "found",
-        message: "Found and added to the practice directory.",
+        message: `Matched existing account ${displayName} and added them to the practice directory.`,
         consultant,
       };
     }
 
     const userId = crypto.randomUUID();
-    await db.insert(users).values({
-      id: userId,
-      email: pendingEmailForPhone(mobile),
-      passwordHash: await hashPassword(randomTempPassword() + randomTempPassword()),
-      firstName: parsedName.firstName,
-      lastName: parsedName.lastName,
-      npi: null,
-      mobilePhone: mobile,
-      mobileVerifiedAt: null,
-      mustChangePassword: false,
-      status: "invited",
-    });
+    try {
+      await db.insert(users).values({
+        id: userId,
+        email: pendingEmailForPhone(mobile),
+        passwordHash: await hashPassword(randomTempPassword() + randomTempPassword()),
+        firstName: parsedName.firstName,
+        lastName: parsedName.lastName,
+        npi: null,
+        mobilePhone: mobile,
+        mobileVerifiedAt: null,
+        mustChangePassword: false,
+        status: "invited",
+        specialtyId,
+        subspecialtyId,
+      });
+    } catch {
+      const [again] = await db.select().from(users).where(eq(users.mobilePhone, mobile)).limit(1);
+      if (again) {
+        return {
+          ok: false,
+          error: `That cell phone is already registered to ${again.firstName} ${again.lastName}.`.trim(),
+          status: 409,
+        };
+      }
+      return { ok: false, error: "Could not add that consultant. Try again.", status: 500 };
+    }
     await ensureFavorite(input.practiceId, input.addedByUserId, userId, office);
+    const specialty = await resolveSpecialtyLabel(db, specialtyId, subspecialtyId);
     return {
       ok: true,
       status: "created",
@@ -260,7 +297,7 @@ export async function addFavoriteConsultant(input: {
         officePhone: office,
         healthSystemName: null,
         healthSystemLogo: null,
-        specialtyLabel: null,
+        specialtyLabel: specialty.specialtyLabel,
         starred: false,
       },
     };
@@ -278,8 +315,11 @@ export async function addFavoriteConsultant(input: {
     mobileVerifiedAt: null,
     mustChangePassword: false,
     status: "invited",
+    specialtyId,
+    subspecialtyId,
   });
   await ensureFavorite(input.practiceId, input.addedByUserId, userId, office);
+  const specialty = await resolveSpecialtyLabel(db, specialtyId, subspecialtyId);
   return {
     ok: true,
     status: "created",
@@ -292,7 +332,7 @@ export async function addFavoriteConsultant(input: {
       officePhone: office,
       healthSystemName: null,
       healthSystemLogo: null,
-      specialtyLabel: null,
+      specialtyLabel: specialty.specialtyLabel,
       starred: false,
     },
   };

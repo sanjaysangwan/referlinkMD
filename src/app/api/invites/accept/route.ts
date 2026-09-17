@@ -7,6 +7,7 @@ import { createSession, homePath, loadSessionUser } from "@/lib/auth";
 import { hashPassword, sha256Hex } from "@/lib/crypto";
 import { writeAudit } from "@/lib/audit";
 import { requestMeta } from "@/lib/request";
+import { cleanupIfExpiredPracticeInviteToken } from "@/lib/placeholders";
 
 const schema = z.object({
   token: z.string().min(16),
@@ -30,6 +31,7 @@ export async function POST(request: Request) {
     .limit(1);
 
   if (!invite || invite.acceptedAt || invite.expiresAt.getTime() < Date.now()) {
+    await cleanupIfExpiredPracticeInviteToken(parsed.data.token);
     return NextResponse.json({ error: "This invite is invalid or expired." }, { status: 400 });
   }
 
@@ -128,6 +130,7 @@ export async function GET(request: Request) {
     .where(and(eq(invitations.tokenHash, sha256Hex(token)), isNull(invitations.revokedAt)))
     .limit(1);
   if (!invite || invite.acceptedAt || invite.expiresAt.getTime() < Date.now()) {
+    await cleanupIfExpiredPracticeInviteToken(token);
     return NextResponse.json({ error: "This invite is invalid or expired." }, { status: 400 });
   }
   const [practice] = await db.select().from(practices).where(eq(practices.id, invite.practiceId)).limit(1);

@@ -16,11 +16,13 @@ export function SpecialtyFields({
   subspecialtyId,
   onChange,
   className,
+  specialtyRequired = false,
 }: {
   specialtyId: string;
   subspecialtyId: string;
   onChange: (next: { specialtyId: string; subspecialtyId: string }) => void;
   className?: string;
+  specialtyRequired?: boolean;
 }) {
   const [options, setOptions] = useState<SpecialtyOption[]>([]);
 
@@ -43,6 +45,7 @@ export function SpecialtyFields({
       <label className={label}>
         Specialty
         <select
+          required={specialtyRequired}
           className={field}
           value={specialtyId}
           onChange={(e) => onChange({ specialtyId: e.target.value, subspecialtyId: "" })}
