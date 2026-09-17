@@ -32,8 +32,38 @@ CREATE UNIQUE INDEX IF NOT EXISTS users_mobile_phone_unique
   ON users (mobile_phone)
   WHERE mobile_phone IS NOT NULL AND length(btrim(mobile_phone)) > 0;
 
+CREATE TABLE IF NOT EXISTS specialties (
+  id uuid PRIMARY KEY,
+  name text NOT NULL UNIQUE,
+  sort_order integer NOT NULL DEFAULT 0,
+  status text NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS specialty_subspecialties (
+  id uuid PRIMARY KEY,
+  specialty_id uuid NOT NULL REFERENCES specialties(id),
+  name text NOT NULL,
+  sort_order integer NOT NULL DEFAULT 0,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (specialty_id, name)
+);
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS specialty_id uuid REFERENCES specialties(id);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS subspecialty_id uuid REFERENCES specialty_subspecialties(id);
+
+CREATE TABLE IF NOT EXISTS health_systems (
+  id uuid PRIMARY KEY,
+  name text NOT NULL,
+  logo text,
+  status text NOT NULL CHECK (status IN ('active', 'suspended')),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
 CREATE TABLE IF NOT EXISTS practices (
   id uuid PRIMARY KEY,
+  health_system_id uuid NOT NULL REFERENCES health_systems(id),
   name text NOT NULL,
   phone text NOT NULL,
   fax text NOT NULL,
@@ -62,6 +92,10 @@ CREATE TABLE IF NOT EXISTS practice_memberships (
   created_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE (practice_id, user_id)
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS practice_memberships_one_active_user_idx
+  ON practice_memberships (user_id)
+  WHERE status = 'active';
 
 CREATE TABLE IF NOT EXISTS invitations (
   id uuid PRIMARY KEY,
@@ -180,10 +214,20 @@ CREATE TABLE IF NOT EXISTS demo_outbox (
 
 CREATE TABLE IF NOT EXISTS favorite_consultants (
   id uuid PRIMARY KEY,
-  owner_user_id uuid NOT NULL REFERENCES users(id),
+  practice_id uuid NOT NULL REFERENCES practices(id),
+  consultant_user_id uuid NOT NULL REFERENCES users(id),
+  office_phone text,
+  added_by_user_id uuid REFERENCES users(id),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (practice_id, consultant_user_id)
+);
+
+CREATE TABLE IF NOT EXISTS favorite_consultant_stars (
+  id uuid PRIMARY KEY,
+  user_id uuid NOT NULL REFERENCES users(id),
   consultant_user_id uuid NOT NULL REFERENCES users(id),
   created_at timestamptz NOT NULL DEFAULT now(),
-  UNIQUE (owner_user_id, consultant_user_id)
+  UNIQUE (user_id, consultant_user_id)
 );
 
 CREATE TABLE IF NOT EXISTS password_reset_tokens (
@@ -195,6 +239,150 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
   created_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS password_reset_tokens_user_idx ON password_reset_tokens (user_id, created_at DESC);
+`;
+
+/** Health systems above practices; one active membership per user. */
+export const MIGRATION_014_SQL = `
+CREATE TABLE IF NOT EXISTS health_systems (
+  id uuid PRIMARY KEY,
+  name text NOT NULL,
+  logo text,
+  status text NOT NULL CHECK (status IN ('active', 'suspended')),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+ALTER TABLE practices ADD COLUMN IF NOT EXISTS health_system_id uuid REFERENCES health_systems(id);
+
+INSERT INTO health_systems (id, name, status)
+SELECT 'b1000000-0000-4000-8000-000000000001', 'Default Health System', 'active'
+WHERE NOT EXISTS (SELECT 1 FROM health_systems WHERE id = 'b1000000-0000-4000-8000-000000000001');
+
+UPDATE practices
+SET health_system_id = 'b1000000-0000-4000-8000-000000000001'
+WHERE health_system_id IS NULL;
+
+ALTER TABLE practices ALTER COLUMN health_system_id SET NOT NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS practice_memberships_one_active_user_idx
+  ON practice_memberships (user_id)
+  WHERE status = 'active';
+`;
+
+/** Health system logos + seed catalog names. */
+export const MIGRATION_016_SQL = `
+ALTER TABLE health_systems ADD COLUMN IF NOT EXISTS logo text;
+
+INSERT INTO health_systems (id, name, status)
+SELECT 'b1000000-0000-4000-8000-000000000011', 'Northwell Health', 'active'
+WHERE NOT EXISTS (SELECT 1 FROM health_systems WHERE lower(name) = lower('Northwell Health'));
+
+INSERT INTO health_systems (id, name, status)
+SELECT 'b1000000-0000-4000-8000-000000000012', 'Catholic Health', 'active'
+WHERE NOT EXISTS (SELECT 1 FROM health_systems WHERE lower(name) = lower('Catholic Health'));
+
+INSERT INTO health_systems (id, name, status)
+SELECT 'b1000000-0000-4000-8000-000000000013', 'Stony Brook', 'active'
+WHERE NOT EXISTS (SELECT 1 FROM health_systems WHERE lower(name) = lower('Stony Brook'));
+
+INSERT INTO health_systems (id, name, status)
+SELECT 'b1000000-0000-4000-8000-000000000014', 'NYU', 'active'
+WHERE NOT EXISTS (SELECT 1 FROM health_systems WHERE lower(name) = lower('NYU'));
+
+INSERT INTO health_systems (id, name, status)
+SELECT 'b1000000-0000-4000-8000-000000000015', 'Independent', 'active'
+WHERE NOT EXISTS (SELECT 1 FROM health_systems WHERE lower(name) = lower('Independent'));
+`;
+
+/** Physician specialty / subspecialty catalog + user assignment columns. */
+export const MIGRATION_017_SQL = `
+CREATE TABLE IF NOT EXISTS specialties (
+  id uuid PRIMARY KEY,
+  name text NOT NULL UNIQUE,
+  sort_order integer NOT NULL DEFAULT 0,
+  status text NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS specialty_subspecialties (
+  id uuid PRIMARY KEY,
+  specialty_id uuid NOT NULL REFERENCES specialties(id),
+  name text NOT NULL,
+  sort_order integer NOT NULL DEFAULT 0,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (specialty_id, name)
+);
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS specialty_id uuid REFERENCES specialties(id);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS subspecialty_id uuid REFERENCES specialty_subspecialties(id);
+`;
+
+/** Practice-owned favorite directory + personal stars. */
+export const MIGRATION_018_SQL = `
+ALTER TABLE favorite_consultants ADD COLUMN IF NOT EXISTS practice_id uuid REFERENCES practices(id);
+ALTER TABLE favorite_consultants ADD COLUMN IF NOT EXISTS added_by_user_id uuid REFERENCES users(id);
+
+UPDATE favorite_consultants AS fc
+SET
+  practice_id = pm.practice_id,
+  added_by_user_id = COALESCE(fc.added_by_user_id, fc.owner_user_id)
+FROM practice_memberships pm
+WHERE pm.user_id = fc.owner_user_id
+  AND pm.status = 'active'
+  AND fc.practice_id IS NULL;
+
+DELETE FROM favorite_consultants WHERE practice_id IS NULL;
+
+DELETE FROM favorite_consultants a
+USING favorite_consultants b
+WHERE a.practice_id = b.practice_id
+  AND a.consultant_user_id = b.consultant_user_id
+  AND a.id::text > b.id::text;
+
+CREATE TABLE IF NOT EXISTS favorite_consultant_stars (
+  id uuid PRIMARY KEY,
+  user_id uuid NOT NULL REFERENCES users(id),
+  consultant_user_id uuid NOT NULL REFERENCES users(id),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (user_id, consultant_user_id)
+);
+
+INSERT INTO favorite_consultant_stars (id, user_id, consultant_user_id)
+SELECT
+  (
+    substr(md5(fc.owner_user_id::text || fc.consultant_user_id::text), 1, 8) || '-' ||
+    substr(md5(fc.owner_user_id::text || fc.consultant_user_id::text), 9, 4) || '-4' ||
+    substr(md5(fc.owner_user_id::text || fc.consultant_user_id::text), 14, 3) || '-a' ||
+    substr(md5(fc.owner_user_id::text || fc.consultant_user_id::text), 18, 3) || '-' ||
+    substr(md5(fc.owner_user_id::text || fc.consultant_user_id::text), 21, 12)
+  )::uuid,
+  fc.owner_user_id,
+  fc.consultant_user_id
+FROM favorite_consultants fc
+WHERE fc.owner_user_id IS NOT NULL
+ON CONFLICT (user_id, consultant_user_id) DO NOTHING;
+
+ALTER TABLE favorite_consultants DROP CONSTRAINT IF EXISTS favorite_consultants_owner_user_id_consultant_user_id_key;
+DROP INDEX IF EXISTS favorite_consultants_owner_consultant_idx;
+
+ALTER TABLE favorite_consultants DROP COLUMN IF EXISTS owner_user_id;
+ALTER TABLE favorite_consultants ALTER COLUMN practice_id SET NOT NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS favorite_consultants_practice_consultant_idx
+  ON favorite_consultants (practice_id, consultant_user_id);
+`;
+
+/** One active practice membership per user; pending invites allowed while still elsewhere. */
+export const MIGRATION_015_SQL = `
+DROP INDEX IF EXISTS practice_memberships_one_current_user_idx;
+CREATE UNIQUE INDEX IF NOT EXISTS practice_memberships_one_active_user_idx
+  ON practice_memberships (user_id)
+  WHERE status = 'active';
+`;
+
+/** Saved office phone on favorite consultants (cell stays on users.mobile_phone). */
+export const MIGRATION_013_SQL = `
+ALTER TABLE favorite_consultants ADD COLUMN IF NOT EXISTS office_phone text;
 `;
 
 /** Practice uniqueness by name + ZIP (name_zip_key). */
@@ -278,6 +466,7 @@ CREATE TABLE IF NOT EXISTS favorite_consultants (
   id uuid PRIMARY KEY,
   owner_user_id uuid NOT NULL REFERENCES users(id),
   consultant_user_id uuid NOT NULL REFERENCES users(id),
+  office_phone text,
   created_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE (owner_user_id, consultant_user_id)
 );

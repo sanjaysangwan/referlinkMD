@@ -8,12 +8,15 @@ import { toE164 } from "@/lib/phone";
 import { npiValid } from "@/lib/clinician";
 import { writeAudit } from "@/lib/audit";
 import { requestMeta } from "@/lib/request";
+import { validatePhysicianSpecialty } from "@/lib/specialty";
 
 const patchSchema = z.object({
   firstName: z.string().optional(),
   lastName: z.string().optional(),
   npi: z.string().optional(),
   mobilePhone: z.string().optional(),
+  specialtyId: z.string().uuid().nullable().optional(),
+  subspecialtyId: z.string().uuid().nullable().optional(),
 });
 
 export async function GET() {
@@ -27,6 +30,11 @@ export async function GET() {
     npi: session.npi,
     mobilePhone: session.mobilePhone,
     role: session.role,
+    specialtyId: session.specialtyId,
+    subspecialtyId: session.subspecialtyId,
+    specialtyName: session.specialtyName,
+    subspecialtyName: session.subspecialtyName,
+    specialtyLabel: session.specialtyLabel,
   });
 }
 
@@ -45,6 +53,8 @@ export async function PATCH(request: Request) {
     npi?: string | null;
     mobilePhone?: string | null;
     mobileVerifiedAt?: Date | null;
+    specialtyId?: string | null;
+    subspecialtyId?: string | null;
   } = {};
   if (parsed.data.firstName !== undefined) patch.firstName = parsed.data.firstName.trim();
   if (parsed.data.lastName !== undefined) patch.lastName = parsed.data.lastName.trim();
@@ -66,6 +76,23 @@ export async function PATCH(request: Request) {
       patch.mobilePhone = mobile;
       patch.mobileVerifiedAt = new Date();
     }
+  }
+
+  const specialtyTouched =
+    parsed.data.specialtyId !== undefined || parsed.data.subspecialtyId !== undefined;
+  if (specialtyTouched) {
+    if (session.role !== "physician") {
+      return NextResponse.json({ error: "Only physicians have a specialty." }, { status: 400 });
+    }
+    const specialtyId =
+      parsed.data.specialtyId !== undefined ? parsed.data.specialtyId : session.specialtyId;
+    const subspecialtyId =
+      parsed.data.subspecialtyId !== undefined ? parsed.data.subspecialtyId : session.subspecialtyId;
+    const db = await getDb();
+    const check = await validatePhysicianSpecialty(db, { specialtyId, subspecialtyId });
+    if (!check.ok) return NextResponse.json({ error: check.error }, { status: 400 });
+    patch.specialtyId = specialtyId;
+    patch.subspecialtyId = specialtyId ? subspecialtyId : null;
   }
 
   const db = await getDb();

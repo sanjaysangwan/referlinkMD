@@ -1,20 +1,17 @@
 import { NextResponse } from "next/server";
-import { desc, eq } from "drizzle-orm";
-import { consults, patients, practices, users } from "@/db/schema";
-import { getDb } from "@/db";
 import { getSession } from "@/lib/auth";
 import { displayName } from "@/lib/privileges";
-import { consultantMatch, listNewConsultsSinceLastLogin } from "@/lib/inbox";
+import { listIncomingConsults, usesPracticeConsultingInbox } from "@/lib/inbox";
 
-function mapRows(
-  rows: Awaited<ReturnType<typeof listNewConsultsSinceLastLogin>>,
-) {
+function mapRows(rows: Awaited<ReturnType<typeof listIncomingConsults>>) {
   return rows.map((r) => ({
     id: r.consult.id,
     createdAt: r.consult.createdAt,
     status: r.consult.status,
     team: "consulting" as const,
     consultingName: r.consult.consultingName,
+    consultingPhone: r.consult.consultingPhone,
+    consultingUserId: r.consult.consultingUserId,
     requestedBy: displayName(r.requestedBy.firstName, r.requestedBy.lastName, r.requestedBy.email),
     practiceName: r.practice.name,
     practiceLogo: r.practice.logo,
@@ -32,26 +29,21 @@ export async function GET(request: Request) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const onlyNew = new URL(request.url).searchParams.get("new") === "1";
 
-  if (onlyNew) {
-    const rows = await listNewConsultsSinceLastLogin(session.id);
-    return NextResponse.json({ consults: mapRows(rows) });
+  const rows = await listIncomingConsults(session, onlyNew);
+  const consults = mapRows(rows);
+
+  if (usesPracticeConsultingInbox(session.role)) {
+    consults.sort((a, b) => {
+      const byName = a.consultingName.localeCompare(b.consultingName, undefined, {
+        sensitivity: "base",
+      });
+      if (byName !== 0) return byName;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
   }
 
-  const db = await getDb();
-  const rows = await db
-    .select({
-      consult: consults,
-      patient: patients,
-      requestedBy: users,
-      practice: practices,
-    })
-    .from(consults)
-    .innerJoin(patients, eq(patients.id, consults.patientId))
-    .innerJoin(users, eq(users.id, consults.requestedByUserId))
-    .innerJoin(practices, eq(practices.id, consults.requestingPracticeId))
-    .where(consultantMatch(session))
-    .orderBy(desc(consults.createdAt))
-    .limit(100);
-
-  return NextResponse.json({ consults: mapRows(rows) });
+  return NextResponse.json({
+    consults,
+    groupByConsultingClinician: usesPracticeConsultingInbox(session.role),
+  });
 }

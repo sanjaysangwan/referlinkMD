@@ -4,6 +4,7 @@ import { practiceMemberships, users } from "@/db/schema";
 import { getDb } from "@/db";
 import { getSession } from "@/lib/auth";
 import { ROLE_LABEL } from "@/lib/privileges";
+import { resolveSpecialtyLabel } from "@/lib/specialty";
 import type { PracticeRole } from "@/lib/types";
 
 export async function GET() {
@@ -18,20 +19,38 @@ export async function GET() {
     .innerJoin(users, eq(users.id, practiceMemberships.userId))
     .where(eq(practiceMemberships.practiceId, session.practiceId));
 
-  return NextResponse.json({
-    members: rows
+  const members = await Promise.all(
+    rows
       .filter((r) => r.membership.status !== "revoked")
-      .map((r) => ({
-        id: r.user.id,
-        name: `${r.user.firstName} ${r.user.lastName}`.trim() || r.user.email,
-        firstName: r.user.firstName,
-        lastName: r.user.lastName,
-        email: r.user.email,
-        role: r.membership.role as PracticeRole,
-        roleLabel: ROLE_LABEL[r.membership.role as PracticeRole],
-        npi: r.user.npi,
-        mobilePhone: r.user.mobilePhone,
-        status: r.membership.status,
-      })),
-  });
+      .map(async (r) => {
+        const role = r.membership.role as PracticeRole;
+        const specialty =
+          role === "physician"
+            ? await resolveSpecialtyLabel(db, r.user.specialtyId, r.user.subspecialtyId)
+            : {
+                specialtyName: null,
+                subspecialtyName: null,
+                specialtyLabel: null,
+              };
+        return {
+          id: r.user.id,
+          name: `${r.user.firstName} ${r.user.lastName}`.trim() || r.user.email,
+          firstName: r.user.firstName,
+          lastName: r.user.lastName,
+          email: r.user.email,
+          role,
+          roleLabel: ROLE_LABEL[role],
+          npi: r.user.npi,
+          mobilePhone: r.user.mobilePhone,
+          status: r.membership.status,
+          specialtyId: role === "physician" ? r.user.specialtyId : null,
+          subspecialtyId: role === "physician" ? r.user.subspecialtyId : null,
+          specialtyName: specialty.specialtyName,
+          subspecialtyName: specialty.subspecialtyName,
+          specialtyLabel: specialty.specialtyLabel,
+        };
+      }),
+  );
+
+  return NextResponse.json({ members });
 }

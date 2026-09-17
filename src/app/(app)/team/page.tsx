@@ -5,6 +5,7 @@ import { PracticeSetting } from "@/components/practice-setting";
 export default async function TeamPage() {
   const session = await getSession();
   if (!session) redirect("/login");
+  if (!session.practiceId) redirect("/create-practice");
   if (!session.isPracticeCreator) redirect("/settings");
   return <PracticeSetting session={session} />;
 }

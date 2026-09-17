@@ -5,8 +5,8 @@ import { drizzle as localDrizzle, type PgliteDatabase } from "drizzle-orm/pglite
 import { drizzle as postgresDrizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import * as schema from "./schema";
-import { MIGRATION_002_SQL, MIGRATION_003_SQL, MIGRATION_004_SQL, MIGRATION_005_SQL, MIGRATION_006_SQL, MIGRATION_007_SQL, MIGRATION_008_SQL, MIGRATION_009_SQL, MIGRATION_010_SQL, MIGRATION_011_SQL, MIGRATION_012_SQL, SCHEMA_SQL } from "./sql";
-import { backfillPracticeProfile, seedIfEmpty } from "./seed";
+import { MIGRATION_002_SQL, MIGRATION_003_SQL, MIGRATION_004_SQL, MIGRATION_005_SQL, MIGRATION_006_SQL, MIGRATION_007_SQL, MIGRATION_008_SQL, MIGRATION_009_SQL, MIGRATION_010_SQL, MIGRATION_011_SQL, MIGRATION_012_SQL, MIGRATION_013_SQL, MIGRATION_014_SQL, MIGRATION_015_SQL, MIGRATION_016_SQL, MIGRATION_017_SQL, MIGRATION_018_SQL, SCHEMA_SQL } from "./sql";
+import { backfillPracticeProfile, backfillSpecialtyCatalog, seedIfEmpty } from "./seed";
 
 export type Db = PgliteDatabase<typeof schema> | NodePgDatabase<typeof schema>;
 const cache = globalThis as unknown as { referlinkReady?: Promise<Db> };
@@ -23,6 +23,12 @@ const migrations = [
   { id: "010", sql: MIGRATION_010_SQL },
   { id: "011", sql: MIGRATION_011_SQL },
   { id: "012", sql: MIGRATION_012_SQL },
+  { id: "013", sql: MIGRATION_013_SQL },
+  { id: "014", sql: MIGRATION_014_SQL },
+  { id: "015", sql: MIGRATION_015_SQL },
+  { id: "016", sql: MIGRATION_016_SQL },
+  { id: "017", sql: MIGRATION_017_SQL },
+  { id: "018", sql: MIGRATION_018_SQL },
 ];
 
 type Query = (sql: string, params?: string[]) => Promise<{ rows: Record<string, unknown>[] }>;
@@ -64,6 +70,7 @@ async function init(): Promise<Db> {
         if (process.env.SEED_DEMO_DATA === "true" && process.env.APP_ENV === "demo") {
           await seedIfEmpty(db);
           await backfillPracticeProfile(db);
+          await backfillSpecialtyCatalog(db);
         }
         await client.query("COMMIT");
       } catch (error) {
@@ -96,6 +103,7 @@ async function init(): Promise<Db> {
     const db = localDrizzle(client, { schema });
     await seedIfEmpty(db);
     await backfillPracticeProfile(db);
+    await backfillSpecialtyCatalog(db);
     return db;
   } catch (error) {
     await client.close();

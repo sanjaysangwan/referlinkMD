@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   boolean,
   date,
@@ -10,6 +10,32 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
+
+export const specialties = pgTable(
+  "specialties",
+  {
+    id: uuid("id").primaryKey(),
+    name: text("name").notNull(),
+    sortOrder: integer("sort_order").notNull().default(0),
+    status: text("status").notNull().default("active"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("specialties_name_idx").on(t.name)],
+);
+
+export const specialtySubspecialties = pgTable(
+  "specialty_subspecialties",
+  {
+    id: uuid("id").primaryKey(),
+    specialtyId: uuid("specialty_id")
+      .notNull()
+      .references(() => specialties.id),
+    name: text("name").notNull(),
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("specialty_subspecialties_specialty_name_idx").on(t.specialtyId, t.name)],
+);
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey(),
@@ -32,10 +58,24 @@ export const users = pgTable("users", {
   lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
   previousLoginAt: timestamp("previous_login_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  specialtyId: uuid("specialty_id").references(() => specialties.id),
+  subspecialtyId: uuid("subspecialty_id").references(() => specialtySubspecialties.id),
+});
+
+export const healthSystems = pgTable("health_systems", {
+  id: uuid("id").primaryKey(),
+  name: text("name").notNull(),
+  logo: text("logo"),
+  status: text("status").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const practices = pgTable("practices", {
   id: uuid("id").primaryKey(),
+  healthSystemId: uuid("health_system_id")
+    .notNull()
+    .references(() => healthSystems.id),
   name: text("name").notNull(),
   phone: text("phone").notNull(),
   fax: text("fax").notNull(),
@@ -71,7 +111,12 @@ export const practiceMemberships = pgTable(
     acceptedAt: timestamp("accepted_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [uniqueIndex("practice_memberships_practice_user_idx").on(t.practiceId, t.userId)],
+  (t) => [
+    uniqueIndex("practice_memberships_practice_user_idx").on(t.practiceId, t.userId),
+    uniqueIndex("practice_memberships_one_active_user_idx")
+      .on(t.userId)
+      .where(sql`${t.status} = 'active'`),
+  ],
 );
 
 export const invitations = pgTable("invitations", {
@@ -198,7 +243,24 @@ export const favoriteConsultants = pgTable(
   "favorite_consultants",
   {
     id: uuid("id").primaryKey(),
-    ownerUserId: uuid("owner_user_id")
+    practiceId: uuid("practice_id")
+      .notNull()
+      .references(() => practices.id),
+    consultantUserId: uuid("consultant_user_id")
+      .notNull()
+      .references(() => users.id),
+    officePhone: text("office_phone"),
+    addedByUserId: uuid("added_by_user_id").references(() => users.id),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("favorite_consultants_practice_consultant_idx").on(t.practiceId, t.consultantUserId)],
+);
+
+export const favoriteConsultantStars = pgTable(
+  "favorite_consultant_stars",
+  {
+    id: uuid("id").primaryKey(),
+    userId: uuid("user_id")
       .notNull()
       .references(() => users.id),
     consultantUserId: uuid("consultant_user_id")
@@ -206,7 +268,7 @@ export const favoriteConsultants = pgTable(
       .references(() => users.id),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [uniqueIndex("favorite_consultants_owner_consultant_idx").on(t.ownerUserId, t.consultantUserId)],
+  (t) => [uniqueIndex("favorite_consultant_stars_user_consultant_idx").on(t.userId, t.consultantUserId)],
 );
 
 export const passwordResetTokens = pgTable("password_reset_tokens", {
@@ -220,15 +282,42 @@ export const passwordResetTokens = pgTable("password_reset_tokens", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ many, one }) => ({
   memberships: many(practiceMemberships),
-  favoriteConsultants: many(favoriteConsultants, { relationName: "ownerFavorites" }),
+  favoriteStars: many(favoriteConsultantStars),
+  specialty: one(specialties, { fields: [users.specialtyId], references: [specialties.id] }),
+  subspecialty: one(specialtySubspecialties, {
+    fields: [users.subspecialtyId],
+    references: [specialtySubspecialties.id],
+  }),
 }));
 
-export const practicesRelations = relations(practices, ({ many }) => ({
+export const specialtiesRelations = relations(specialties, ({ many }) => ({
+  subspecialties: many(specialtySubspecialties),
+  users: many(users),
+}));
+
+export const specialtySubspecialtiesRelations = relations(specialtySubspecialties, ({ one, many }) => ({
+  specialty: one(specialties, {
+    fields: [specialtySubspecialties.specialtyId],
+    references: [specialties.id],
+  }),
+  users: many(users),
+}));
+
+export const healthSystemsRelations = relations(healthSystems, ({ many }) => ({
+  practices: many(practices),
+}));
+
+export const practicesRelations = relations(practices, ({ one, many }) => ({
+  healthSystem: one(healthSystems, {
+    fields: [practices.healthSystemId],
+    references: [healthSystems.id],
+  }),
   memberships: many(practiceMemberships),
   patients: many(patients),
   consults: many(consults),
+  favoriteConsultants: many(favoriteConsultants),
 }));
 
 export const practiceMembershipsRelations = relations(practiceMemberships, ({ one }) => ({
@@ -252,13 +341,27 @@ export const consultsRelations = relations(consults, ({ one }) => ({
 }));
 
 export const favoriteConsultantsRelations = relations(favoriteConsultants, ({ one }) => ({
-  owner: one(users, {
-    fields: [favoriteConsultants.ownerUserId],
-    references: [users.id],
-    relationName: "ownerFavorites",
+  practice: one(practices, {
+    fields: [favoriteConsultants.practiceId],
+    references: [practices.id],
   }),
   consultant: one(users, {
     fields: [favoriteConsultants.consultantUserId],
+    references: [users.id],
+  }),
+  addedBy: one(users, {
+    fields: [favoriteConsultants.addedByUserId],
+    references: [users.id],
+  }),
+}));
+
+export const favoriteConsultantStarsRelations = relations(favoriteConsultantStars, ({ one }) => ({
+  user: one(users, {
+    fields: [favoriteConsultantStars.userId],
+    references: [users.id],
+  }),
+  consultant: one(users, {
+    fields: [favoriteConsultantStars.consultantUserId],
     references: [users.id],
   }),
 }));

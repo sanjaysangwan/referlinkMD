@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { practices } from "@/db/schema";
+import { healthSystems, practices } from "@/db/schema";
 import { getDb } from "@/db";
 import { getSession } from "@/lib/auth";
 import { toE164 } from "@/lib/phone";
 import { isPracticeLogoDataUrl } from "@/lib/practice-logo";
 import { normalizePostalCode, practiceNameZipKey } from "@/lib/practice-identity";
+import { resolveOrCreateHealthSystem } from "@/lib/health-systems";
 import { writeAudit } from "@/lib/audit";
 import { requestMeta } from "@/lib/request";
 
@@ -20,15 +21,20 @@ const patchSchema = z.object({
   city: z.string().optional(),
   state: z.string().optional(),
   postalCode: z.string().optional(),
+  healthSystemId: z.string().uuid().nullable().optional(),
+  healthSystemName: z.string().min(1).optional(),
 });
 
-export async function GET() {
-  const session = await getSession();
-  if (!session?.isPracticeCreator || !session.practiceId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+async function practicePayload(practiceId: string) {
   const db = await getDb();
-  const [practice] = await db.select().from(practices).where(eq(practices.id, session.practiceId)).limit(1);
-  if (!practice) return NextResponse.json({ error: "Not found." }, { status: 404 });
-  return NextResponse.json({
+  const [practice] = await db.select().from(practices).where(eq(practices.id, practiceId)).limit(1);
+  if (!practice) return null;
+  const [hs] = await db
+    .select()
+    .from(healthSystems)
+    .where(eq(healthSystems.id, practice.healthSystemId))
+    .limit(1);
+  return {
     id: practice.id,
     name: practice.name,
     phone: practice.phone,
@@ -39,7 +45,20 @@ export async function GET() {
     city: practice.city,
     state: practice.state,
     postalCode: practice.postalCode,
-  });
+    healthSystemId: practice.healthSystemId,
+    healthSystemName: hs?.name ?? null,
+    healthSystemLogo: hs?.logo ?? null,
+  };
+}
+
+export async function GET() {
+  const session = await getSession();
+  if (!session?.isPracticeCreator || !session.practiceId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const payload = await practicePayload(session.practiceId);
+  if (!payload) return NextResponse.json({ error: "Not found." }, { status: 404 });
+  return NextResponse.json(payload);
 }
 
 export async function PATCH(request: Request) {
@@ -94,6 +113,24 @@ export async function PATCH(request: Request) {
     }
   }
 
+  const assigningHealthSystem =
+    parsed.data.healthSystemId !== undefined || parsed.data.healthSystemName !== undefined;
+
+  if (assigningHealthSystem) {
+    try {
+      const healthSystemId = await resolveOrCreateHealthSystem(db, {
+        healthSystemId: parsed.data.healthSystemId,
+        healthSystemName: parsed.data.healthSystemName,
+      });
+      patch.healthSystemId = healthSystemId;
+    } catch (err) {
+      return NextResponse.json(
+        { error: err instanceof Error ? err.message : "Could not assign health system." },
+        { status: 400 },
+      );
+    }
+  }
+
   await db.update(practices).set(patch).where(eq(practices.id, session.practiceId));
   const { ip, userAgent } = await requestMeta();
   await writeAudit({
@@ -104,18 +141,6 @@ export async function PATCH(request: Request) {
     ip,
     userAgent,
   });
-  const [practice] = await db.select().from(practices).where(eq(practices.id, session.practiceId)).limit(1);
-  return NextResponse.json({
-    ok: true,
-    id: practice?.id,
-    name: practice?.name,
-    phone: practice?.phone,
-    fax: practice?.fax,
-    logo: practice?.logo,
-    addressLine1: practice?.addressLine1,
-    addressLine2: practice?.addressLine2,
-    city: practice?.city,
-    state: practice?.state,
-    postalCode: practice?.postalCode,
-  });
+  const payload = await practicePayload(session.practiceId);
+  return NextResponse.json({ ok: true, ...payload });
 }

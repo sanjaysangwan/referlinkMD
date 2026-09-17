@@ -16,6 +16,7 @@ export default async function ConsultsPage() {
     ? (await db.select().from(practices).where(eq(practices.id, session.practiceId)).limit(1))[0]
     : null;
   const settingsHref = session.isPracticeCreator ? "/team" : "/settings";
+  const directoryHref = "/directory";
   const profileIncomplete = session.isPracticeCreator
     ? Boolean(session.practiceId) &&
       (!session.firstName.trim() || !session.lastName.trim() || !practice?.phone)
@@ -24,12 +25,27 @@ export default async function ConsultsPage() {
 
   return (
     <div>
+      {!session.practiceId ? (
+        <section className="sans chart-card mb-8 space-y-3 p-6">
+          <h2 className="font-serif text-xl">No practice yet</h2>
+          <p className="text-sm text-[#3d4a5c]">
+            Create your own practice, or join another practice only through an invite email.
+          </p>
+          <Link
+            href="/create-practice"
+            className="inline-flex rounded-full bg-teal-800 px-5 py-2.5 text-sm font-semibold text-white"
+          >
+            Create practice
+          </Link>
+        </section>
+      ) : null}
       <ConsultsHome
         showIdentifiers
         canRequest={canRequest}
-        settingsHref={settingsHref}
+        settingsHref={directoryHref}
+        demoDefaults={isDemo()}
       />
-      {profileIncomplete ? (
+      {session.practiceId && profileIncomplete ? (
         <p className="sans mt-8 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
           <Link href={settingsHref} className="font-semibold underline underline-offset-2">
             Add practice details, invite other users

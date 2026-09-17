@@ -37,6 +37,8 @@ export interface SessionUser {
   lastName: string;
   npi: string | null;
   mobilePhone: string | null;
+  healthSystemId: string | null;
+  healthSystemName: string | null;
   practiceId: string | null;
   practiceName: string | null;
   practiceLogo: string | null;
@@ -44,6 +46,11 @@ export interface SessionUser {
   isPracticeCreator: boolean;
   mustChangePassword: boolean;
   mfaEnabled: boolean;
+  specialtyId: string | null;
+  subspecialtyId: string | null;
+  specialtyName: string | null;
+  subspecialtyName: string | null;
+  specialtyLabel: string | null;
 }
 
 export type Privilege =

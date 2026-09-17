@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { fileToSmallLogo } from "@/lib/practice-logo-file";
 import { PracticeMark } from "@/components/practice-mark";
 import { PhoneField } from "@/components/phone-field";
-import { FavoriteConsultantsManager } from "@/components/favorite-consultants";
 import { ChangePasswordCard } from "@/components/change-password-card";
+import { LeavePracticeCard } from "@/components/leave-practice-card";
+import { SpecialtyFields } from "@/components/specialty-fields";
 import { isDemo } from "@/lib/env";
 import Link from "next/link";
 import type { PracticeRole, SessionUser } from "@/lib/types";
@@ -22,6 +23,9 @@ type Member = {
   npi: string | null;
   mobilePhone: string | null;
   status: string;
+  specialtyId?: string | null;
+  subspecialtyId?: string | null;
+  specialtyLabel?: string | null;
 };
 
 const field = "mt-1 w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2 text-sm";
@@ -39,10 +43,25 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [postalCode, setPostalCode] = useState("");
+  const [healthSystemId, setHealthSystemId] = useState<string | null>(session.healthSystemId);
+  const [healthSystemName, setHealthSystemName] = useState(session.healthSystemName ?? "");
+  const [healthSystemLogo, setHealthSystemLogo] = useState<string | null>(null);
+  const [healthSystemOptions, setHealthSystemOptions] = useState<
+    Array<{ id: string; name: string; logo: string | null }>
+  >([]);
+  const [hsSuggestOpen, setHsSuggestOpen] = useState(false);
   const [editingPractice, setEditingPractice] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<PracticeRole>("app");
-  const [form, setForm] = useState({ firstName: "", lastName: "", npi: "", mobilePhone: "", role: "physician" as PracticeRole });
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    npi: "",
+    mobilePhone: "",
+    role: "physician" as PracticeRole,
+    specialtyId: "",
+    subspecialtyId: "",
+  });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [ok, setOk] = useState("");
@@ -59,6 +78,15 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
     setCity(data.city ?? "");
     setState(data.state ?? "");
     setPostalCode(data.postalCode ?? "");
+    setHealthSystemId(data.healthSystemId ?? null);
+    setHealthSystemName(data.healthSystemName ?? "");
+    setHealthSystemLogo(data.healthSystemLogo ?? null);
+  }
+
+  async function loadHealthSystems() {
+    const res = await fetch("/api/health-systems");
+    const data = await res.json();
+    if (res.ok) setHealthSystemOptions(data.healthSystems ?? []);
   }
 
   async function loadMembers() {
@@ -71,6 +99,7 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
   useEffect(() => {
     void loadPractice();
     void loadMembers();
+    void loadHealthSystems();
   }, []);
 
   function startEdit(member: Member) {
@@ -83,6 +112,8 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
       npi: member.npi ?? "",
       mobilePhone: member.mobilePhone ?? "",
       role: member.role,
+      specialtyId: member.specialtyId ?? "",
+      subspecialtyId: member.subspecialtyId ?? "",
     });
   }
 
@@ -93,10 +124,33 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
     setError("");
     setOk("");
     const url = editingId === session.id ? "/api/me" : `/api/team/${editingId}`;
+    const isPhysicianEdit =
+      editingId === session.id ? session.role === "physician" : form.role === "physician";
+    const specialtyPayload = isPhysicianEdit
+      ? {
+          specialtyId: form.specialtyId || null,
+          subspecialtyId: form.specialtyId ? form.subspecialtyId || null : null,
+        }
+      : editingId === session.id
+        ? {}
+        : { specialtyId: null, subspecialtyId: null };
     const body =
       editingId === session.id
-        ? { firstName: form.firstName, lastName: form.lastName, npi: form.npi, mobilePhone: form.mobilePhone }
-        : form;
+        ? {
+            firstName: form.firstName,
+            lastName: form.lastName,
+            npi: form.npi,
+            mobilePhone: form.mobilePhone,
+            ...specialtyPayload,
+          }
+        : {
+            firstName: form.firstName,
+            lastName: form.lastName,
+            npi: form.npi,
+            mobilePhone: form.mobilePhone,
+            role: form.role,
+            ...specialtyPayload,
+          };
     const res = await fetch(url, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -122,7 +176,18 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
     const res = await fetch("/api/practice", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, phone, fax, logo, addressLine1, city, state, postalCode }),
+      body: JSON.stringify({
+        name,
+        phone,
+        fax,
+        logo,
+        addressLine1,
+        city,
+        state,
+        postalCode,
+        healthSystemId,
+        healthSystemName: healthSystemName.trim() || undefined,
+      }),
     });
     const data = await res.json();
     setBusy(false);
@@ -132,8 +197,12 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
     }
     setName(data.name ?? name);
     setLogo(data.logo ?? logo);
+    setHealthSystemId(data.healthSystemId ?? null);
+    setHealthSystemName(data.healthSystemName ?? "");
+    setHealthSystemLogo(data.healthSystemLogo ?? null);
     setEditingPractice(false);
     setOk("Practice details saved.");
+    await loadHealthSystems();
     router.refresh();
   }
 
@@ -146,6 +215,12 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
       setError(err instanceof Error ? err.message : "Could not read that logo.");
     }
   }
+
+  const hsSuggestions = healthSystemOptions.filter((hs) => {
+    const q = healthSystemName.trim().toLowerCase();
+    if (!q) return true;
+    return hs.name.toLowerCase().includes(q);
+  });
 
   async function invite(e: React.FormEvent) {
     e.preventDefault();
@@ -163,7 +238,7 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
       setError(data.error ?? "Invite failed.");
       return;
     }
-    setOk("Invite email sent. They create a password from the link.");
+        setOk("Invite email sent. They can join (or move from another practice) via the link.");
     setInviteEmail("");
     void loadMembers();
   }
@@ -175,6 +250,12 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
         <div className="min-w-0 flex-1">
           <p className="sans text-xs font-semibold tracking-[0.18em] text-teal-800 uppercase">Practice</p>
           <h1 className="truncate text-3xl">{name || "Practice"}</h1>
+          {healthSystemName ? (
+            <p className="sans mt-1 flex items-center gap-2 text-sm text-[#5b6573]">
+              <PracticeMark name={healthSystemName} logo={healthSystemLogo} size={20} />
+              <span>{healthSystemName}</span>
+            </p>
+          ) : null}
           {city || state ? (
             <p className="sans text-sm text-[#5b6573]">
               {[city, state].filter(Boolean).join(", ")}
@@ -211,6 +292,50 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
             Practice name
             <input required className={field} value={name} onChange={(e) => setName(e.target.value)} />
           </label>
+          <div className="relative">
+            <label className={label}>
+              Health system
+              <input
+                required
+                className={field}
+                value={healthSystemName}
+                autoComplete="off"
+                placeholder="Northwell Health, Independent, …"
+                onChange={(e) => {
+                  setHealthSystemName(e.target.value);
+                  setHealthSystemId(null);
+                  setHsSuggestOpen(true);
+                }}
+                onFocus={() => setHsSuggestOpen(true)}
+                onBlur={() => window.setTimeout(() => setHsSuggestOpen(false), 150)}
+              />
+            </label>
+            {hsSuggestOpen && hsSuggestions.length ? (
+              <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-xl border border-[#d8d0c2] bg-white py-1 shadow-sm">
+                {hsSuggestions.map((hs) => (
+                  <li key={hs.id}>
+                    <button
+                      type="button"
+                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-[#f5f0e8]"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => {
+                        setHealthSystemId(hs.id);
+                        setHealthSystemName(hs.name);
+                        setHealthSystemLogo(hs.logo);
+                        setHsSuggestOpen(false);
+                      }}
+                    >
+                      <PracticeMark name={hs.name} logo={hs.logo} size={22} />
+                      <span>{hs.name}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            <p className="mt-1 text-xs text-[#5b6573]">
+              Pick an existing system or type a new name to create one. Logos are set by ReferLink.
+            </p>
+          </div>
           <div className="grid gap-3 md:grid-cols-2">
             <label className={label}>
               Phone
@@ -259,6 +384,7 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
                   <p className="font-medium">{m.name.trim() || m.email}</p>
                   <p className="text-sm text-[#5b6573]">
                     {m.roleLabel}
+                    {m.role === "physician" && m.specialtyLabel ? ` · ${m.specialtyLabel}` : ""}
                     {m.status === "invited" ? " · Pending email" : ""}
                     {m.id === session.id ? " · You" : ""}
                   </p>
@@ -306,13 +432,31 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
                       <select
                         className={field}
                         value={form.role}
-                        onChange={(e) => setForm({ ...form, role: e.target.value as PracticeRole })}
+                        onChange={(e) =>
+                          setForm({
+                            ...form,
+                            role: e.target.value as PracticeRole,
+                            specialtyId: e.target.value === "physician" ? form.specialtyId : "",
+                            subspecialtyId: e.target.value === "physician" ? form.subspecialtyId : "",
+                          })
+                        }
                       >
                         <option value="physician">Physician</option>
                         <option value="app">APP (NP / PA)</option>
                         <option value="office_manager">Office staff</option>
                       </select>
                     </label>
+                  ) : null}
+                  {(m.id === session.id ? session.role === "physician" : form.role === "physician") ? (
+                    <div className="md:col-span-2">
+                      <SpecialtyFields
+                        specialtyId={form.specialtyId}
+                        subspecialtyId={form.subspecialtyId}
+                        onChange={({ specialtyId, subspecialtyId }) =>
+                          setForm({ ...form, specialtyId, subspecialtyId })
+                        }
+                      />
+                    </div>
                   ) : null}
                   <div className="md:col-span-2">
                     <button disabled={busy} className="rounded-full bg-[#0f1c2e] px-5 py-2 text-sm font-semibold text-white">
@@ -327,8 +471,8 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
       </article>
 
       <div className="mb-6 space-y-6">
-        <FavoriteConsultantsManager />
         <ChangePasswordCard />
+        <LeavePracticeCard practiceName={name || session.practiceName} />
       </div>
 
       <form onSubmit={invite} className="sans chart-card space-y-3 p-6">

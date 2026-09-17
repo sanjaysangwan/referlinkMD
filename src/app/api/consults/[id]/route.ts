@@ -8,6 +8,7 @@ import { writeAudit } from "@/lib/audit";
 import { requestMeta } from "@/lib/request";
 import { accessTokens } from "@/db/schema";
 import { and, isNull } from "drizzle-orm";
+import { isConsultingAccess } from "@/lib/inbox";
 
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
   const session = await getSession();
@@ -31,13 +32,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
   if (!row) return NextResponse.json({ error: "Not found." }, { status: 404 });
 
   const isPrimary = session.practiceId === row.consult.requestingPracticeId;
-  const isConsulting =
-    row.consult.consultingUserId === session.id ||
-    (session.mobilePhone !== null && row.consult.consultingPhone === session.mobilePhone) ||
-    (session.firstName.trim().length > 0 &&
-      session.lastName.trim().length > 0 &&
-      row.consult.consultingName.toLowerCase().includes(session.firstName.trim().toLowerCase()) &&
-      row.consult.consultingName.toLowerCase().includes(session.lastName.trim().toLowerCase()));
+  const isConsulting = await isConsultingAccess(session, row.consult);
 
   if (!isPrimary && !isConsulting) {
     return NextResponse.json({ error: "Not found." }, { status: 404 });

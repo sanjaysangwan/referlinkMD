@@ -49,7 +49,6 @@ export function PhoneField({
         required={required}
         disabled={disabled}
         autoComplete={autoComplete}
-        pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
         title="Enter a 10-digit phone number: xxx-xxx-xxxx"
         placeholder={placeholder}
         className={`${inputClass} ${mobile ? "pl-10" : ""}`}

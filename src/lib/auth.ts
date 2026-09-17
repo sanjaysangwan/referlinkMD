@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { and, eq } from "drizzle-orm";
-import { practiceMemberships, practices, users } from "@/db/schema";
+import { practiceMemberships, practices, healthSystems, specialties, specialtySubspecialties, users } from "@/db/schema";
 import { getDb } from "@/db";
 import {
   IDLE_SECONDS,
@@ -13,6 +13,7 @@ import {
   verifyAuthToken,
 } from "./auth-cookie";
 import type { PracticeRole, SessionUser } from "./types";
+import { physicianSpecialtyLabel } from "@/lib/specialty";
 
 export { issueSessionToken, sessionCookieName, sessionCookieOptions } from "./auth-cookie";
 
@@ -64,6 +65,8 @@ export async function loadSessionUser(userId: string): Promise<SessionUser | nul
   let practiceName: string | null = null;
   let practiceLogo: string | null = null;
   let isPracticeCreator = false;
+  let healthSystemId: string | null = null;
+  let healthSystemName: string | null = null;
   if (membership) {
     const [practice] = await db
       .select()
@@ -73,6 +76,34 @@ export async function loadSessionUser(userId: string): Promise<SessionUser | nul
     practiceName = practice?.name ?? null;
     practiceLogo = practice?.logo ?? null;
     isPracticeCreator = practice?.createdByUserId === user.id;
+    healthSystemId = practice?.healthSystemId ?? null;
+    if (practice?.healthSystemId) {
+      const [hs] = await db
+        .select()
+        .from(healthSystems)
+        .where(eq(healthSystems.id, practice.healthSystemId))
+        .limit(1);
+      healthSystemName = hs?.name ?? null;
+    }
+  }
+
+  let specialtyName: string | null = null;
+  let subspecialtyName: string | null = null;
+  if (user.specialtyId) {
+    const [spec] = await db
+      .select({ name: specialties.name })
+      .from(specialties)
+      .where(eq(specialties.id, user.specialtyId))
+      .limit(1);
+    specialtyName = spec?.name ?? null;
+  }
+  if (user.subspecialtyId) {
+    const [sub] = await db
+      .select({ name: specialtySubspecialties.name })
+      .from(specialtySubspecialties)
+      .where(eq(specialtySubspecialties.id, user.subspecialtyId))
+      .limit(1);
+    subspecialtyName = sub?.name ?? null;
   }
 
   return {
@@ -82,6 +113,8 @@ export async function loadSessionUser(userId: string): Promise<SessionUser | nul
     lastName: user.lastName,
     npi: user.npi,
     mobilePhone: user.mobilePhone,
+    healthSystemId,
+    healthSystemName,
     practiceId: membership?.practiceId ?? null,
     practiceName,
     practiceLogo,
@@ -89,6 +122,11 @@ export async function loadSessionUser(userId: string): Promise<SessionUser | nul
     isPracticeCreator,
     mustChangePassword: user.mustChangePassword,
     mfaEnabled: Boolean(user.mfaEnabledAt),
+    specialtyId: user.specialtyId ?? null,
+    subspecialtyId: user.subspecialtyId ?? null,
+    specialtyName,
+    subspecialtyName,
+    specialtyLabel: physicianSpecialtyLabel({ specialtyName, subspecialtyName }),
   };
 }
 

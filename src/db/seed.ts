@@ -5,10 +5,16 @@ import * as schema from "./schema";
 import { encryptSecret, hashPassword } from "@/lib/crypto";
 import { DEMO_MFA_SECRET, DEMO_PASSWORD } from "@/lib/env";
 import { practiceNameZipKey } from "@/lib/practice-identity";
+import { SPECIALTY_CATALOG, SPECIALTY_IDS } from "@/lib/specialty-catalog";
 
 
 
 const IDS = {
+  northwell: "b1000000-0000-4000-8000-000000000011",
+  catholic: "b1000000-0000-4000-8000-000000000012",
+  stonyBrook: "b1000000-0000-4000-8000-000000000013",
+  nyu: "b1000000-0000-4000-8000-000000000014",
+  independent: "b1000000-0000-4000-8000-000000000015",
   harbor: "a1000000-0000-4000-8000-000000000001",
   riverside: "a1000000-0000-4000-8000-000000000002",
   elena: "a2000000-0000-4000-8000-000000000001",
@@ -32,6 +38,39 @@ function letterLogo(letter: string, background: string): string {
   return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
 }
 
+async function ensureSpecialtyCatalog(db: Db): Promise<void> {
+  for (const specialty of SPECIALTY_CATALOG) {
+    const [existing] = await db
+      .select({ id: schema.specialties.id })
+      .from(schema.specialties)
+      .where(eq(schema.specialties.id, specialty.id))
+      .limit(1);
+    if (!existing) {
+      await db.insert(schema.specialties).values({
+        id: specialty.id,
+        name: specialty.name,
+        sortOrder: specialty.sortOrder,
+        status: "active",
+      });
+    }
+    for (const sub of specialty.subspecialties) {
+      const [subExisting] = await db
+        .select({ id: schema.specialtySubspecialties.id })
+        .from(schema.specialtySubspecialties)
+        .where(eq(schema.specialtySubspecialties.id, sub.id))
+        .limit(1);
+      if (!subExisting) {
+        await db.insert(schema.specialtySubspecialties).values({
+          id: sub.id,
+          specialtyId: specialty.id,
+          name: sub.name,
+          sortOrder: sub.sortOrder,
+        });
+      }
+    }
+  }
+}
+
 export async function seedIfEmpty(db: Db): Promise<void> {
   const existing = await db.select({ id: users.id }).from(users).limit(1);
   if (existing.length) return;
@@ -40,6 +79,8 @@ export async function seedIfEmpty(db: Db): Promise<void> {
   const mfaSecretEncrypted = encryptSecret(DEMO_MFA_SECRET);
   const now = new Date();
 
+  await ensureSpecialtyCatalog(db);
+
   function clinician(
     id: string,
     email: string,
@@ -47,6 +88,7 @@ export async function seedIfEmpty(db: Db): Promise<void> {
     last: string,
     npi: string,
     phone: string,
+    specialty?: { specialtyId: string; subspecialtyId?: string },
   ) {
     return {
       id,
@@ -64,11 +106,16 @@ export async function seedIfEmpty(db: Db): Promise<void> {
       status: "active" as const,
       failedLoginCount: 0,
       lastLoginAt: null,
+      specialtyId: specialty?.specialtyId ?? null,
+      subspecialtyId: specialty?.subspecialtyId ?? null,
     };
   }
 
   await db.insert(schema.users).values([
-    clinician(IDS.elena, "elena@referlink.demo", "Elena", "Vasquez", "1234567890", "+15550100101"),
+    clinician(IDS.elena, "elena@referlink.demo", "Elena", "Vasquez", "1234567890", "+15550100101", {
+      specialtyId: SPECIALTY_IDS.cardiology,
+      subspecialtyId: SPECIALTY_IDS.ep,
+    }),
     clinician(IDS.jordan, "jordan@referlink.demo", "Jordan", "Hale", "1234567891", "+15550100102"),
     {
       id: IDS.priya,
@@ -86,13 +133,25 @@ export async function seedIfEmpty(db: Db): Promise<void> {
       status: "active",
       failedLoginCount: 0,
     },
-    clinician(IDS.david, "david@referlink.demo", "David", "Okonkwo", "2234567890", "+15550100201"),
+    clinician(IDS.david, "david@referlink.demo", "David", "Okonkwo", "2234567890", "+15550100201", {
+      specialtyId: SPECIALTY_IDS.orthopedicSurgery,
+      subspecialtyId: SPECIALTY_IDS.handSurgery,
+    }),
     clinician(IDS.amina, "amina@referlink.demo", "Amina", "Patel", "2234567891", "+15550100202"),
+  ]);
+
+  await db.insert(schema.healthSystems).values([
+    { id: IDS.northwell, name: "Northwell Health", logo: letterLogo("N", "#0f4c81"), status: "active" },
+    { id: IDS.catholic, name: "Catholic Health", logo: letterLogo("C", "#7c2d12"), status: "active" },
+    { id: IDS.stonyBrook, name: "Stony Brook", logo: letterLogo("S", "#14532d"), status: "active" },
+    { id: IDS.nyu, name: "NYU", logo: letterLogo("Y", "#570a0a"), status: "active" },
+    { id: IDS.independent, name: "Independent", logo: letterLogo("I", "#334155"), status: "active" },
   ]);
 
   await db.insert(schema.practices).values([
     {
       id: IDS.harbor,
+      healthSystemId: IDS.northwell,
       name: "Harbor Family Medicine",
       phone: "+15550100100",
       fax: "+15550100109",
@@ -108,6 +167,7 @@ export async function seedIfEmpty(db: Db): Promise<void> {
     },
     {
       id: IDS.riverside,
+      healthSystemId: IDS.catholic,
       name: "Riverside Internal Medicine",
       phone: "+15550100200",
       fax: "+15550100209",
@@ -214,35 +274,113 @@ export async function seedIfEmpty(db: Db): Promise<void> {
   });
 }
 
-/** Fill fax/logo on demo practices created before those columns existed. */
+/** Fill fax/logo on demo practices; ensure catalog health systems exist with logos. */
 export async function backfillPracticeProfile(db: Db): Promise<void> {
+  const catalog = [
+    { id: IDS.northwell, name: "Northwell Health", logo: letterLogo("N", "#0f4c81") },
+    { id: IDS.catholic, name: "Catholic Health", logo: letterLogo("C", "#7c2d12") },
+    { id: IDS.stonyBrook, name: "Stony Brook", logo: letterLogo("S", "#14532d") },
+    { id: IDS.nyu, name: "NYU", logo: letterLogo("Y", "#570a0a") },
+    { id: IDS.independent, name: "Independent", logo: letterLogo("I", "#334155") },
+  ];
+  for (const row of catalog) {
+    const [existing] = await db
+      .select({ id: schema.healthSystems.id, logo: schema.healthSystems.logo })
+      .from(schema.healthSystems)
+      .where(eq(schema.healthSystems.id, row.id))
+      .limit(1);
+    if (!existing) {
+      await db.insert(schema.healthSystems).values({
+        id: row.id,
+        name: row.name,
+        logo: row.logo,
+        status: "active",
+      });
+      continue;
+    }
+    if (!existing.logo) {
+      await db
+        .update(schema.healthSystems)
+        .set({ logo: row.logo, updatedAt: new Date() })
+        .where(eq(schema.healthSystems.id, row.id));
+    }
+  }
+
   const demo = [
     {
       id: IDS.harbor,
       fax: "+15550100109",
       logo: letterLogo("H", "#115e59"),
+      healthSystemId: IDS.northwell,
     },
     {
       id: IDS.riverside,
       fax: "+15550100209",
       logo: letterLogo("R", "#0f1c2e"),
+      healthSystemId: IDS.catholic,
     },
   ];
   for (const row of demo) {
     const [practice] = await db
-      .select({ id: schema.practices.id, fax: schema.practices.fax, logo: schema.practices.logo })
+      .select({
+        id: schema.practices.id,
+        fax: schema.practices.fax,
+        logo: schema.practices.logo,
+        healthSystemId: schema.practices.healthSystemId,
+      })
       .from(schema.practices)
       .where(eq(schema.practices.id, row.id))
       .limit(1);
     if (!practice) continue;
-    if (practice.fax && practice.logo) continue;
-    await db
-      .update(schema.practices)
-      .set({
-        fax: practice.fax || row.fax,
-        logo: practice.logo || row.logo,
-        updatedAt: new Date(),
+    const patch: {
+      fax?: string;
+      logo?: string;
+      healthSystemId?: string;
+      updatedAt: Date;
+    } = { updatedAt: new Date() };
+    if (!practice.fax) patch.fax = row.fax;
+    if (!practice.logo) patch.logo = row.logo;
+    if (
+      practice.healthSystemId === "b1000000-0000-4000-8000-000000000001" ||
+      practice.healthSystemId === "b1000000-0000-4000-8000-000000000010"
+    ) {
+      patch.healthSystemId = row.healthSystemId;
+    }
+    if (patch.fax || patch.logo || patch.healthSystemId) {
+      await db.update(schema.practices).set(patch).where(eq(schema.practices.id, row.id));
+    }
+  }
+}
+
+/** Seed specialty catalog and assign demo physicians when missing. */
+export async function backfillSpecialtyCatalog(db: Db): Promise<void> {
+  await ensureSpecialtyCatalog(db);
+
+  const demoPhysicians = [
+    {
+      id: IDS.elena,
+      specialtyId: SPECIALTY_IDS.cardiology,
+      subspecialtyId: SPECIALTY_IDS.ep,
+    },
+    {
+      id: IDS.david,
+      specialtyId: SPECIALTY_IDS.orthopedicSurgery,
+      subspecialtyId: SPECIALTY_IDS.handSurgery,
+    },
+  ];
+  for (const row of demoPhysicians) {
+    const [user] = await db
+      .select({
+        id: schema.users.id,
+        specialtyId: schema.users.specialtyId,
       })
-      .where(eq(schema.practices.id, row.id));
+      .from(schema.users)
+      .where(eq(schema.users.id, row.id))
+      .limit(1);
+    if (!user || user.specialtyId) continue;
+    await db
+      .update(schema.users)
+      .set({ specialtyId: row.specialtyId, subspecialtyId: row.subspecialtyId })
+      .where(eq(schema.users.id, row.id));
   }
 }

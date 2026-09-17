@@ -28,8 +28,22 @@ CREATE TABLE IF NOT EXISTS users (
   created_at timestamptz NOT NULL DEFAULT now()
 );
 
+CREATE UNIQUE INDEX IF NOT EXISTS users_mobile_phone_unique
+  ON users (mobile_phone)
+  WHERE mobile_phone IS NOT NULL AND length(btrim(mobile_phone)) > 0;
+
+CREATE TABLE IF NOT EXISTS health_systems (
+  id uuid PRIMARY KEY,
+  name text NOT NULL,
+  logo text,
+  status text NOT NULL CHECK (status IN ('active', 'suspended')),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
 CREATE TABLE IF NOT EXISTS practices (
   id uuid PRIMARY KEY,
+  health_system_id uuid NOT NULL REFERENCES health_systems(id),
   name text NOT NULL,
   phone text NOT NULL,
   fax text NOT NULL,
@@ -58,6 +72,10 @@ CREATE TABLE IF NOT EXISTS practice_memberships (
   created_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE (practice_id, user_id)
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS practice_memberships_one_active_user_idx
+  ON practice_memberships (user_id)
+  WHERE status = 'active';
 
 CREATE TABLE IF NOT EXISTS invitations (
   id uuid PRIMARY KEY,

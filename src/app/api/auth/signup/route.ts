@@ -8,6 +8,7 @@ import { hashPassword } from "@/lib/crypto";
 import { writeAudit } from "@/lib/audit";
 import { requestMeta } from "@/lib/request";
 import { isValidUsZip, normalizePostalCode, practiceNameZipKey } from "@/lib/practice-identity";
+import { ensureIndependentHealthSystem } from "@/lib/health-systems";
 import type { PracticeRole } from "@/lib/types";
 
 const schema = z.object({
@@ -114,8 +115,10 @@ export async function POST(request: Request) {
       mustChangePassword: false,
       status: "active",
     });
+    const healthSystemId = await ensureIndependentHealthSystem(db);
     await db.insert(practices).values({
       id: practiceId,
+      healthSystemId,
       name: practiceName,
       phone: "",
       fax: "",

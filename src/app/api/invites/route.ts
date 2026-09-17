@@ -50,17 +50,10 @@ export async function POST(request: Request) {
       mustChangePassword: true,
       status: "invited",
     });
-  } else if (existing.status !== "disabled") {
-    await db
-      .update(users)
-      .set({
-        mustChangePassword: true,
-        status: existing.status === "active" ? "active" : "invited",
-      })
-      .where(eq(users.id, existing.id));
-  } else {
+  } else if (existing.status === "disabled") {
     return NextResponse.json({ error: "That account is disabled." }, { status: 400 });
   }
+  // Existing active users keep their login; accepting the invite moves them to this practice.
 
   await db.insert(invitations).values({
     id: inviteId,
@@ -92,6 +85,16 @@ export async function POST(request: Request) {
       status: "invited",
       invitedByUserId: session.id,
     });
+  } else if (membership.status === "revoked") {
+    await db
+      .update(practiceMemberships)
+      .set({
+        status: "invited",
+        role: parsed.data.role,
+        invitedByUserId: session.id,
+        acceptedAt: null,
+      })
+      .where(eq(practiceMemberships.id, membership.id));
   }
 
   await sendInviteEmail({

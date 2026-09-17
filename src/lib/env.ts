@@ -7,7 +7,20 @@ export function isDemo(): boolean {
 }
 
 export function appUrl(): string {
-  return process.env.APP_URL ?? "http://localhost:4000";
+  const configured = process.env.APP_URL?.trim();
+  if (configured) return configured.replace(/\/$/, "");
+
+  const railwayHost =
+    process.env.RAILWAY_STATIC_URL?.trim() ||
+    process.env.RAILWAY_SERVICE_REFERLINKMD_URL?.trim() ||
+    process.env.RAILWAY_PUBLIC_DOMAIN?.trim();
+  if (railwayHost) {
+    return railwayHost.startsWith("http")
+      ? railwayHost.replace(/\/$/, "")
+      : `https://${railwayHost.replace(/\/$/, "")}`;
+  }
+
+  return "http://localhost:4000";
 }
 
 export function authSecret(): string {

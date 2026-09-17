@@ -14,6 +14,7 @@ type Member = {
   npi: string | null;
   mobilePhone: string | null;
   status: string;
+  specialtyLabel?: string | null;
 };
 
 export function TeamManager() {
@@ -73,6 +74,9 @@ export function TeamManager() {
                 <td className="px-4 py-3">
                   <div className="font-medium">{m.name.trim() || m.email}</div>
                   <div className="text-xs text-[#5b6573]">{m.email}</div>
+                  {m.role === "physician" && m.specialtyLabel ? (
+                    <div className="text-xs text-[#5b6573]">{m.specialtyLabel}</div>
+                  ) : null}
                   {m.npi || m.mobilePhone ? (
                     <div className="text-xs text-[#5b6573]">
                       {m.npi ? `NPI ${m.npi}` : ""}

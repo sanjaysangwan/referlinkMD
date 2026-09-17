@@ -26,7 +26,7 @@ function Brand({ session }: { session: SessionUser }) {
       <PracticeMark name={session.practiceName ?? APP_NAME} logo={session.practiceLogo} size={40} />
       <div className="min-w-0">
         <p className="sans text-xs font-semibold tracking-[0.12em] text-teal-800">{APP_NAME}</p>
-        <Link href="/consults" className="block truncate rounded text-lg leading-tight hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-800" aria-label={`${session.practiceName ?? APP_NAME} home`}>{session.practiceName ?? APP_NAME}</Link>
+        <Link href="/consults" className="block truncate rounded text-lg leading-tight hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-800" aria-label={`${session.practiceName ?? APP_NAME} home`}>{session.practiceName ?? "No practice"}</Link>
         <p className="sans truncate text-xs text-[#5b6573]">
           {session.firstName || session.lastName
             ? `${session.firstName} ${session.lastName}`.trim()
@@ -114,15 +114,31 @@ export function AppShell({
     router.refresh();
   }
 
-  const links: NavLink[] = [
-    { href: "/consults", label: "Home", badge: true, match: ["/consults", "/inbox"] },
-    {
-      href: session.isPracticeCreator ? "/team" : "/settings",
-      label: "Setting",
-      badge: false,
-      match: ["/team", "/settings"],
-    },
-  ];
+  const links: NavLink[] = session.practiceId
+    ? [
+        { href: "/consults", label: "Home", badge: true, match: ["/consults", "/inbox"] },
+        {
+          href: "/directory",
+          label: "Consultant Directory",
+          badge: false,
+          match: ["/directory"],
+        },
+        {
+          href: session.isPracticeCreator ? "/team" : "/settings",
+          label: "Setting",
+          badge: false,
+          match: ["/team", "/settings"],
+        },
+      ]
+    : [
+        { href: "/consults", label: "Home", badge: true, match: ["/consults", "/inbox"] },
+        {
+          href: "/create-practice",
+          label: "Create practice",
+          badge: false,
+          match: ["/create-practice"],
+        },
+      ];
 
   return (
     <div className="min-h-screen overflow-x-hidden">

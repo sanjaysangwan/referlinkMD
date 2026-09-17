@@ -13,20 +13,36 @@ export type NewConsultFormHandle = {
   applyFavorite: (input: { name: string; phone: string | null }) => void;
 };
 
-export const NewConsultForm = forwardRef<NewConsultFormHandle>(function NewConsultForm(_props, ref) {
+const DEMO_FORM_DEFAULTS = {
+  patientFirstName: "",
+  patientLastName: "Patient",
+  patientDob: "1970-01-01",
+  patientPhone: "555-111-2222",
+  consultingName: "",
+  consultingPhone: "",
+  consultPriority: "urgent",
+  consultRequestComment: "Hi, Can you see this patient As soon as possible",
+};
+
+const EMPTY_FORM_DEFAULTS = {
+  patientFirstName: "",
+  patientLastName: "",
+  patientDob: "",
+  patientPhone: "",
+  consultingName: "",
+  consultingPhone: "",
+  consultPriority: "urgent",
+  consultRequestComment: "",
+};
+
+export const NewConsultForm = forwardRef<
+  NewConsultFormHandle,
+  { demoDefaults?: boolean }
+>(function NewConsultForm({ demoDefaults = false }, ref) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [form, setForm] = useState({
-    patientFirstName: "",
-    patientLastName: "",
-    patientDob: "",
-    patientPhone: "",
-    consultingName: "",
-    consultingPhone: "",
-    consultPriority: "urgent",
-    consultRequestComment: "",
-  });
+  const [form, setForm] = useState(() => (demoDefaults ? DEMO_FORM_DEFAULTS : EMPTY_FORM_DEFAULTS));
 
   const [matches, setMatches] = useState<
     Array<{ id: string; firstName: string; lastName: string; mobilePhone: string | null; npi: string | null }>

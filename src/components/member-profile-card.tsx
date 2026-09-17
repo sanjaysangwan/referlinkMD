@@ -6,6 +6,7 @@ import { formatPhone } from "@/lib/phone";
 import { ROLE_LABEL } from "@/lib/privileges";
 import type { SessionUser } from "@/lib/types";
 import { PhoneField, MobilePhoneText } from "@/components/phone-field";
+import { SpecialtyFields } from "@/components/specialty-fields";
 
 const field = "mt-1 w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2 text-sm";
 const label = "block text-xs font-semibold tracking-wide text-[#5b6573] uppercase";
@@ -26,18 +27,26 @@ export function MemberProfileCard({ session }: { session: SessionUser }) {
   const [lastName, setLastName] = useState(session.lastName);
   const [npi, setNpi] = useState(session.npi ?? "");
   const [mobilePhone, setMobilePhone] = useState(session.mobilePhone ?? "");
+  const [specialtyId, setSpecialtyId] = useState(session.specialtyId ?? "");
+  const [subspecialtyId, setSubspecialtyId] = useState(session.subspecialtyId ?? "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const name = `${session.firstName} ${session.lastName}`.trim() || session.email;
+  const isPhysician = session.role === "physician";
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     setError("");
+    const body: Record<string, unknown> = { firstName, lastName, npi, mobilePhone };
+    if (isPhysician) {
+      body.specialtyId = specialtyId || null;
+      body.subspecialtyId = specialtyId ? subspecialtyId || null : null;
+    }
     const res = await fetch("/api/me", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ firstName, lastName, npi, mobilePhone }),
+      body: JSON.stringify(body),
     });
     const data = await res.json();
     setBusy(false);
@@ -47,6 +56,17 @@ export function MemberProfileCard({ session }: { session: SessionUser }) {
     }
     setEditing(false);
     router.refresh();
+  }
+
+  function resetForm() {
+    setEditing(false);
+    setError("");
+    setFirstName(session.firstName);
+    setLastName(session.lastName);
+    setNpi(session.npi ?? "");
+    setMobilePhone(session.mobilePhone ?? "");
+    setSpecialtyId(session.specialtyId ?? "");
+    setSubspecialtyId(session.subspecialtyId ?? "");
   }
 
   if (editing) {
@@ -74,6 +94,16 @@ export function MemberProfileCard({ session }: { session: SessionUser }) {
             </div>
           </label>
         </div>
+        {isPhysician ? (
+          <SpecialtyFields
+            specialtyId={specialtyId}
+            subspecialtyId={subspecialtyId}
+            onChange={({ specialtyId: nextSpec, subspecialtyId: nextSub }) => {
+              setSpecialtyId(nextSpec);
+              setSubspecialtyId(nextSub);
+            }}
+          />
+        ) : null}
         {error ? <p className="text-sm text-orange-800">{error}</p> : null}
         <div className="flex gap-2">
           <button
@@ -85,14 +115,7 @@ export function MemberProfileCard({ session }: { session: SessionUser }) {
           <button
             type="button"
             className="rounded-full px-5 py-2.5 text-sm font-semibold text-[#5b6573]"
-            onClick={() => {
-              setEditing(false);
-              setError("");
-              setFirstName(session.firstName);
-              setLastName(session.lastName);
-              setNpi(session.npi ?? "");
-              setMobilePhone(session.mobilePhone ?? "");
-            }}
+            onClick={resetForm}
           >
             Cancel
           </button>
@@ -109,6 +132,7 @@ export function MemberProfileCard({ session }: { session: SessionUser }) {
         <Row caption="Email" value={session.email} />
         {session.role ? <Row caption="Credential" value={ROLE_LABEL[session.role]} /> : null}
         {session.practiceName ? <Row caption="Practice" value={session.practiceName} /> : null}
+        {isPhysician ? <Row caption="Specialty" value={session.specialtyLabel ?? ""} /> : null}
         <Row caption="NPI" value={session.npi ?? ""} />
         <Row
           caption="Mobile"
