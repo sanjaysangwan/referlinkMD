@@ -106,19 +106,21 @@ export async function loadSessionUser(userId: string): Promise<SessionUser | nul
     subspecialtyName = sub?.name ?? null;
   }
 
+  const role = (membership?.role as PracticeRole | undefined) ?? null;
+
   return {
     id: user.id,
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
-    npi: user.npi,
+    npi: role === "physician" ? user.npi : null,
     mobilePhone: user.mobilePhone,
     healthSystemId,
     healthSystemName,
     practiceId: membership?.practiceId ?? null,
     practiceName,
     practiceLogo,
-    role: (membership?.role as PracticeRole | undefined) ?? null,
+    role,
     isPracticeCreator,
     mustChangePassword: user.mustChangePassword,
     mfaEnabled: Boolean(user.mfaEnabledAt),

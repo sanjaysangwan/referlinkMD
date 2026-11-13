@@ -25,9 +25,9 @@ function Brand({ session }: { session: SessionUser }) {
     <div className="flex min-w-0 items-center gap-3">
       <PracticeMark name={session.practiceName ?? APP_NAME} logo={session.practiceLogo} size={40} />
       <div className="min-w-0">
-        <p className="sans text-xs font-semibold tracking-[0.12em] text-teal-800">{APP_NAME}</p>
-        <Link href="/consults" className="block truncate rounded text-lg leading-tight hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-800" aria-label={`${session.practiceName ?? APP_NAME} home`}>{session.practiceName ?? "No practice"}</Link>
-        <p className="sans truncate text-xs text-[#5b6573]">
+        <p className="sans text-xs font-semibold tracking-[0.12em] text-blue">{APP_NAME}</p>
+        <Link href="/consults" className="block truncate rounded text-lg leading-tight hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue" aria-label={`${session.practiceName ?? APP_NAME} home`}>{session.practiceName ?? "No practice"}</Link>
+        <p className="sans truncate text-xs text-muted">
           {session.firstName || session.lastName
             ? `${session.firstName} ${session.lastName}`.trim()
             : session.email}
@@ -58,7 +58,7 @@ function NavItems({
             key={l.href}
             href={l.href}
             className={`flex items-center justify-between rounded-xl px-4 py-3 text-base font-semibold ${
-              active ? "bg-teal-800 text-white" : "text-[#0f1c2e] hover:bg-[#efe8dc]"
+              active ? "bg-ink text-white" : "text-ink hover:bg-soft"
             }`}
           >
             <span>{l.label}</span>
@@ -69,7 +69,7 @@ function NavItems({
       <button
         type="button"
         onClick={onLogout}
-        className="rounded-xl px-4 py-3 text-left text-base font-semibold text-[#5b6573] hover:bg-[#efe8dc]"
+        className="rounded-xl px-4 py-3 text-left text-base font-semibold text-muted hover:bg-soft"
       >
         Sign out
       </button>
@@ -146,7 +146,7 @@ export function AppShell({
         DEMO — synthetic patients only. SMS never includes patient name, DOB, or phone.
       </div>
       <div className="lg:flex lg:items-start">
-        <aside className="hidden lg:sticky lg:top-0 lg:flex lg:h-[calc(100dvh-2.5rem)] lg:w-64 lg:shrink-0 lg:flex-col lg:border-r lg:border-[#e4ddd0] lg:bg-[#fffdf8]">
+        <aside className="hidden lg:sticky lg:top-0 lg:flex lg:h-[calc(100dvh-2.5rem)] lg:w-64 lg:shrink-0 lg:flex-col lg:border-r lg:border-line/40 lg:bg-white">
           <div className="flex h-full flex-col gap-8 px-4 py-6">
             <Brand session={session} />
             <nav className="flex-1">
@@ -156,12 +156,12 @@ export function AppShell({
         </aside>
 
         <div className="min-w-0 flex-1">
-          <header className="sticky top-0 z-40 border-b border-[#e4ddd0] bg-[#fffdf8] lg:hidden">
+          <header className="sticky top-0 z-40 border-b border-line/40 bg-white lg:hidden">
             <div className="flex items-center justify-between gap-3 px-4 py-3">
               <Brand session={session} />
               <button
                 type="button"
-                className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#0f1c2e] hover:bg-[#efe8dc]"
+                className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-ink hover:bg-soft"
                 aria-label={open ? "Close menu" : "Open menu"}
                 aria-expanded={open}
                 onClick={() => setOpen((v) => !v)}
@@ -175,7 +175,7 @@ export function AppShell({
               </button>
             </div>
             {open ? (
-              <nav className="border-t border-[#e4ddd0] px-2 py-2">
+              <nav className="border-t border-line/40 px-2 py-2">
                 <NavItems links={links} pathname={pathname} newCount={newCount} onLogout={logout} />
               </nav>
             ) : null}

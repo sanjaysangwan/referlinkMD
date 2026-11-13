@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { users } from "@/db/schema";
 import { getDb } from "@/db";
 import { getSession, homePath, loadSessionUser } from "@/lib/auth";
-import { hashPassword } from "@/lib/crypto";
+import { hashPassword, verifyPassword } from "@/lib/crypto";
 import { writeAudit } from "@/lib/audit";
 import { requestMeta } from "@/lib/request";
 import { sendPasswordChangedEmail } from "@/lib/notify";
@@ -24,6 +24,26 @@ export async function POST(request: Request) {
   }
 
   const db = await getDb();
+  const [user] = await db
+    .select({
+      passwordHash: users.passwordHash,
+      mustChangePassword: users.mustChangePassword,
+    })
+    .from(users)
+    .where(eq(users.id, session.id))
+    .limit(1);
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  if (!user.mustChangePassword) {
+    if (!parsed.data.currentPassword) {
+      return NextResponse.json({ error: "Enter your current password." }, { status: 400 });
+    }
+    const matches = await verifyPassword(parsed.data.currentPassword, user.passwordHash);
+    if (!matches) {
+      return NextResponse.json({ error: "Current password is incorrect." }, { status: 400 });
+    }
+  }
+
   const passwordHash = await hashPassword(parsed.data.newPassword);
   await db
     .update(users)

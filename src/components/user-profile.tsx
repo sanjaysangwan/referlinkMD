@@ -3,13 +3,15 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PhoneField } from "@/components/phone-field";
+import type { PracticeRole } from "@/lib/types";
 
-const field = "mt-1 w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2 text-sm";
-const label = "block text-xs font-semibold tracking-wide text-[#5b6573] uppercase";
+const field = "field mt-1";
+const label = "label";
 
 export function UserProfile() {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const [role, setRole] = useState<PracticeRole | null>(null);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [npi, setNpi] = useState("");
@@ -27,9 +29,10 @@ export function UserProfile() {
           return;
         }
         setEmail(d.email ?? "");
+        setRole(d.role ?? null);
         setFirstName(d.firstName ?? "");
         setLastName(d.lastName ?? "");
-        setNpi(d.npi ?? "");
+        setNpi(d.role === "physician" ? (d.npi ?? "") : "");
         setMobilePhone(d.mobilePhone ?? "");
       });
   }, []);
@@ -42,7 +45,13 @@ export function UserProfile() {
     const res = await fetch("/api/me", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ firstName, lastName, npi, mobilePhone }),
+      body: JSON.stringify({
+        firstName,
+        lastName,
+        email,
+        mobilePhone,
+        ...(role === "physician" ? { npi } : {}),
+      }),
     });
     const data = await res.json();
     setBusy(false);
@@ -57,7 +66,6 @@ export function UserProfile() {
   return (
     <form onSubmit={save} className="sans chart-card mb-6 space-y-4 p-6">
       <h2 className="font-serif text-xl">Your details</h2>
-      <p className="text-xs text-[#5b6573]">{email}</p>
       <div className="grid gap-3 md:grid-cols-2">
         <label className={label}>
           First name
@@ -68,8 +76,8 @@ export function UserProfile() {
           <input className={field} value={lastName} onChange={(e) => setLastName(e.target.value)} />
         </label>
         <label className={label}>
-          NPI
-          <input className={field} value={npi} onChange={(e) => setNpi(e.target.value)} />
+          Email
+          <input required type="email" className={field} value={email} onChange={(e) => setEmail(e.target.value)} />
         </label>
         <label className={label}>
           Mobile
@@ -77,10 +85,16 @@ export function UserProfile() {
             <PhoneField mobile value={mobilePhone} onChange={setMobilePhone} />
           </div>
         </label>
+        {role === "physician" ? (
+          <label className={label}>
+            NPI
+            <input className={field} value={npi} onChange={(e) => setNpi(e.target.value)} />
+          </label>
+        ) : null}
       </div>
       {error ? <p className="text-sm text-orange-800">{error}</p> : null}
-      {ok ? <p className="text-sm text-teal-900">{ok}</p> : null}
-      <button disabled={busy} className="rounded-full bg-[#0f1c2e] px-5 py-2.5 text-sm font-semibold text-white">
+      {ok ? <p className="text-sm text-blue">{ok}</p> : null}
+      <button disabled={busy} className="rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white">
         {busy ? "Saving…" : "Save your details"}
       </button>
     </form>

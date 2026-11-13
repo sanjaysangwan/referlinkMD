@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
-const field = "mt-1 w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2 text-base";
-const label = "block text-xs font-semibold tracking-wide text-[#5b6573] uppercase";
+const field = "field mt-1";
+const label = "label";
 
 type Preview = {
   email: string;
@@ -63,7 +63,7 @@ export default function InviteAcceptPage() {
   return (
     <main className="mx-auto max-w-lg px-6 py-16">
       <h1 className="text-4xl">{preview?.needsPassword ? "Create your password" : "Join this practice"}</h1>
-      <p className="sans mt-3 text-[#3d4a5c]">
+      <p className="sans mt-3 text-muted">
         {preview ? (
           <>
             You were invited to <strong>{preview.practiceName}</strong>
@@ -114,7 +114,7 @@ export default function InviteAcceptPage() {
             </label>
           </>
         ) : (
-          <p className="text-sm text-[#5b6573]">
+          <p className="text-sm text-muted">
             This invite is for {preview?.email}. Confirm to join {preview?.practiceName}
             {preview?.currentPracticeName ? " (you will leave your current practice)" : ""}.
           </p>
@@ -122,7 +122,7 @@ export default function InviteAcceptPage() {
         {error ? <p className="text-sm text-orange-800">{error}</p> : null}
         <button
           disabled={busy || !preview}
-          className="w-full rounded-full bg-[#0f1c2e] py-3 text-sm font-semibold text-white disabled:opacity-60"
+          className="w-full rounded-full bg-ink py-3 text-sm font-semibold text-white disabled:opacity-60"
         >
           {busy
             ? "Saving…"

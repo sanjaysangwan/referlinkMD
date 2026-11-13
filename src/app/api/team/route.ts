@@ -40,7 +40,7 @@ export async function GET() {
           email: r.user.email,
           role,
           roleLabel: ROLE_LABEL[role],
-          npi: r.user.npi,
+          npi: role === "physician" ? r.user.npi : null,
           mobilePhone: r.user.mobilePhone,
           status: r.membership.status,
           specialtyId: role === "physician" ? r.user.specialtyId : null,

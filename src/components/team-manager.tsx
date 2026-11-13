@@ -61,7 +61,7 @@ export function TeamManager() {
     <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
       <div className="chart-card overflow-hidden">
         <table className="sans w-full text-left text-sm">
-          <thead className="bg-[#efe8dc] text-xs tracking-wide text-[#5b6573] uppercase">
+          <thead className="bg-soft text-xs tracking-wide text-muted uppercase">
             <tr>
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Role</th>
@@ -70,18 +70,19 @@ export function TeamManager() {
           </thead>
           <tbody>
             {members.map((m) => (
-              <tr key={m.id} className="border-t border-[#eee6d8]">
+              <tr key={m.id} className="border-t border-line/30">
                 <td className="px-4 py-3">
                   <div className="font-medium">{m.name.trim() || m.email}</div>
-                  <div className="text-xs text-[#5b6573]">{m.email}</div>
+                  <div className="text-xs text-muted">{m.email}</div>
                   {m.role === "physician" && m.specialtyLabel ? (
-                    <div className="text-xs text-[#5b6573]">{m.specialtyLabel}</div>
+                    <div className="text-xs text-muted">{m.specialtyLabel}</div>
                   ) : null}
-                  {m.npi || m.mobilePhone ? (
-                    <div className="text-xs text-[#5b6573]">
-                      {m.npi ? `NPI ${m.npi}` : ""}
-                      {m.npi && m.mobilePhone ? " · " : ""}
-                      {m.mobilePhone ? <MobilePhoneText phone={formatPhone(m.mobilePhone)} /> : null}
+                  {m.role === "physician" && m.npi ? (
+                    <div className="text-xs text-muted">NPI {m.npi}</div>
+                  ) : null}
+                  {m.mobilePhone ? (
+                    <div className="text-xs text-muted">
+                      <MobilePhoneText phone={formatPhone(m.mobilePhone)} />
                     </div>
                   ) : null}
                 </td>
@@ -94,23 +95,23 @@ export function TeamManager() {
       </div>
       <form onSubmit={invite} className="sans chart-card h-fit space-y-3 p-6">
         <h2 className="font-serif text-xl">Invite staff</h2>
-        <p className="text-xs text-[#5b6573]">
+        <p className="text-xs text-muted">
           Sends an email with a link to create a password. No temporary password is included.
         </p>
-        <label className="block text-xs font-semibold tracking-wide text-[#5b6573] uppercase">
+        <label className="label">
           Email
           <input
             required
             type="email"
-            className="mt-1 w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2"
+            className="field mt-1"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </label>
-        <label className="block text-xs font-semibold tracking-wide text-[#5b6573] uppercase">
+        <label className="label">
           Credential
           <select
-            className="mt-1 w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2"
+            className="field mt-1"
             value={role}
             onChange={(e) => setRole(e.target.value as PracticeRole)}
           >
@@ -120,8 +121,8 @@ export function TeamManager() {
           </select>
         </label>
         {error ? <p className="text-sm text-orange-800">{error}</p> : null}
-        {ok ? <p className="text-sm text-teal-900">{ok}</p> : null}
-        <button disabled={busy} className="w-full rounded-full bg-teal-800 py-2.5 text-sm font-semibold text-white">
+        {ok ? <p className="text-sm text-blue">{ok}</p> : null}
+        <button disabled={busy} className="w-full rounded-full bg-ink py-2.5 text-sm font-semibold text-white">
           {busy ? "Sending…" : "Send invite email"}
         </button>
       </form>

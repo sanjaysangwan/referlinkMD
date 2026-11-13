@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
-const field = "mt-1 w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2 text-base";
-const label = "block text-xs font-semibold tracking-wide text-[#5b6573] uppercase";
+const field = "field mt-1";
+const label = "label";
 
 export default function ConsultLinkPage() {
   const params = useParams<{ token: string }>();
@@ -72,7 +72,7 @@ export default function ConsultLinkPage() {
   if (state === "loading") {
     return (
       <main className="mx-auto max-w-lg px-6 py-16">
-        <p className="sans text-sm text-[#5b6573]">Checking secure link…</p>
+        <p className="sans text-sm text-muted">Checking secure link…</p>
       </main>
     );
   }
@@ -81,7 +81,7 @@ export default function ConsultLinkPage() {
     return (
       <main className="mx-auto max-w-lg px-6 py-16">
         <h1 className="text-3xl">Link unavailable</h1>
-        <p className="sans mt-3 text-[#3d4a5c]">{error}</p>
+        <p className="sans mt-3 text-muted">{error}</p>
       </main>
     );
   }
@@ -90,13 +90,13 @@ export default function ConsultLinkPage() {
     return (
       <main className="mx-auto max-w-lg px-6 py-16">
         <h1 className="text-3xl">Sign in to view this consult</h1>
-        <p className="sans mt-3 text-[#3d4a5c]">
+        <p className="sans mt-3 text-muted">
           Patient details are shown only after you confirm your login. This message was addressed to{" "}
           {consultingName || "the consulting clinician"}.
         </p>
         <Link
           href={`/login?next=/c/${params.token}`}
-          className="sans mt-8 inline-block rounded-full bg-teal-800 px-6 py-3 text-sm font-semibold text-white"
+          className="sans mt-8 inline-block rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white"
         >
           Sign in
         </Link>
@@ -107,7 +107,7 @@ export default function ConsultLinkPage() {
   return (
     <main className="mx-auto max-w-lg px-6 py-16">
       <h1 className="text-3xl">Create your clinician account</h1>
-      <p className="sans mt-3 text-[#3d4a5c]">
+      <p className="sans mt-3 text-muted">
         Minimum details: name, email, NPI, and password. Your mobile number is already verified by
         this secure link. Patient information is not shown until setup is complete.
       </p>
@@ -135,7 +135,7 @@ export default function ConsultLinkPage() {
           <input required type="password" minLength={10} className={field} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
         </label>
         {error ? <p className="text-sm text-orange-800">{error}</p> : null}
-        <button disabled={busy} className="w-full rounded-full bg-[#0f1c2e] py-3 text-sm font-semibold text-white">
+        <button disabled={busy} className="w-full rounded-full bg-ink py-3 text-sm font-semibold text-white">
           {busy ? "Creating…" : "Create account"}
         </button>
       </form>

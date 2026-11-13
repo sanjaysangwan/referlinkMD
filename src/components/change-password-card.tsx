@@ -1,18 +1,29 @@
 "use client";
 
 import { useState } from "react";
+import { DisclosureCard } from "@/components/disclosure-card";
 
-const field = "mt-1 w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2 text-sm";
-const label = "block text-xs font-semibold tracking-wide text-[#5b6573] uppercase";
+const field = "field mt-1";
+const label = "label";
 
 export function ChangePasswordCard() {
+  const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const canChooseNew = currentPassword.length > 0;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (!currentPassword) {
+      setError("Enter your current password.");
+      return;
+    }
+    if (password.length < 10) {
+      setError("Password must be at least 10 characters.");
+      return;
+    }
     if (password !== confirm) {
       setError("Passwords do not match.");
       return;
@@ -22,7 +33,7 @@ export function ChangePasswordCard() {
     const res = await fetch("/api/auth/password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ newPassword: password }),
+      body: JSON.stringify({ currentPassword, newPassword: password }),
     });
     const data = await res.json();
     if (!res.ok) {
@@ -35,40 +46,62 @@ export function ChangePasswordCard() {
   }
 
   return (
-    <form onSubmit={submit} className="sans chart-card max-w-lg space-y-4 p-6">
-      <h2 className="font-serif text-xl">Change password</h2>
-      <p className="text-xs text-[#5b6573]">Use a strong password you do not reuse elsewhere.</p>
-      <label className={label}>
-        New password (min 10 characters)
-        <input
-          required
-          type="password"
-          minLength={10}
-          className={field}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="new-password"
-        />
-      </label>
-      <label className={label}>
-        Confirm password
-        <input
-          required
-          type="password"
-          minLength={10}
-          className={field}
-          value={confirm}
-          onChange={(e) => setConfirm(e.target.value)}
-          autoComplete="new-password"
-        />
-      </label>
-      {error ? <p className="text-sm text-orange-800">{error}</p> : null}
-      <button
-        disabled={busy}
-        className="rounded-full bg-[#0f1c2e] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
-      >
-        {busy ? "Saving…" : "Update password"}
-      </button>
-    </form>
+    <DisclosureCard title="Change password">
+      <form onSubmit={submit} className="space-y-4">
+        <div>
+          <p className="text-sm font-semibold text-ink">Password requirements</p>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted">
+            <li>At least 10 characters</li>
+          </ul>
+        </div>
+        <label className={label}>
+          Current password
+          <input
+            required
+            type="password"
+            className={field}
+            value={currentPassword}
+            onChange={(e) => {
+              setCurrentPassword(e.target.value);
+              if (error) setError("");
+            }}
+            autoComplete="current-password"
+          />
+        </label>
+        <label className={label}>
+          New password
+          <input
+            required
+            type="password"
+            minLength={10}
+            disabled={!canChooseNew}
+            className={field}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="new-password"
+          />
+        </label>
+        <label className={label}>
+          Confirm new password
+          <input
+            required
+            type="password"
+            minLength={10}
+            disabled={!canChooseNew}
+            className={field}
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            autoComplete="new-password"
+          />
+        </label>
+        {error ? <p className="text-sm text-orange-800">{error}</p> : null}
+        <button
+          disabled={busy || !canChooseNew}
+          className="rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+        >
+          {busy ? "Saving…" : "Update password"}
+        </button>
+      </form>
+    </DisclosureCard>
   );
 }

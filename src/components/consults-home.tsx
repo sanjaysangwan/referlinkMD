@@ -56,7 +56,7 @@ function WaitingList({
       <h2 className="text-2xl">
         {groupByConsultingClinician ? "Waiting for your practice" : "Waiting for you"}
       </h2>
-      <p className="sans mt-1 mb-4 text-sm text-[#3d4a5c]">
+      <p className="sans mt-1 mb-4 text-sm text-muted">
         {groupByConsultingClinician
           ? "Incoming consults for clinicians in your practice, grouped by consulting physician."
           : "Consults sent to you that still need to be resolved."}
@@ -65,11 +65,11 @@ function WaitingList({
         {sections.map((section) => (
           <div key={section.key}>
             {section.title ? (
-              <h3 className="sans mb-2 text-sm font-semibold tracking-wide text-[#5b6573] uppercase">
+              <h3 className="sans mb-2 text-sm font-semibold tracking-wide text-muted uppercase">
                 {section.title}
               </h3>
             ) : null}
-            <ul className="sans chart-card divide-y divide-[#ebe4d8] px-4 py-1">
+            <ul className="sans chart-card divide-y divide-line/30 px-4 py-1">
               {section.rows.map((r) => {
                 const patientName = `${r.patient.firstName} ${r.patient.lastName}`.trim();
                 const line2Parts = [
@@ -83,10 +83,10 @@ function WaitingList({
                   <li key={r.id}>
                     <Link
                       href={`/consults/${r.id}`}
-                      className="block py-3 hover:bg-[#f5f0e8] focus-visible:bg-[#f5f0e8] focus-visible:outline-none"
+                      className="block py-3 hover:bg-soft focus-visible:bg-soft focus-visible:outline-none"
                     >
-                      <p className="text-base font-medium text-teal-900">{patientName}</p>
-                      <p className="mt-0.5 text-sm text-[#5b6573]">
+                      <p className="text-base font-medium text-blue">{patientName}</p>
+                      <p className="mt-0.5 text-sm text-muted">
                         {showIdentifiers && r.patient.dob ? (
                           <>
                             DOB {r.patient.dob}
@@ -206,8 +206,7 @@ export function ConsultsHome({
             ]}
           />
 
-          <div className="mt-4">
-            <BrowserTabPanel id="favorites" activeId={homeTab}>
+          <BrowserTabPanel id="favorites" activeId={homeTab}>
               <FavoriteConsultantsPicker
                 settingsHref={settingsHref}
                 onSelect={(f) => {
@@ -228,7 +227,7 @@ export function ConsultsHome({
                 <div className="sans chart-card h-fit w-full p-5">
                   <button
                     type="button"
-                    className="text-sm font-semibold text-teal-900 underline-offset-2 hover:underline"
+                    className="text-sm font-semibold text-blue underline-offset-2 hover:underline"
                     onClick={() => {
                       setFormOpen(true);
                       setFormOpenTouched(true);
@@ -241,7 +240,6 @@ export function ConsultsHome({
                 <NewConsultForm ref={formRef} demoDefaults={demoDefaults} />
               )}
             </BrowserTabPanel>
-          </div>
         </section>
       ) : null}
     </>

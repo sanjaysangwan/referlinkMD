@@ -43,15 +43,15 @@ export default function ConsultDetailPage() {
   }, [params.id]);
 
   if (error) return <p className="sans text-orange-800">{error}</p>;
-  if (!row) return <p className="sans text-sm text-[#5b6573]">Loading…</p>;
+  if (!row) return <p className="sans text-sm text-muted">Loading…</p>;
 
   return (
     <div className="max-w-2xl">
-      <p className="sans text-xs font-semibold tracking-[0.18em] text-teal-800 uppercase">Consult</p>
+      <p className="sans text-xs font-semibold tracking-[0.18em] text-blue uppercase">Consult</p>
       <h1 className="mt-2 text-3xl">
         {row.patient.firstName} {row.patient.lastName}
       </h1>
-      <p className="sans mt-1 text-sm capitalize text-[#5b6573]">{row.status.replaceAll("_", " ")}</p>
+      <p className="sans mt-1 text-sm capitalize text-muted">{row.status.replaceAll("_", " ")}</p>
 
       <section className="chart-card mt-6 p-6">
         <h2 className="text-xl">Patient</h2>
@@ -62,15 +62,15 @@ export default function ConsultDetailPage() {
           {row.patient.firstName} {row.patient.lastName}
         </p>
         {row.patient.dob && row.patient.contactPhone ? (
-          <p className="sans mt-2 text-sm text-[#3d4a5c]">
+          <p className="sans mt-2 text-sm text-muted">
             DOB {row.patient.dob} · {formatPhone(row.patient.contactPhone)}
           </p>
         ) : (
-          <p className="sans mt-2 text-sm text-[#5b6573]">
+          <p className="sans mt-2 text-sm text-muted">
             Date of birth and phone are limited to physicians and APPs.
           </p>
         )}
-        <p className="sans mt-4 text-xs text-[#5b6573]">This product does not store consult notes.</p>
+        <p className="sans mt-4 text-xs text-muted">This product does not store consult notes.</p>
       </section>
 
       <div className="mt-4 grid gap-4 md:grid-cols-2">
@@ -80,9 +80,9 @@ export default function ConsultDetailPage() {
             <PracticeMark name={row.primaryTeam.practiceName} logo={row.primaryTeam.logo} size={48} />
             <div>
               <p>{row.primaryTeam.clinician}</p>
-              <p className="sans text-sm text-[#3d4a5c]">{row.primaryTeam.practiceName}</p>
-              {row.primaryTeam.npi ? <p className="sans text-xs text-[#5b6573]">NPI {row.primaryTeam.npi}</p> : null}
-              <p className="sans mt-1 text-xs text-[#5b6573]">
+              <p className="sans text-sm text-muted">{row.primaryTeam.practiceName}</p>
+              {row.primaryTeam.npi ? <p className="sans text-xs text-muted">NPI {row.primaryTeam.npi}</p> : null}
+              <p className="sans mt-1 text-xs text-muted">
                 Phone {formatPhone(row.primaryTeam.phone)}
                 {row.primaryTeam.fax ? ` · Fax ${formatPhone(row.primaryTeam.fax)}` : ""}
               </p>
@@ -92,7 +92,7 @@ export default function ConsultDetailPage() {
         <section className="chart-card p-6">
           <h2 className="text-lg">Consultant</h2>
           <p className="mt-2">{row.consultingTeam.name}</p>
-          <p className="sans text-sm text-[#3d4a5c]">{formatPhone(row.consultingTeam.phone)}</p>
+          <p className="sans text-sm text-muted">{formatPhone(row.consultingTeam.phone)}</p>
         </section>
       </div>
     </div>

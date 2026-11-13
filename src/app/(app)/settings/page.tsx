@@ -12,13 +12,11 @@ export default async function SettingsPage() {
   return (
     <div>
       <h1 className="text-3xl">Setting</h1>
-      <p className="sans mt-2 mb-6 max-w-xl text-sm text-[#3d4a5c]">Your contact details for this practice.</p>
-      <div className="grid max-w-4xl gap-6 lg:grid-cols-2 lg:items-start">
+      <p className="sans mt-2 mb-6 max-w-xl text-sm text-muted">Your contact details for this practice.</p>
+      <div className="flex w-full max-w-4xl flex-col gap-6">
         <MemberProfileCard session={session} />
-        <div className="space-y-6">
-          <ChangePasswordCard />
-          <LeavePracticeCard practiceName={session.practiceName} />
-        </div>
+        <ChangePasswordCard />
+        <LeavePracticeCard practiceName={session.practiceName} />
       </div>
     </div>
   );

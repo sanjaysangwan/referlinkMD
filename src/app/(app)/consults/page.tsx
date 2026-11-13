@@ -28,12 +28,12 @@ export default async function ConsultsPage() {
       {!session.practiceId ? (
         <section className="sans chart-card mb-8 space-y-3 p-6">
           <h2 className="font-serif text-xl">No practice yet</h2>
-          <p className="text-sm text-[#3d4a5c]">
+          <p className="text-sm text-muted">
             Create your own practice, or join another practice only through an invite email.
           </p>
           <Link
             href="/create-practice"
-            className="inline-flex rounded-full bg-teal-800 px-5 py-2.5 text-sm font-semibold text-white"
+            className="inline-flex rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white"
           >
             Create practice
           </Link>
@@ -53,7 +53,7 @@ export default async function ConsultsPage() {
         </p>
       ) : null}
       {isDemo() ? (
-        <p className="sans mt-8 text-xs text-[#5b6573]">
+        <p className="sans mt-8 text-xs text-muted">
           SMS is stubbed in demo.{" "}
           <Link href="/demo/outbox" className="underline underline-offset-2">
             Open demo messages

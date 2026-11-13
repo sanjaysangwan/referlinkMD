@@ -4,7 +4,7 @@ import { Smartphone } from "lucide-react";
 import { formatPhoneInput } from "@/lib/phone";
 
 const inputClass =
-  "w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2 text-base text-[#0f1c2e]";
+  "field";
 
 type PhoneFieldProps = {
   id?: string;
@@ -39,7 +39,7 @@ export function PhoneField({
       {mobile ? (
         <Smartphone
           aria-hidden
-          className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-teal-800"
+          className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-blue"
         />
       ) : null}
       <input
@@ -69,7 +69,7 @@ export function MobilePhoneText({
 }) {
   return (
     <span className={`inline-flex items-center gap-1 ${className}`}>
-      <Smartphone aria-hidden className="h-3.5 w-3.5 shrink-0 text-teal-800" />
+      <Smartphone aria-hidden className="h-3.5 w-3.5 shrink-0 text-blue" />
       <span>{phone}</span>
     </span>
   );

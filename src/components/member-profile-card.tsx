@@ -8,14 +8,14 @@ import type { SessionUser } from "@/lib/types";
 import { PhoneField, MobilePhoneText } from "@/components/phone-field";
 import { SpecialtyFields } from "@/components/specialty-fields";
 
-const field = "mt-1 w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2 text-sm";
-const label = "block text-xs font-semibold tracking-wide text-[#5b6573] uppercase";
+const field = "field mt-1";
+const label = "label";
 
 function Row({ caption, value }: { caption: string; value: React.ReactNode }) {
   return (
     <div>
-      <p className="text-[11px] font-semibold tracking-wide text-[#5b6573] uppercase">{caption}</p>
-      <div className="mt-1 text-base text-[#0f1c2e]">{value || "—"}</div>
+      <p className="text-[11px] font-semibold tracking-wide text-muted uppercase">{caption}</p>
+      <div className="mt-1 text-base text-ink">{value || "—"}</div>
     </div>
   );
 }
@@ -25,6 +25,7 @@ export function MemberProfileCard({ session }: { session: SessionUser }) {
   const [editing, setEditing] = useState(false);
   const [firstName, setFirstName] = useState(session.firstName);
   const [lastName, setLastName] = useState(session.lastName);
+  const [email, setEmail] = useState(session.email);
   const [npi, setNpi] = useState(session.npi ?? "");
   const [mobilePhone, setMobilePhone] = useState(session.mobilePhone ?? "");
   const [specialtyId, setSpecialtyId] = useState(session.specialtyId ?? "");
@@ -38,8 +39,9 @@ export function MemberProfileCard({ session }: { session: SessionUser }) {
     e.preventDefault();
     setBusy(true);
     setError("");
-    const body: Record<string, unknown> = { firstName, lastName, npi, mobilePhone };
+    const body: Record<string, unknown> = { firstName, lastName, email, mobilePhone };
     if (isPhysician) {
+      body.npi = npi;
       body.specialtyId = specialtyId || null;
       body.subspecialtyId = specialtyId ? subspecialtyId || null : null;
     }
@@ -63,6 +65,7 @@ export function MemberProfileCard({ session }: { session: SessionUser }) {
     setError("");
     setFirstName(session.firstName);
     setLastName(session.lastName);
+    setEmail(session.email);
     setNpi(session.npi ?? "");
     setMobilePhone(session.mobilePhone ?? "");
     setSpecialtyId(session.specialtyId ?? "");
@@ -71,9 +74,8 @@ export function MemberProfileCard({ session }: { session: SessionUser }) {
 
   if (editing) {
     return (
-      <form onSubmit={save} className="sans chart-card max-w-lg space-y-4 p-6">
+      <form onSubmit={save} className="sans chart-card w-full space-y-4 p-6">
         <h2 className="font-serif text-xl">Edit your details</h2>
-        <p className="text-xs text-[#5b6573]">{session.email}</p>
         <div className="grid gap-3 md:grid-cols-2">
           <label className={label}>
             First name
@@ -84,8 +86,14 @@ export function MemberProfileCard({ session }: { session: SessionUser }) {
             <input className={field} value={lastName} onChange={(e) => setLastName(e.target.value)} />
           </label>
           <label className={label}>
-            NPI
-            <input className={field} value={npi} onChange={(e) => setNpi(e.target.value)} />
+            Email
+            <input
+              required
+              type="email"
+              className={field}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </label>
           <label className={label}>
             Mobile
@@ -93,6 +101,12 @@ export function MemberProfileCard({ session }: { session: SessionUser }) {
               <PhoneField mobile value={mobilePhone} onChange={setMobilePhone} />
             </div>
           </label>
+          {isPhysician ? (
+            <label className={label}>
+              NPI
+              <input className={field} value={npi} onChange={(e) => setNpi(e.target.value)} />
+            </label>
+          ) : null}
         </div>
         {isPhysician ? (
           <SpecialtyFields
@@ -108,13 +122,13 @@ export function MemberProfileCard({ session }: { session: SessionUser }) {
         <div className="flex gap-2">
           <button
             disabled={busy}
-            className="rounded-full bg-[#0f1c2e] px-5 py-2.5 text-sm font-semibold text-white"
+            className="rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white"
           >
             {busy ? "Saving…" : "Save"}
           </button>
           <button
             type="button"
-            className="rounded-full px-5 py-2.5 text-sm font-semibold text-[#5b6573]"
+            className="rounded-full border border-line bg-white px-5 py-2.5 text-sm font-semibold text-ink"
             onClick={resetForm}
           >
             Cancel
@@ -125,15 +139,15 @@ export function MemberProfileCard({ session }: { session: SessionUser }) {
   }
 
   return (
-    <article className="sans chart-card max-w-lg p-6">
-      <p className="text-xs font-semibold tracking-[0.18em] text-teal-800 uppercase">Your profile</p>
+    <article className="sans chart-card w-full p-6">
+      <p className="text-xs font-semibold tracking-[0.18em] text-blue uppercase">Your profile</p>
       <h2 className="mt-2 font-serif text-2xl">{name}</h2>
       <div className="mt-5 grid gap-4">
         <Row caption="Email" value={session.email} />
         {session.role ? <Row caption="Credential" value={ROLE_LABEL[session.role]} /> : null}
         {session.practiceName ? <Row caption="Practice" value={session.practiceName} /> : null}
         {isPhysician ? <Row caption="Specialty" value={session.specialtyLabel ?? ""} /> : null}
-        <Row caption="NPI" value={session.npi ?? ""} />
+        {isPhysician ? <Row caption="NPI" value={session.npi ?? ""} /> : null}
         <Row
           caption="Mobile"
           value={
@@ -143,7 +157,7 @@ export function MemberProfileCard({ session }: { session: SessionUser }) {
       </div>
       <button
         type="button"
-        className="mt-8 w-full rounded-full bg-[#0f1c2e] px-5 py-2.5 text-sm font-semibold text-white"
+        className="mt-8 w-full rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white"
         onClick={() => setEditing(true)}
       >
         Edit

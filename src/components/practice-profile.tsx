@@ -6,8 +6,8 @@ import { fileToSmallLogo } from "@/lib/practice-logo-file";
 import { PracticeMark } from "@/components/practice-mark";
 import { PhoneField } from "@/components/phone-field";
 
-const field = "mt-1 w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2 text-sm";
-const label = "block text-xs font-semibold tracking-wide text-[#5b6573] uppercase";
+const field = "field mt-1";
+const label = "label";
 
 export function PracticeProfile() {
   const router = useRouter();
@@ -130,8 +130,8 @@ export function PracticeProfile() {
         </label>
       </div>
       {error ? <p className="text-sm text-orange-800">{error}</p> : null}
-      {ok ? <p className="text-sm text-teal-900">{ok}</p> : null}
-      <button disabled={busy} className="rounded-full bg-[#0f1c2e] px-5 py-2.5 text-sm font-semibold text-white">
+      {ok ? <p className="text-sm text-blue">{ok}</p> : null}
+      <button disabled={busy} className="rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white">
         {busy ? "Saving…" : "Save practice"}
       </button>
     </form>

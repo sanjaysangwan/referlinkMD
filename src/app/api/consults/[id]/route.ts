@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
-import { consults, patients, practices, users } from "@/db/schema";
+import { consults, patients, practiceMemberships, practices, users } from "@/db/schema";
 import { getDb } from "@/db";
 import { getSession } from "@/lib/auth";
 import { can, displayName } from "@/lib/privileges";
@@ -70,6 +70,18 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
     });
   }
 
+  const [requesterMembership] = await db
+    .select({ role: practiceMemberships.role })
+    .from(practiceMemberships)
+    .where(
+      and(
+        eq(practiceMemberships.userId, row.requestedBy.id),
+        eq(practiceMemberships.practiceId, row.practice.id),
+        eq(practiceMemberships.status, "active"),
+      ),
+    )
+    .limit(1);
+
   return NextResponse.json({
     id: row.consult.id,
     status: markViewed ? "viewed" : row.consult.status,
@@ -79,7 +91,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
       practiceName: row.practice.name,
       logo: row.practice.logo,
       clinician: displayName(row.requestedBy.firstName, row.requestedBy.lastName, row.requestedBy.email),
-      npi: row.requestedBy.npi,
+      npi: requesterMembership?.role === "physician" ? row.requestedBy.npi : null,
       phone: row.practice.phone,
       fax: row.practice.fax,
     },

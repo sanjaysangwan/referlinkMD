@@ -31,7 +31,7 @@ function FavoritePhoneLine({
   const cell = showCell && mobilePhone ? formatPhone(mobilePhone) : "";
   if (!office && !cell) return null;
   return (
-    <span className="mt-0.5 block text-xs font-normal text-[#5b6573]">
+    <span className="mt-0.5 block text-xs font-normal text-muted">
       {office ? <span>O-{office}</span> : null}
       {office && cell ? " " : null}
       {cell ? <span>C-{cell}</span> : null}
@@ -83,7 +83,7 @@ function StarToggle({
       aria-pressed={Boolean(starred)}
       onClick={onToggle}
       className={`mt-0.5 shrink-0 text-base leading-none ${
-        starred ? "text-teal-900" : "text-[#c4bbaa] hover:text-teal-800"
+        starred ? "text-blue" : "text-line hover:text-blue"
       }`}
     >
       {starred ? "★" : "☆"}
@@ -136,7 +136,7 @@ export function FavoriteConsultantsPicker({
           aria-pressed={starredOnly}
           onClick={() => setStarredOnly((v) => !v)}
           className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${
-            starredOnly ? "bg-teal-900 text-white" : "bg-[#efe8dc] text-teal-900"
+            starredOnly ? "bg-ink text-white" : "bg-soft text-blue"
           }`}
         >
           {starredOnly ? "All" : "☆ Personal Favorites"}
@@ -147,10 +147,10 @@ export function FavoriteConsultantsPicker({
         <div className="mt-3 space-y-4">
           {specialtyGroups.map((group) => (
             <div key={group.specialty}>
-              <p className="sans px-1 text-[11px] font-semibold tracking-wide text-[#5b6573] uppercase">
+              <p className="sans px-1 text-[11px] font-semibold tracking-wide text-muted uppercase">
                 {group.specialty}
               </p>
-              <ul className="mt-1 -mx-2 divide-y divide-[#ebe4d8]">
+              <ul className="mt-1 -mx-2 divide-y divide-line/30">
                 {group.consultants.map((f) => {
                   const name = `${f.firstName} ${f.lastName}`.trim();
                   const hasCell = Boolean(f.mobilePhone);
@@ -171,8 +171,8 @@ export function FavoriteConsultantsPicker({
                             onSelect(f);
                           }}
                           aria-pressed={selected}
-                          className={`min-w-0 flex-1 rounded-lg px-2 py-2.5 text-left text-sm font-medium focus-visible:outline-none focus-visible:bg-[#f5f0e8] hover:bg-[#f5f0e8] ${
-                            selected ? "bg-[#f5f0e8] text-teal-900" : "text-[#0f1c2e]"
+                          className={`min-w-0 flex-1 rounded-lg px-2 py-2.5 text-left text-sm font-medium focus-visible:outline-none focus-visible:bg-soft hover:bg-soft ${
+                            selected ? "bg-soft text-blue" : "text-ink"
                           }`}
                         >
                           <FavoriteRowContent
@@ -191,7 +191,7 @@ export function FavoriteConsultantsPicker({
                   return (
                     <li
                       key={f.id}
-                      className="flex items-start gap-1 px-3 py-2.5 text-sm text-[#5b6573]"
+                      className="flex items-start gap-1 px-3 py-2.5 text-sm text-muted"
                     >
                       <StarToggle
                         starred={f.starred}
@@ -215,14 +215,14 @@ export function FavoriteConsultantsPicker({
       ) : null}
 
       {!favorites.length ? (
-        <p className="sans mt-2 text-sm text-[#5b6573]">No consultants in the practice directory yet.</p>
+        <p className="sans mt-2 text-sm text-muted">No consultants in the practice directory yet.</p>
       ) : null}
       {favorites.length && starredOnly && !visible.length ? (
-        <p className="sans mt-2 text-sm text-[#5b6573]">No starred consultants. Tap ★ on a row.</p>
+        <p className="sans mt-2 text-sm text-muted">No starred consultants. Tap ★ on a row.</p>
       ) : null}
 
       <p className={`text-sm ${favorites.length ? "mt-3" : "mt-2"}`}>
-        <Link href={settingsHref} className="text-teal-900 underline-offset-2 hover:underline">
+        <Link href={settingsHref} className="text-blue underline-offset-2 hover:underline">
           Manage directory
         </Link>
       </p>

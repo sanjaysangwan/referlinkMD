@@ -67,16 +67,16 @@ export function ConsultTable({
 
   function renderRow(r: Row) {
     return (
-      <tr key={r.id} className="border-t border-[#eee6d8]">
-        <td className="px-4 py-3 whitespace-nowrap text-[#5b6573]">
+      <tr key={r.id} className="border-t border-line/30">
+        <td className="px-4 py-3 whitespace-nowrap text-muted">
           {new Date(r.createdAt).toLocaleString()}
         </td>
         <td className="px-4 py-3">
-          <Link href={`/consults/${r.id}`} className="font-medium text-teal-900 hover:underline">
+          <Link href={`/consults/${r.id}`} className="font-medium text-blue hover:underline">
             {r.patient.firstName} {r.patient.lastName}
           </Link>
           {showIdentifiers && r.patient.dob ? (
-            <div className="text-xs text-[#5b6573]">
+            <div className="text-xs text-muted">
               DOB {r.patient.dob}
               {r.patient.contactPhone ? (
                 <>
@@ -86,7 +86,7 @@ export function ConsultTable({
               ) : null}
             </div>
           ) : (
-            <div className="text-xs text-[#5b6573]">Identifiers limited for this role</div>
+            <div className="text-xs text-muted">Identifiers limited for this role</div>
           )}
         </td>
         <td className="px-4 py-3">
@@ -94,7 +94,7 @@ export function ConsultTable({
             <>
               <div className="font-medium">{r.consultingName}</div>
               {r.consultingPhone ? (
-                <div className="text-xs text-[#5b6573]">
+                <div className="text-xs text-muted">
                   <MobilePhoneText phone={formatPhone(r.consultingPhone)} />
                 </div>
               ) : null}
@@ -104,7 +104,7 @@ export function ConsultTable({
               <PracticeMark name={r.practiceName} logo={r.practiceLogo} size={32} />
               <div>
                 <div className="font-medium">{r.practiceName}</div>
-                <div className="text-xs text-[#5b6573]">{r.requestedBy}</div>
+                <div className="text-xs text-muted">{r.requestedBy}</div>
               </div>
             </div>
           )}
@@ -120,13 +120,13 @@ export function ConsultTable({
       {sections.map((section) => (
         <div key={section.key} className="chart-card overflow-hidden">
           {section.title ? (
-            <div className="border-b border-[#eee6d8] bg-[#f7f2ea] px-4 py-2 text-sm font-semibold text-[#0f1c2e]">
+            <div className="border-b border-line/30 bg-soft px-4 py-2 text-sm font-semibold text-ink">
               {section.title}
             </div>
           ) : null}
           <div className="overflow-x-auto">
             <table className="sans w-full min-w-[720px] text-left text-sm">
-              <thead className="bg-[#efe8dc] text-xs tracking-wide text-[#5b6573] uppercase">
+              <thead className="bg-soft text-xs tracking-wide text-muted uppercase">
                 <tr>
                   <th className="px-4 py-3">When</th>
                   <th className="px-4 py-3">Patient</th>
@@ -137,7 +137,7 @@ export function ConsultTable({
               <tbody>
                 {section.rows.length === 0 ? (
                   <tr>
-                    <td className="px-4 py-8 text-[#5b6573]" colSpan={4}>
+                    <td className="px-4 py-8 text-muted" colSpan={4}>
                       No consults yet.
                     </td>
                   </tr>

@@ -19,11 +19,7 @@ export function BrowserTabList({
   "aria-label": string;
 }) {
   return (
-    <div
-      role="tablist"
-      aria-label={ariaLabel}
-      className="sans flex items-end gap-1 border-b border-[#e4ddd0]"
-    >
+    <div role="tablist" aria-label={ariaLabel} className="folder-tabs sans">
       {tabs.map((tab) => {
         const active = tab.id === activeId;
         return (
@@ -35,11 +31,7 @@ export function BrowserTabList({
             aria-selected={active}
             aria-controls={`panel-${tab.id}`}
             tabIndex={active ? 0 : -1}
-            className={
-              active
-                ? "-mb-px rounded-t-xl border border-b-0 border-[#e4ddd0] bg-[#fffdf8] px-4 py-2.5 text-sm font-semibold text-[#0f1c2e]"
-                : "rounded-t-xl px-4 py-2.5 text-sm font-semibold text-[#5b6573] hover:bg-[#efe8dc] hover:text-[#0f1c2e]"
-            }
+            className="folder-tab"
             onClick={() => onChange(tab.id)}
           >
             {tab.label}
@@ -68,7 +60,7 @@ export function BrowserTabPanel({
       id={`panel-${id}`}
       aria-labelledby={`tab-${id}`}
       hidden={!active}
-      className={className}
+      className={`folder-panel ${className}`.trim()}
     >
       {children}
     </div>

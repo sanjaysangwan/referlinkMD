@@ -30,8 +30,8 @@ type ConsultantMatch = {
   subspecialtyId?: string | null;
 };
 
-const field = "mt-1 w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2 text-base text-[#0f1c2e]";
-const label = "block text-xs font-semibold tracking-wide text-[#5b6573] uppercase";
+const field = "field mt-1";
+const label = "label";
 
 function FavoritePhones({
   officePhone,
@@ -46,7 +46,7 @@ function FavoritePhones({
   const cell = showCell && mobilePhone ? formatPhone(mobilePhone) : "";
   if (!office && !cell) return null;
   return (
-    <p className="mt-0.5 text-xs font-normal text-[#5b6573]">
+    <p className="mt-0.5 text-xs font-normal text-muted">
       {office ? <span>O-{office}</span> : null}
       {office && cell ? " " : null}
       {cell ? <span>C-{cell}</span> : null}
@@ -240,7 +240,7 @@ export function FavoriteConsultantsManager() {
             aria-pressed={Boolean(f.starred)}
             onClick={() => void toggleStar(f.id, Boolean(f.starred))}
             className={`mt-0.5 shrink-0 text-lg leading-none ${
-              f.starred ? "text-teal-900" : "text-[#c4bbaa] hover:text-teal-800"
+              f.starred ? "text-blue" : "text-line hover:text-blue"
             }`}
           >
             {f.starred ? "★" : "☆"}
@@ -251,7 +251,7 @@ export function FavoriteConsultantsManager() {
             size={32}
           />
           <div className="min-w-0">
-            <p className="font-medium text-[#0f1c2e]">
+            <p className="font-medium text-ink">
               {f.firstName} {f.lastName}
             </p>
             <FavoritePhones
@@ -277,7 +277,7 @@ export function FavoriteConsultantsManager() {
     <section className="sans chart-card space-y-4 p-6">
       <div>
         <h2 className="font-serif text-xl">Consultant directory</h2>
-        <p className="mt-1 text-sm text-[#5b6573]">
+        <p className="mt-1 text-sm text-muted">
           Add consultants by name, specialty, and office and/or cell. Specialty and at least one
           phone are required. Cell numbers can populate a new consult request.
         </p>
@@ -311,30 +311,30 @@ export function FavoriteConsultantsManager() {
           />
         </label>
         {searching && name.trim().length >= 2 ? (
-          <div className="rounded-xl border border-[#d8d0c2] bg-white p-2" aria-label="Matching consultants">
+          <div className="rounded-xl border border-line bg-white p-2" aria-label="Matching consultants">
             {matches.map((person) => (
               <button
                 type="button"
                 key={person.id}
-                className="block w-full rounded-lg px-3 py-2 text-left hover:bg-teal-50 focus:bg-teal-50"
+                className="block w-full rounded-lg px-3 py-2 text-left hover:bg-soft focus:bg-soft"
                 onClick={() => selectMatch(person)}
               >
                 <span className="block font-semibold">
                   {person.firstName} {person.lastName}
                 </span>
                 {person.officePhone || person.mobilePhone ? (
-                  <span className="text-xs text-gray-600">
+                  <span className="text-xs text-muted">
                     {person.officePhone ? <>O-{formatPhoneInput(person.officePhone)} </> : null}
                     {person.mobilePhone ? (
                       <MobilePhoneText phone={formatPhoneInput(person.mobilePhone)} />
                     ) : null}
                   </span>
                 ) : (
-                  <span className="text-xs text-gray-600">No phone on file</span>
+                  <span className="text-xs text-muted">No phone on file</span>
                 )}
               </button>
             ))}
-            <p role="status" className="px-3 py-2 text-sm text-gray-600">
+            <p role="status" className="px-3 py-2 text-sm text-muted">
               {searchStatus}
             </p>
           </div>
@@ -362,48 +362,48 @@ export function FavoriteConsultantsManager() {
             </div>
           </label>
         </div>
-        <p className="text-xs text-[#5b6573]">Specialty and at least one phone number are required.</p>
+        <p className="text-xs text-muted">Specialty and at least one phone number are required.</p>
         {error ? (
           <p role="alert" className="rounded-lg bg-orange-50 px-3 py-2 text-sm text-orange-900">
             {error}
           </p>
         ) : null}
         {ok ? (
-          <p role="status" className="rounded-lg bg-teal-50 px-3 py-2 text-sm text-teal-950">
+          <p role="status" className="rounded-lg bg-soft px-3 py-2 text-sm text-ink">
             {ok}
           </p>
         ) : null}
         <button
           disabled={busy}
-          className="rounded-full bg-[#0f1c2e] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+          className="rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
         >
           {busy ? "Saving…" : "Add to directory"}
         </button>
       </form>
 
       {favorites.length ? (
-        <div className="space-y-4 border-t border-[#ebe4d8] pt-2">
+        <div className="space-y-4 border-t border-line/30 pt-2">
           <div className="flex items-center justify-between gap-2">
             <button
               type="button"
               aria-pressed={starredOnly}
               onClick={() => setStarredOnly((v) => !v)}
               className={`rounded-full px-3 py-1.5 text-sm font-semibold ${
-                starredOnly ? "bg-teal-900 text-white" : "bg-[#efe8dc] text-teal-900"
+                starredOnly ? "bg-ink text-white" : "bg-soft text-blue"
               }`}
             >
               {starredOnly ? "All" : "☆ Personal Favorites"}
             </button>
-            <p className="text-xs text-[#5b6573]">
+            <p className="text-xs text-muted">
               {starredOnly ? "Showing your starred list" : "Showing full practice directory"}
             </p>
           </div>
           {specialtyGroups.map((group) => (
             <div key={group.specialty}>
-              <p className="text-[11px] font-semibold tracking-wide text-[#5b6573] uppercase">
+              <p className="text-[11px] font-semibold tracking-wide text-muted uppercase">
                 {group.specialty}
               </p>
-              <ul className="divide-y divide-[#ebe4d8]">
+              <ul className="divide-y divide-line/30">
                 {group.consultants.map((f) => (
                   <FavoriteRow key={f.id} f={f} />
                 ))}
@@ -411,11 +411,11 @@ export function FavoriteConsultantsManager() {
             </div>
           ))}
           {starredOnly && !visible.length ? (
-            <p className="text-sm text-[#5b6573]">No starred consultants yet. Tap ★ on a row.</p>
+            <p className="text-sm text-muted">No starred consultants yet. Tap ★ on a row.</p>
           ) : null}
         </div>
       ) : (
-        <p className="text-sm text-[#5b6573]">No consultants in the practice directory yet.</p>
+        <p className="text-sm text-muted">No consultants in the practice directory yet.</p>
       )}
     </section>
   );

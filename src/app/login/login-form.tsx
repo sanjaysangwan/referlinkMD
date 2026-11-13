@@ -14,10 +14,10 @@ const demos = [
   { email: "amina@referlink.demo", label: "Riverside — Amina Patel, PA-C" },
 ];
 
-const field = "mt-1 w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2 text-base";
+const field = "field mt-1";
 const fieldDisabled =
-  "mt-1 w-full rounded-xl border border-[#e5dfd4] bg-[#f3eee6] px-3 py-2 text-base text-[#8a8790] disabled:cursor-not-allowed";
-const label = "block text-xs font-semibold tracking-wide text-[#5b6573] uppercase";
+  "field mt-1";
+const label = "label";
 
 type PracticeMatch = {
   id: string;
@@ -252,18 +252,18 @@ export function LoginForm() {
   return (
     <form onSubmit={submit} className="sans chart-card mx-auto w-full max-w-lg p-8">
       {!mfa ? (
-        <div className="mb-6 grid grid-cols-2 gap-2 rounded-full bg-[#efe8dc] p-1">
+        <div className="mb-6 grid grid-cols-2 gap-2 rounded-full bg-soft p-1">
           <button
             type="button"
             onClick={() => switchMode("signin")}
-            className={`rounded-full px-4 py-2 text-sm font-semibold ${mode === "signin" ? "bg-teal-800 text-white" : "text-[#3d4a5c]"}`}
+            className={`rounded-full px-4 py-2 text-sm font-semibold ${mode === "signin" ? "bg-ink text-white" : "text-muted"}`}
           >
             Sign in
           </button>
           <button
             type="button"
             onClick={() => switchMode("create")}
-            className={`rounded-full px-4 py-2 text-sm font-semibold ${mode === "create" ? "bg-teal-800 text-white" : "text-[#3d4a5c]"}`}
+            className={`rounded-full px-4 py-2 text-sm font-semibold ${mode === "create" ? "bg-ink text-white" : "text-muted"}`}
           >
             Create Login
           </button>
@@ -283,7 +283,7 @@ export function LoginForm() {
             />
           </label>
           {mfaMethod === "sms" ? (
-            <p className="mt-2 text-xs text-[#5b6573]">
+            <p className="mt-2 text-xs text-muted">
               Code sent to {maskedMobile || "your mobile"}
               {demoCode ? (
                 <>
@@ -293,7 +293,7 @@ export function LoginForm() {
               ) : null}
             </p>
           ) : (
-            <p className="mt-2 text-xs text-[#5b6573]">
+            <p className="mt-2 text-xs text-muted">
               Demo accounts share authenticator secret <span className="font-mono">{DEMO_MFA_SECRET}</span>
               {demoCode ? (
                 <>
@@ -306,7 +306,7 @@ export function LoginForm() {
             <button
               type="button"
               disabled={busy}
-              className="mt-2 text-sm text-teal-900 underline-offset-2 hover:underline"
+              className="mt-2 text-sm text-blue underline-offset-2 hover:underline"
               onClick={async () => {
                 setBusy(true);
                 setError("");
@@ -372,17 +372,17 @@ export function LoginForm() {
               }}
             />
           </label>
-          <p className="mt-1 text-xs text-[#5b6573]">
+          <p className="mt-1 text-xs text-muted">
             Practices are unique by name + ZIP. Same name in another ZIP is a different practice.
           </p>
 
           {showPracticeSuggestions && practiceName.trim().length >= 2 ? (
-            <div className="mt-2 rounded-xl border border-[#d8d0c2] bg-white p-2" aria-label="Matching practices">
+            <div className="mt-2 rounded-xl border border-line bg-white p-2" aria-label="Matching practices">
               {practiceChecking ? (
-                <p className="px-2 py-1.5 text-sm text-[#5b6573]">Checking practice name…</p>
+                <p className="px-2 py-1.5 text-sm text-muted">Checking practice name…</p>
               ) : practiceMatches.length ? (
                 <>
-                  <p className="px-2 py-1 text-xs text-[#5b6573]">
+                  <p className="px-2 py-1 text-xs text-muted">
                     {practiceMatches.length > 1
                       ? "Multiple practices share this name — choose the correct ZIP:"
                       : "Matching practice:"}
@@ -391,15 +391,15 @@ export function LoginForm() {
                     <button
                       type="button"
                       key={match.id}
-                      className="block w-full rounded-lg px-2 py-2 text-left text-sm hover:bg-[#efe8dc]"
+                      className="block w-full rounded-lg px-2 py-2 text-left text-sm hover:bg-soft"
                       onClick={() => selectPractice(match)}
                     >
-                      <span className="font-medium text-[#0f1c2e]">
+                      <span className="font-medium text-ink">
                         {match.label ||
                           `${match.name} · ${match.postalCodeDisplay || formatZipDisplay(match.postalCode)}`}
                       </span>
                       {match.admin ? (
-                        <span className="mt-0.5 block text-xs text-[#5b6573]">
+                        <span className="mt-0.5 block text-xs text-muted">
                           Practice admin: {match.admin.name}
                         </span>
                       ) : null}
@@ -407,7 +407,7 @@ export function LoginForm() {
                   ))}
                 </>
               ) : (
-                <p className="px-2 py-1.5 text-sm text-[#5b6573]">
+                <p className="px-2 py-1.5 text-sm text-muted">
                   No existing practice with this name. Continue with a ZIP to create it.
                 </p>
               )}
@@ -429,26 +429,26 @@ export function LoginForm() {
               </p>
               {existingPractice.admin ? (
                 <div className="mt-4">
-                  <p className="text-2xl font-semibold tracking-tight text-[#0f1c2e]">
+                  <p className="text-2xl font-semibold tracking-tight text-ink">
                     {existingPractice.admin.name}
                   </p>
-                  <p className="mt-2 text-lg text-[#3d4a5c]">
+                  <p className="mt-2 text-lg text-muted">
                     {[existingPractice.admin.email, existingPractice.admin.phone]
                       .filter(Boolean)
                       .join(" · ")}
                   </p>
                 </div>
               ) : (
-                <p className="mt-3 text-lg font-semibold text-[#0f1c2e]">
+                <p className="mt-3 text-lg font-semibold text-ink">
                   Ask your practice administrator for an invite.
                 </p>
               )}
 
               {claimMessage ? (
-                <p className="mt-4 text-sm text-teal-900">{claimMessage}</p>
+                <p className="mt-4 text-sm text-blue">{claimMessage}</p>
               ) : showClaimForm ? (
                 <div className="mt-5 space-y-3 border-t border-orange-200 pt-4">
-                  <p className="text-sm text-[#3d4a5c]">
+                  <p className="text-sm text-muted">
                     Tell us why this listing is incorrect. We’ll email support to review reclaiming
                     this practice name.
                   </p>
@@ -484,13 +484,13 @@ export function LoginForm() {
                       type="button"
                       disabled={claimBusy || !claimEmail.trim()}
                       onClick={() => void submitClaim()}
-                      className="rounded-full bg-[#0f1c2e] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                      className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
                     >
                       {claimBusy ? "Sending…" : "Submit claim"}
                     </button>
                     <button
                       type="button"
-                      className="rounded-full px-4 py-2 text-sm font-semibold text-[#5b6573]"
+                      className="rounded-full border border-line bg-white px-4 py-2 text-sm font-semibold text-ink"
                       onClick={() => setShowClaimForm(false)}
                     >
                       Cancel
@@ -501,7 +501,7 @@ export function LoginForm() {
                 <p className="mt-5 text-sm">
                   <button
                     type="button"
-                    className="font-semibold text-teal-900 underline underline-offset-2"
+                    className="font-semibold text-blue underline underline-offset-2"
                     onClick={() => {
                       setShowClaimForm(true);
                       setClaimEmail(email);
@@ -515,11 +515,11 @@ export function LoginForm() {
           ) : (
             <>
               {practiceAvailable ? (
-                <p className="mt-2 text-xs text-[#3d4a5c]">
+                <p className="mt-2 text-xs text-muted">
                   Practice name + ZIP is available. Enter your login details to create it.
                 </p>
               ) : (
-                <p className="mt-2 text-xs text-[#5b6573]">
+                <p className="mt-2 text-xs text-muted">
                   Enter practice name and ZIP first. Other fields unlock when that combination is
                   available.
                 </p>
@@ -550,7 +550,7 @@ export function LoginForm() {
                   autoComplete="new-password"
                 />
               </label>
-              <p className="mt-1 text-xs text-[#5b6573]">At least 10 characters.</p>
+              <p className="mt-1 text-xs text-muted">At least 10 characters.</p>
               <label className={`mt-4 ${label}`}>
                 Your credential
                 <select
@@ -565,7 +565,7 @@ export function LoginForm() {
                 </select>
               </label>
               {practiceAvailable ? (
-                <p className="mt-2 text-xs text-[#3d4a5c]">
+                <p className="mt-2 text-xs text-muted">
                   This creates your practice and your login together. Add a logo, phone, fax, and
                   staff after you sign in.
                 </p>
@@ -599,7 +599,7 @@ export function LoginForm() {
             />
           </label>
           <p className="mt-2 text-right text-sm">
-            <a href="/forgot-password" className="text-teal-900 underline-offset-2 hover:underline">
+            <a href="/forgot-password" className="text-blue underline-offset-2 hover:underline">
               Forgot password?
             </a>
           </p>
@@ -608,12 +608,12 @@ export function LoginForm() {
 
       {error ? <p className="mt-4 text-sm text-orange-800">{error}</p> : null}
       {!mfa && mode === "signin" && params.get("reset") === "1" ? (
-        <p className="mt-4 text-sm text-teal-900">Password updated. Sign in with your new password.</p>
+        <p className="mt-4 text-sm text-blue">Password updated. Sign in with your new password.</p>
       ) : null}
 
       <button
         disabled={busy || (mode === "create" && !mfa && (!practiceAvailable || !!existingPractice))}
-        className="mt-6 w-full rounded-full bg-[#0f1c2e] py-3 text-sm font-semibold text-white disabled:opacity-60"
+        className="mt-6 w-full rounded-full bg-ink py-3 text-sm font-semibold text-white disabled:opacity-60"
       >
         {busy
           ? "Please wait…"
@@ -628,7 +628,7 @@ export function LoginForm() {
 
       {!mfa && mode === "signin" ? (
         <>
-          <p className="mt-6 text-xs font-semibold tracking-wide text-[#5b6573] uppercase">
+          <p className="mt-6 text-xs font-semibold tracking-wide text-muted uppercase">
             Demo accounts (password: {DEMO_PASSWORD})
           </p>
           <ul className="mt-2 space-y-1">
@@ -636,7 +636,7 @@ export function LoginForm() {
               <li key={a.email}>
                 <button
                   type="button"
-                  className="text-left text-sm text-teal-900 underline-offset-2 hover:underline"
+                  className="text-left text-sm text-blue underline-offset-2 hover:underline"
                   onClick={() => setEmail(a.email)}
                 >
                   {a.label} · {a.email}

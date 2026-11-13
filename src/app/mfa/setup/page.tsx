@@ -129,9 +129,9 @@ function MfaSetupForm() {
 
   return (
     <main className="mx-auto max-w-lg px-6 py-16">
-      <p className="sans text-sm font-medium tracking-[0.2em] text-teal-800 uppercase">Security</p>
+      <p className="sans text-sm font-medium tracking-[0.2em] text-blue uppercase">Security</p>
       <h1 className="mt-2 text-4xl">Enable multi-factor authentication</h1>
-      <p className="sans mt-3 text-[#3d4a5c]">
+      <p className="sans mt-3 text-muted">
         PHI screens require MFA. Choose an authenticator app or a one-time code by SMS. Sessions idle
         out after 15 minutes.
       </p>
@@ -142,10 +142,10 @@ function MfaSetupForm() {
             type="button"
             disabled={busy}
             onClick={() => void startTotp()}
-            className="w-full rounded-xl border border-[#d8d0c2] bg-white px-4 py-4 text-left hover:border-teal-800"
+            className="w-full rounded-xl border border-line bg-white px-4 py-4 text-left hover:border-blue"
           >
-            <span className="block text-sm font-semibold text-[#0f1c2e]">Authenticator app</span>
-            <span className="mt-1 block text-sm text-[#5b6573]">
+            <span className="block text-sm font-semibold text-ink">Authenticator app</span>
+            <span className="mt-1 block text-sm text-muted">
               Use Google Authenticator, Authy, or a similar app.
             </span>
           </button>
@@ -159,10 +159,10 @@ function MfaSetupForm() {
               setCode("");
               setDemoCode("");
             }}
-            className="w-full rounded-xl border border-[#d8d0c2] bg-white px-4 py-4 text-left hover:border-teal-800"
+            className="w-full rounded-xl border border-line bg-white px-4 py-4 text-left hover:border-blue"
           >
-            <span className="block text-sm font-semibold text-[#0f1c2e]">Text message (SMS)</span>
-            <span className="mt-1 block text-sm text-[#5b6573]">
+            <span className="block text-sm font-semibold text-ink">Text message (SMS)</span>
+            <span className="mt-1 block text-sm text-muted">
               Receive a 6-digit code on your mobile phone.
             </span>
           </button>
@@ -174,7 +174,7 @@ function MfaSetupForm() {
         <form onSubmit={confirmTotp} className="sans chart-card mt-8 space-y-4 p-8">
           <button
             type="button"
-            className="text-sm text-teal-900 underline-offset-2 hover:underline"
+            className="text-sm text-blue underline-offset-2 hover:underline"
             onClick={() => {
               setMethod(null);
               setQr("");
@@ -187,17 +187,17 @@ function MfaSetupForm() {
           </button>
           {qr ? <img src={qr} alt="Authenticator QR code" className="mx-auto" /> : null}
           {secret ? (
-            <p className="text-center text-xs text-[#5b6573]">
+            <p className="text-center text-xs text-muted">
               Or enter secret <span className="font-mono">{secret}</span>
             </p>
           ) : null}
-          <label className="block text-xs font-semibold tracking-wide text-[#5b6573] uppercase">
+          <label className="label">
             Authenticator code
             <input
               required
               inputMode="numeric"
               autoComplete="one-time-code"
-              className="mt-1 w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2"
+              className="field mt-1"
               value={code}
               onChange={(e) => setCode(e.target.value)}
             />
@@ -205,7 +205,7 @@ function MfaSetupForm() {
           {error ? <p className="text-sm text-orange-800">{error}</p> : null}
           <button
             disabled={busy}
-            className="w-full rounded-full bg-[#0f1c2e] py-3 text-sm font-semibold text-white disabled:opacity-60"
+            className="w-full rounded-full bg-ink py-3 text-sm font-semibold text-white disabled:opacity-60"
           >
             {busy ? "Verifying…" : "Enable authenticator MFA"}
           </button>
@@ -219,7 +219,7 @@ function MfaSetupForm() {
         >
           <button
             type="button"
-            className="text-sm text-teal-900 underline-offset-2 hover:underline"
+            className="text-sm text-blue underline-offset-2 hover:underline"
             onClick={() => {
               setMethod(null);
               setSmsSent(false);
@@ -231,7 +231,7 @@ function MfaSetupForm() {
             ← Choose a different method
           </button>
           {!smsSent ? (
-            <label className="block text-xs font-semibold tracking-wide text-[#5b6573] uppercase">
+            <label className="label">
               Mobile phone
               <div className="mt-1">
                 <PhoneField mobile required value={phone} onChange={setPhone} />
@@ -239,23 +239,23 @@ function MfaSetupForm() {
             </label>
           ) : (
             <>
-              <p className="text-sm text-[#3d4a5c]">
+              <p className="text-sm text-muted">
                 We sent a 6-digit code to{" "}
                 <span className="font-semibold">{maskedMobile ?? "your phone"}</span>.
               </p>
-              <label className="block text-xs font-semibold tracking-wide text-[#5b6573] uppercase">
+              <label className="label">
                 SMS code
                 <input
                   required
                   inputMode="numeric"
                   autoComplete="one-time-code"
-                  className="mt-1 w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2"
+                  className="field mt-1"
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
                 />
               </label>
               {demoCode ? (
-                <p className="text-xs text-[#5b6573]">
+                <p className="text-xs text-muted">
                   Demo code: <span className="font-mono font-semibold">{demoCode}</span> (also in Demo
                   inbox)
                 </p>
@@ -264,7 +264,7 @@ function MfaSetupForm() {
                 type="button"
                 disabled={busy}
                 onClick={() => void sendSms()}
-                className="text-sm text-teal-900 underline-offset-2 hover:underline"
+                className="text-sm text-blue underline-offset-2 hover:underline"
               >
                 Resend code
               </button>
@@ -273,7 +273,7 @@ function MfaSetupForm() {
           {error ? <p className="text-sm text-orange-800">{error}</p> : null}
           <button
             disabled={busy}
-            className="w-full rounded-full bg-[#0f1c2e] py-3 text-sm font-semibold text-white disabled:opacity-60"
+            className="w-full rounded-full bg-ink py-3 text-sm font-semibold text-white disabled:opacity-60"
           >
             {busy
               ? smsSent

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { and, eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import { z } from "zod";
 import { practiceMemberships, users } from "@/db/schema";
 import { getDb } from "@/db";
@@ -14,6 +14,7 @@ import type { PracticeRole } from "@/lib/types";
 const patchSchema = z.object({
   firstName: z.string().optional(),
   lastName: z.string().optional(),
+  email: z.string().email().optional(),
   npi: z.string().optional(),
   mobilePhone: z.string().optional(),
   role: z.enum(["physician", "app", "office_manager"]).optional(),
@@ -60,6 +61,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ userI
   const userPatch: {
     firstName?: string;
     lastName?: string;
+    email?: string;
     npi?: string | null;
     mobilePhone?: string | null;
     mobileVerifiedAt?: Date | null;
@@ -68,12 +70,28 @@ export async function PATCH(request: Request, context: { params: Promise<{ userI
   } = {};
   if (parsed.data.firstName !== undefined) userPatch.firstName = parsed.data.firstName.trim();
   if (parsed.data.lastName !== undefined) userPatch.lastName = parsed.data.lastName.trim();
-  if (parsed.data.npi !== undefined) {
-    const npi = parsed.data.npi.trim();
-    if (npi && !npiValid(npi)) {
-      return NextResponse.json({ error: "NPI must be 10 digits." }, { status: 400 });
+  if (parsed.data.email !== undefined) {
+    const email = parsed.data.email.toLowerCase().trim();
+    const [taken] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(and(eq(users.email, email), ne(users.id, userId)))
+      .limit(1);
+    if (taken) {
+      return NextResponse.json({ error: "That email is already in use." }, { status: 409 });
     }
-    userPatch.npi = npi || null;
+    userPatch.email = email;
+  }
+  if (nextRole === "physician") {
+    if (parsed.data.npi !== undefined) {
+      const npi = parsed.data.npi.trim();
+      if (npi && !npiValid(npi)) {
+        return NextResponse.json({ error: "NPI must be 10 digits." }, { status: 400 });
+      }
+      userPatch.npi = npi || null;
+    }
+  } else {
+    userPatch.npi = null;
   }
   if (parsed.data.mobilePhone !== undefined) {
     const raw = parsed.data.mobilePhone.trim();

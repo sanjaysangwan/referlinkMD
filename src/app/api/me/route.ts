@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import { z } from "zod";
 import { users } from "@/db/schema";
 import { getDb } from "@/db";
@@ -13,6 +13,7 @@ import { validatePhysicianSpecialty } from "@/lib/specialty";
 const patchSchema = z.object({
   firstName: z.string().optional(),
   lastName: z.string().optional(),
+  email: z.string().email().optional(),
   npi: z.string().optional(),
   mobilePhone: z.string().optional(),
   specialtyId: z.string().uuid().nullable().optional(),
@@ -27,7 +28,7 @@ export async function GET() {
     email: session.email,
     firstName: session.firstName,
     lastName: session.lastName,
-    npi: session.npi,
+    npi: session.role === "physician" ? session.npi : null,
     mobilePhone: session.mobilePhone,
     role: session.role,
     specialtyId: session.specialtyId,
@@ -47,9 +48,11 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Check your profile details and try again." }, { status: 400 });
   }
 
+  const db = await getDb();
   const patch: {
     firstName?: string;
     lastName?: string;
+    email?: string;
     npi?: string | null;
     mobilePhone?: string | null;
     mobileVerifiedAt?: Date | null;
@@ -58,7 +61,22 @@ export async function PATCH(request: Request) {
   } = {};
   if (parsed.data.firstName !== undefined) patch.firstName = parsed.data.firstName.trim();
   if (parsed.data.lastName !== undefined) patch.lastName = parsed.data.lastName.trim();
+  if (parsed.data.email !== undefined) {
+    const email = parsed.data.email.toLowerCase().trim();
+    const [taken] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(and(eq(users.email, email), ne(users.id, session.id)))
+      .limit(1);
+    if (taken) {
+      return NextResponse.json({ error: "That email is already in use." }, { status: 409 });
+    }
+    patch.email = email;
+  }
   if (parsed.data.npi !== undefined) {
+    if (session.role !== "physician") {
+      return NextResponse.json({ error: "Only physicians have an NPI." }, { status: 400 });
+    }
     const npi = parsed.data.npi.trim();
     if (npi && !npiValid(npi)) {
       return NextResponse.json({ error: "NPI must be 10 digits." }, { status: 400 });
@@ -88,14 +106,12 @@ export async function PATCH(request: Request) {
       parsed.data.specialtyId !== undefined ? parsed.data.specialtyId : session.specialtyId;
     const subspecialtyId =
       parsed.data.subspecialtyId !== undefined ? parsed.data.subspecialtyId : session.subspecialtyId;
-    const db = await getDb();
     const check = await validatePhysicianSpecialty(db, { specialtyId, subspecialtyId });
     if (!check.ok) return NextResponse.json({ error: check.error }, { status: 400 });
     patch.specialtyId = specialtyId;
     patch.subspecialtyId = specialtyId ? subspecialtyId : null;
   }
 
-  const db = await getDb();
   await db.update(users).set(patch).where(eq(users.id, session.id));
   const { ip, userAgent } = await requestMeta();
   await writeAudit({

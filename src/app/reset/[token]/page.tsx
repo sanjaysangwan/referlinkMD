@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { APP_NAME } from "@/lib/brand";
 
-const field = "mt-1 w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2 text-base";
-const label = "block text-xs font-semibold tracking-wide text-[#5b6573] uppercase";
+const field = "field mt-1";
+const label = "label";
 
 export default function ResetPasswordPage() {
   const params = useParams<{ token: string }>();
@@ -46,9 +46,9 @@ export default function ResetPasswordPage() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center px-6 py-16">
-      <p className="sans text-center text-sm font-medium tracking-[0.16em] text-teal-800">{APP_NAME}</p>
+      <p className="sans text-center text-sm font-medium tracking-[0.16em] text-blue">{APP_NAME}</p>
       <h1 className="mt-2 text-center text-4xl">Choose a new password</h1>
-      <p className="sans mx-auto mt-3 text-center text-[#3d4a5c]">
+      <p className="sans mx-auto mt-3 text-center text-muted">
         Enter a new password for your {APP_NAME} account. The link expires after one hour. Your
         current password stays valid until you click Update password.
       </p>
@@ -87,12 +87,12 @@ export default function ResetPasswordPage() {
           type="button"
           disabled={!canSubmit}
           onClick={() => void updatePassword()}
-          className="w-full rounded-full bg-[#0f1c2e] py-3 text-sm font-semibold text-white disabled:opacity-60"
+          className="w-full rounded-full bg-ink py-3 text-sm font-semibold text-white disabled:opacity-60"
         >
           {busy ? "Saving…" : "Update password"}
         </button>
-        <p className="text-center text-sm text-[#3d4a5c]">
-          <Link href="/login" className="text-teal-900 underline-offset-2 hover:underline">
+        <p className="text-center text-sm text-muted">
+          <Link href="/login" className="text-blue underline-offset-2 hover:underline">
             Back to sign in
           </Link>
         </p>

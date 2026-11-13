@@ -6,8 +6,10 @@ import { fileToSmallLogo } from "@/lib/practice-logo-file";
 import { PracticeMark } from "@/components/practice-mark";
 import { PhoneField } from "@/components/phone-field";
 import { ChangePasswordCard } from "@/components/change-password-card";
+import { DisclosureCard } from "@/components/disclosure-card";
 import { LeavePracticeCard } from "@/components/leave-practice-card";
 import { SpecialtyFields } from "@/components/specialty-fields";
+import { formatPhone } from "@/lib/phone";
 import { isDemo } from "@/lib/env";
 import Link from "next/link";
 import type { PracticeRole, SessionUser } from "@/lib/types";
@@ -28,8 +30,8 @@ type Member = {
   specialtyLabel?: string | null;
 };
 
-const field = "mt-1 w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2 text-sm";
-const label = "block text-xs font-semibold tracking-wide text-[#5b6573] uppercase";
+const field = "field mt-1";
+const label = "label";
 
 export function PracticeSetting({ session }: { session: SessionUser }) {
   const router = useRouter();
@@ -56,6 +58,7 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
+    email: "",
     npi: "",
     mobilePhone: "",
     role: "physician" as PracticeRole,
@@ -109,7 +112,8 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
     setForm({
       firstName: member.firstName,
       lastName: member.lastName,
-      npi: member.npi ?? "",
+      email: member.email,
+      npi: member.role === "physician" ? (member.npi ?? "") : "",
       mobilePhone: member.mobilePhone ?? "",
       role: member.role,
       specialtyId: member.specialtyId ?? "",
@@ -134,23 +138,17 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
       : editingId === session.id
         ? {}
         : { specialtyId: null, subspecialtyId: null };
+    const contact = {
+      firstName: form.firstName,
+      lastName: form.lastName,
+      email: form.email,
+      mobilePhone: form.mobilePhone,
+      ...(isPhysicianEdit ? { npi: form.npi } : {}),
+    };
     const body =
       editingId === session.id
-        ? {
-            firstName: form.firstName,
-            lastName: form.lastName,
-            npi: form.npi,
-            mobilePhone: form.mobilePhone,
-            ...specialtyPayload,
-          }
-        : {
-            firstName: form.firstName,
-            lastName: form.lastName,
-            npi: form.npi,
-            mobilePhone: form.mobilePhone,
-            role: form.role,
-            ...specialtyPayload,
-          };
+        ? { ...contact, ...specialtyPayload }
+        : { ...contact, role: form.role, ...specialtyPayload };
     const res = await fetch(url, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -238,33 +236,33 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
       setError(data.error ?? "Invite failed.");
       return;
     }
-        setOk("Invite email sent. They can join (or move from another practice) via the link.");
+    setOk("Invite email sent. They can join (or move from another practice) via the link.");
     setInviteEmail("");
     void loadMembers();
   }
 
   return (
-    <div className="max-w-4xl">
-      <header className="mb-6 flex items-center gap-4">
+    <div className="flex w-full max-w-4xl flex-col gap-6">
+      <header className="flex items-center gap-4">
         <PracticeMark name={name || "Practice"} logo={logo} size={72} />
         <div className="min-w-0 flex-1">
-          <p className="sans text-xs font-semibold tracking-[0.18em] text-teal-800 uppercase">Practice</p>
+          <p className="sans text-xs font-semibold tracking-[0.18em] text-blue uppercase">Practice</p>
           <h1 className="truncate text-3xl">{name || "Practice"}</h1>
           {healthSystemName ? (
-            <div className="sans mt-1 flex items-center gap-2 text-sm text-[#5b6573]">
+            <div className="sans mt-1 flex items-center gap-2 text-sm text-muted">
               <PracticeMark name={healthSystemName} logo={healthSystemLogo} size={20} />
               <span>{healthSystemName}</span>
             </div>
           ) : null}
           {city || state ? (
-            <p className="sans text-sm text-[#5b6573]">
+            <p className="sans text-sm text-muted">
               {[city, state].filter(Boolean).join(", ")}
             </p>
           ) : null}
         </div>
         <button
           type="button"
-          className="sans shrink-0 rounded-full border border-[#d8d0c2] px-4 py-2 text-sm font-semibold"
+          className="sans shrink-0 rounded-full border border-line bg-white px-4 py-2 text-sm font-semibold text-ink"
           onClick={() => {
             setEditingPractice((v) => !v);
             setEditingId(null);
@@ -277,7 +275,7 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
       </header>
 
       {editingPractice ? (
-        <form onSubmit={savePractice} className="sans chart-card mb-6 space-y-4 p-6">
+        <form onSubmit={savePractice} className="sans chart-card w-full space-y-4 p-6">
           <h2 className="font-serif text-xl">Practice details</h2>
           <label className={`${label} flex items-center gap-3`}>
             Logo
@@ -311,12 +309,12 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
               />
             </label>
             {hsSuggestOpen && hsSuggestions.length ? (
-              <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-xl border border-[#d8d0c2] bg-white py-1 shadow-sm">
+              <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-xl border border-line bg-white py-1 shadow-sm">
                 {hsSuggestions.map((hs) => (
                   <li key={hs.id}>
                     <button
                       type="button"
-                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-[#f5f0e8]"
+                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-soft"
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={() => {
                         setHealthSystemId(hs.id);
@@ -332,7 +330,7 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
                 ))}
               </ul>
             ) : null}
-            <p className="mt-1 text-xs text-[#5b6573]">
+            <p className="mt-1 text-xs text-muted">
               Pick an existing system or type a new name to create one. Logos are set by ReferLink.
             </p>
           </div>
@@ -368,31 +366,43 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
               <input className={field} value={postalCode} onChange={(e) => setPostalCode(e.target.value)} />
             </label>
           </div>
-          <button disabled={busy} className="rounded-full bg-[#0f1c2e] px-5 py-2.5 text-sm font-semibold text-white">
+          <button disabled={busy} className="rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white">
             {busy ? "Saving…" : "Save practice"}
           </button>
         </form>
       ) : null}
 
-      <article className="chart-card mb-6 p-6">
-        <h2 className="font-serif text-xl">People</h2>
-        <ul className="sans mt-4 divide-y divide-[#eee6d8]">
+      <article className="chart-card w-full p-6">
+        <h2 className="font-serif text-xl">Team</h2>
+        <ul className="sans mt-4 divide-y divide-line/30">
           {members.map((m) => (
             <li key={m.id} className="py-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="font-medium">{m.name.trim() || m.email}</p>
-                  <p className="text-sm text-[#5b6573]">
+                  <p className="font-medium">
+                    {m.status === "invited" ? (
+                      <span className="mr-2 inline-flex rounded-full bg-amber-100 px-2 py-0.5 align-middle text-xs font-semibold text-amber-950">
+                        Invited: pending acceptance
+                      </span>
+                    ) : null}
+                    {m.name.trim() || m.email}
+                  </p>
+                  <p className="text-sm text-muted">
                     {m.roleLabel}
                     {m.role === "physician" && m.specialtyLabel ? ` · ${m.specialtyLabel}` : ""}
-                    {m.status === "invited" ? " · Pending email" : ""}
                     {m.id === session.id ? " · You" : ""}
                   </p>
-                  <p className="text-xs text-[#5b6573]">{m.email}</p>
+                  <p className="text-xs text-muted">{m.email}</p>
+                  {m.mobilePhone ? (
+                    <p className="text-xs text-muted">{formatPhone(m.mobilePhone)}</p>
+                  ) : null}
+                  {m.role === "physician" && m.npi ? (
+                    <p className="text-xs text-muted">NPI {m.npi}</p>
+                  ) : null}
                 </div>
                 <button
                   type="button"
-                  className="shrink-0 rounded-full px-3 py-1.5 text-sm font-semibold text-teal-900 hover:bg-[#efe8dc]"
+                  className="shrink-0 rounded-full px-3 py-1.5 text-sm font-semibold text-blue hover:bg-soft"
                   onClick={() => {
                     setEditingPractice(false);
                     if (editingId === m.id) setEditingId(null);
@@ -413,8 +423,14 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
                     <input className={field} value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} />
                   </label>
                   <label className={label}>
-                    NPI
-                    <input className={field} value={form.npi} onChange={(e) => setForm({ ...form, npi: e.target.value })} />
+                    Email
+                    <input
+                      required
+                      type="email"
+                      className={field}
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    />
                   </label>
                   <label className={label}>
                     Mobile
@@ -426,6 +442,12 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
                       />
                     </div>
                   </label>
+                  {(m.id === session.id ? session.role === "physician" : form.role === "physician") ? (
+                    <label className={label}>
+                      NPI
+                      <input className={field} value={form.npi} onChange={(e) => setForm({ ...form, npi: e.target.value })} />
+                    </label>
+                  ) : null}
                   {m.id !== session.id ? (
                     <label className={`${label} md:col-span-2`}>
                       Credential
@@ -436,6 +458,7 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
                           setForm({
                             ...form,
                             role: e.target.value as PracticeRole,
+                            npi: e.target.value === "physician" ? form.npi : "",
                             specialtyId: e.target.value === "physician" ? form.specialtyId : "",
                             subspecialtyId: e.target.value === "physician" ? form.subspecialtyId : "",
                           })
@@ -459,7 +482,7 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
                     </div>
                   ) : null}
                   <div className="md:col-span-2">
-                    <button disabled={busy} className="rounded-full bg-[#0f1c2e] px-5 py-2 text-sm font-semibold text-white">
+                    <button disabled={busy} className="rounded-full bg-ink px-5 py-2 text-sm font-semibold text-white">
                       {busy ? "Saving…" : "Save"}
                     </button>
                   </div>
@@ -470,48 +493,47 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
         </ul>
       </article>
 
-      <div className="mb-6 space-y-6">
-        <ChangePasswordCard />
-        <LeavePracticeCard practiceName={name || session.practiceName} />
-      </div>
+      <DisclosureCard title="Invite member">
+        <form onSubmit={invite} className="space-y-3">
+          <p className="text-xs text-muted">
+            Sends an email with a link to create a password. No temporary password is included.
+          </p>
+          <label className={label}>
+            Email
+            <input
+              required
+              type="email"
+              className={field}
+              value={inviteEmail}
+              onChange={(e) => setInviteEmail(e.target.value)}
+            />
+          </label>
+          <label className={label}>
+            Credential
+            <select
+              className={field}
+              value={inviteRole}
+              onChange={(e) => setInviteRole(e.target.value as PracticeRole)}
+            >
+              <option value="physician">Physician</option>
+              <option value="app">APP (NP / PA)</option>
+              <option value="office_manager">Office staff</option>
+            </select>
+          </label>
+          <button disabled={busy} className="w-full rounded-full bg-ink py-2.5 text-sm font-semibold text-white">
+            {busy ? "Sending…" : "Send invite"}
+          </button>
+        </form>
+      </DisclosureCard>
 
-      <form onSubmit={invite} className="sans chart-card space-y-3 p-6">
-        <h2 className="font-serif text-xl">Invite member</h2>
-        <p className="text-xs text-[#5b6573]">
-          Sends an email with a link to create a password. No temporary password is included.
-        </p>
-        <label className={label}>
-          Email
-          <input
-            required
-            type="email"
-            className={field}
-            value={inviteEmail}
-            onChange={(e) => setInviteEmail(e.target.value)}
-          />
-        </label>
-        <label className={label}>
-          Credential
-          <select
-            className={field}
-            value={inviteRole}
-            onChange={(e) => setInviteRole(e.target.value as PracticeRole)}
-          >
-            <option value="physician">Physician</option>
-            <option value="app">APP (NP / PA)</option>
-            <option value="office_manager">Office staff</option>
-          </select>
-        </label>
-        <button disabled={busy} className="w-full rounded-full bg-teal-800 py-2.5 text-sm font-semibold text-white">
-          {busy ? "Sending…" : "Send invite"}
-        </button>
-      </form>
+      <ChangePasswordCard />
+      <LeavePracticeCard practiceName={name || session.practiceName} />
 
       {error ? <p className="sans mt-4 text-sm text-orange-800">{error}</p> : null}
-      {ok ? <p className="sans mt-4 text-sm text-teal-900">{ok}</p> : null}
+      {ok ? <p className="sans mt-4 text-sm text-blue">{ok}</p> : null}
 
       {isDemo() ? (
-        <p className="sans mt-6 text-sm text-[#5b6573]">
+        <p className="sans mt-6 text-sm text-muted">
           <Link href="/demo/outbox" className="underline underline-offset-2">
             Demo messages
           </Link>

@@ -8,8 +8,8 @@ export type SpecialtyOption = {
   subspecialties: Array<{ id: string; name: string }>;
 };
 
-const field = "mt-1 w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2 text-sm";
-const label = "block text-xs font-semibold tracking-wide text-[#5b6573] uppercase";
+const field = "field mt-1";
+const label = "label";
 
 export function SpecialtyFields({
   specialtyId,

@@ -5,9 +5,8 @@ import { useRouter } from "next/navigation";
 import { PhoneField, MobilePhoneText } from "@/components/phone-field";
 import { formatPhoneInput } from "@/lib/phone";
 
-const field =
-  "mt-1 w-full rounded-xl border border-[#d8d0c2] bg-white px-3 py-2 text-base text-[#0f1c2e]";
-const label = "block text-xs font-semibold tracking-wide text-[#5b6573] uppercase";
+const field = "field mt-1";
+const label = "label";
 
 export type NewConsultFormHandle = {
   applyFavorite: (input: { name: string; phone: string | null }) => void;
@@ -138,12 +137,12 @@ export const NewConsultForm = forwardRef<
         />
       </label>
       {searching && form.consultingName.trim().length >= 2 ? (
-        <div className="rounded-xl border border-[#d8d0c2] bg-white p-2" aria-label="Matching consultants">
+        <div className="rounded-xl border border-line bg-white p-2" aria-label="Matching consultants">
           {matches.map((person) => (
             <button
               type="button"
               key={person.id}
-              className="block w-full rounded-lg px-3 py-2 text-left hover:bg-teal-50 focus:bg-teal-50"
+              className="block w-full rounded-lg px-3 py-2 text-left hover:bg-soft focus:bg-soft"
               onClick={() => {
                 setForm((f) => ({
                   ...f,
@@ -158,15 +157,15 @@ export const NewConsultForm = forwardRef<
               </span>
               {person.mobilePhone ? (
                 <MobilePhoneText
-                  className="text-xs text-gray-600"
+                  className="text-xs text-muted"
                   phone={formatPhoneInput(person.mobilePhone)}
                 />
               ) : (
-                <span className="text-xs text-gray-600">Mobile not added</span>
+                <span className="text-xs text-muted">Mobile not added</span>
               )}
             </button>
           ))}
-          <p role="status" className="px-3 py-2 text-sm text-gray-600">
+          <p role="status" className="px-3 py-2 text-sm text-muted">
             {searchStatus}
           </p>
         </div>
@@ -253,11 +252,11 @@ export const NewConsultForm = forwardRef<
       {error ? <p className="text-sm text-orange-800">{error}</p> : null}
       <button
         disabled={busy}
-        className="rounded-full bg-teal-800 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+        className="rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
       >
         {busy ? "Sending secure link…" : "Request consult"}
       </button>
-      <p className="text-xs leading-relaxed text-[#5b6573]">
+      <p className="text-xs leading-relaxed text-muted">
         Patient details and your comment stay in the secure portal. The consultant receives a text
         with a secure link — no patient identifiers in the SMS.
       </p>

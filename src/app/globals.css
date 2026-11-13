@@ -1,9 +1,18 @@
 @import "tailwindcss";
 
+@theme {
+  --color-ink: #1a1f26;
+  --color-paper: #f2efe9;
+  --color-blue: #6b2b36;
+  --color-soft: #e7e2d8;
+  --color-line: #6a645c;
+  --color-muted: #514c45;
+}
+
 :root {
-  --ink: #0f1c2e;
-  --paper: #f4f1ea;
-  --accent: #0f766e;
+  --ink: #1a1f26;
+  --paper: #f2efe9;
+  --accent: #6b2b36;
   --accent-2: #c2410c;
 }
 
@@ -22,8 +31,122 @@ body {
   font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
 }
 
-.chart-card {
-  background: #fffdf8;
-  border: 1px solid #e4ddd0;
-  border-radius: 16px;
+@layer components {
+  .chart-card {
+    background: #fff;
+    border: 1px solid color-mix(in srgb, var(--color-line) 40%, white);
+    border-radius: 16px;
+  }
+
+  .label {
+    display: block;
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .field {
+    box-sizing: border-box;
+    height: 3rem;
+    width: 100%;
+    border-radius: 10px;
+    border: 1.5px solid #c4bdb3;
+    background-color: #fff;
+    padding: 0 0.75rem;
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size: 1rem;
+    line-height: 1.25rem;
+    color: var(--color-ink);
+  }
+
+  .field:focus {
+    outline: 2px solid var(--color-blue);
+    outline-offset: 2px;
+  }
+
+  .field:disabled {
+    background-color: var(--color-soft);
+    color: var(--color-muted);
+    cursor: not-allowed;
+  }
+
+  textarea.field {
+    height: auto;
+    min-height: 7.5rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    line-height: 1.5;
+  }
+
+  select.field {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%231A1F26' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px 16px;
+    padding-right: 2.25rem;
+  }
+
+  .folder-tabs {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+  }
+
+  .folder-tab {
+    box-sizing: border-box;
+    min-height: 3rem;
+    padding: 0 1rem;
+    border-width: 3px 1px 1px;
+    border-style: solid;
+    border-color: #cfc8bc;
+    border-radius: 10px 10px 0 0;
+    background: #e8e3da;
+    color: var(--color-muted);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.2;
+    cursor: pointer;
+  }
+
+  .folder-tab:hover {
+    background: #ddd6cb;
+    color: var(--color-ink);
+  }
+
+  .folder-tab[aria-selected="true"] {
+    position: relative;
+    z-index: 1;
+    margin-bottom: -1px;
+    background: #fff;
+    color: var(--color-ink);
+    border-color: var(--color-line);
+    border-top-color: var(--color-blue);
+    border-bottom-color: #fff;
+  }
+
+  .folder-tab[aria-selected="true"]:hover {
+    background: #fff;
+  }
+
+  .folder-tab:focus-visible {
+    outline: 2px solid var(--color-blue);
+    outline-offset: 2px;
+  }
+
+  .folder-panel {
+    border: 1px solid var(--color-line);
+    border-radius: 0 0 12px 12px;
+    background: #fff;
+  }
+
+  .folder-panel > .chart-card {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
 }

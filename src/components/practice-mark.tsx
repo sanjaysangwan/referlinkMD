@@ -21,7 +21,7 @@ export function PracticeMark({
   }
   return (
     <div
-      className="flex items-center justify-center rounded-xl bg-teal-800 font-serif text-white"
+      className="flex items-center justify-center rounded-xl bg-ink font-serif text-white"
       style={{ width: size, height: size, fontSize: Math.round(size * 0.45) }}
       aria-hidden
     >

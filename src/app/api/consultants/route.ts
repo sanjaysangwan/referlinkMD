@@ -31,10 +31,15 @@ export async function GET(request: Request) {
         lastName: users.lastName,
         mobilePhone: users.mobilePhone,
         npi: users.npi,
+        role: practiceMemberships.role,
         specialtyId: users.specialtyId,
         subspecialtyId: users.subspecialtyId,
       })
       .from(users)
+      .leftJoin(
+        practiceMemberships,
+        and(eq(practiceMemberships.userId, users.id), eq(practiceMemberships.status, "active")),
+      )
       .where(
         and(
           eq(users.status, "active"),
@@ -90,7 +95,13 @@ export async function GET(request: Request) {
     }
 
     const consultants = matches.map((m) => ({
-      ...m,
+      id: m.id,
+      firstName: m.firstName,
+      lastName: m.lastName,
+      mobilePhone: m.mobilePhone,
+      npi: m.role === "physician" ? m.npi : null,
+      specialtyId: m.specialtyId,
+      subspecialtyId: m.subspecialtyId,
       officePhone: officeByUser.get(m.id) ?? null,
     }));
 
