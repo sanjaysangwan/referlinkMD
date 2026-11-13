@@ -53,7 +53,7 @@ function WaitingList({
 
   return (
     <section className="mb-8">
-      <h2 className="text-2xl">
+      <h2 className="text-lg">
         {groupByConsultingClinician ? "Waiting for your practice" : "Waiting for you"}
       </h2>
       <p className="sans mt-1 mb-4 text-sm text-muted">

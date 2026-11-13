@@ -80,9 +80,9 @@ export default function ForgotPasswordPage() {
     : "/login?mode=create";
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center px-6 py-16">
+    <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center px-6 py-10">
       <p className="sans text-center text-sm font-medium tracking-[0.16em] text-blue">{APP_NAME}</p>
-      <h1 className="mt-2 text-center text-4xl">Forgot password</h1>
+      <h1 className="mt-2 text-center text-2xl">Forgot password</h1>
       <p className="sans mx-auto mt-3 text-center text-muted">
         Enter your account email. We’ll send a secure link to choose a new password.
       </p>

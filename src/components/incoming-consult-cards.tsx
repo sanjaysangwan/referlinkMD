@@ -80,7 +80,7 @@ export function IncomingConsultCards({
 
   return (
     <section className="mb-8">
-      <h2 className="text-2xl">{grouped ? "Waiting for your practice" : "Waiting for you"}</h2>
+      <h2 className="text-lg">{grouped ? "Waiting for your practice" : "Waiting for you"}</h2>
       <p className="sans mt-1 mb-4 text-sm text-muted">
         {grouped
           ? "Incoming consults for clinicians in your practice, grouped by consulting physician."

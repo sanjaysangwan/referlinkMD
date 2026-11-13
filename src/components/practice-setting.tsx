@@ -247,7 +247,7 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
         <PracticeMark name={name || "Practice"} logo={logo} size={72} />
         <div className="min-w-0 flex-1">
           <p className="sans text-xs font-semibold tracking-[0.18em] text-blue uppercase">Practice</p>
-          <h1 className="truncate text-3xl">{name || "Practice"}</h1>
+          <h1 className="truncate text-2xl">{name || "Practice"}</h1>
           {healthSystemName ? (
             <div className="sans mt-1 flex items-center gap-2 text-sm text-muted">
               <PracticeMark name={healthSystemName} logo={healthSystemLogo} size={20} />
@@ -276,7 +276,7 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
 
       {editingPractice ? (
         <form onSubmit={savePractice} className="sans chart-card w-full space-y-4 p-6">
-          <h2 className="font-serif text-xl">Practice details</h2>
+          <h2 className="font-serif text-lg">Practice details</h2>
           <label className={`${label} flex items-center gap-3`}>
             Logo
             <input
@@ -373,7 +373,7 @@ export function PracticeSetting({ session }: { session: SessionUser }) {
       ) : null}
 
       <article className="chart-card w-full p-6">
-        <h2 className="font-serif text-xl">Team</h2>
+        <h2 className="font-serif text-lg">Team</h2>
         <ul className="sans mt-4 divide-y divide-line/30">
           {members.map((m) => (
             <li key={m.id} className="py-3">

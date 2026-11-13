@@ -75,7 +75,7 @@ export function MemberProfileCard({ session }: { session: SessionUser }) {
   if (editing) {
     return (
       <form onSubmit={save} className="sans chart-card w-full space-y-4 p-6">
-        <h2 className="font-serif text-xl">Edit your details</h2>
+        <h2 className="font-serif text-lg">Edit your details</h2>
         <div className="grid gap-3 md:grid-cols-2">
           <label className={label}>
             First name
@@ -141,7 +141,7 @@ export function MemberProfileCard({ session }: { session: SessionUser }) {
   return (
     <article className="sans chart-card w-full p-6">
       <p className="text-xs font-semibold tracking-[0.18em] text-blue uppercase">Your profile</p>
-      <h2 className="mt-2 font-serif text-2xl">{name}</h2>
+      <h2 className="mt-2 font-serif text-lg">{name}</h2>
       <div className="mt-5 grid gap-4">
         <Row caption="Email" value={session.email} />
         {session.role ? <Row caption="Credential" value={ROLE_LABEL[session.role]} /> : null}

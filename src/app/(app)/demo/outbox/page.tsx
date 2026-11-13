@@ -23,7 +23,7 @@ export default function DemoOutboxPage() {
 
   return (
     <div>
-      <h1 className="text-3xl">Demo inbox</h1>
+      <h1 className="text-2xl">Demo inbox</h1>
       <p className="sans mt-2 max-w-2xl text-sm text-muted">
         Carrier SMS is stubbed. These messages contain a secure link and public clinician names only —
         never patient name, DOB, or phone.

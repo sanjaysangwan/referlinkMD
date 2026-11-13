@@ -71,7 +71,7 @@ export default function ConsultLinkPage() {
 
   if (state === "loading") {
     return (
-      <main className="mx-auto max-w-lg px-6 py-16">
+      <main className="mx-auto max-w-lg px-6 py-10">
         <p className="sans text-sm text-muted">Checking secure link…</p>
       </main>
     );
@@ -79,8 +79,8 @@ export default function ConsultLinkPage() {
 
   if (state === "error") {
     return (
-      <main className="mx-auto max-w-lg px-6 py-16">
-        <h1 className="text-3xl">Link unavailable</h1>
+      <main className="mx-auto max-w-lg px-6 py-10">
+        <h1 className="text-2xl">Link unavailable</h1>
         <p className="sans mt-3 text-muted">{error}</p>
       </main>
     );
@@ -88,8 +88,8 @@ export default function ConsultLinkPage() {
 
   if (state === "login") {
     return (
-      <main className="mx-auto max-w-lg px-6 py-16">
-        <h1 className="text-3xl">Sign in to view this consult</h1>
+      <main className="mx-auto max-w-lg px-6 py-10">
+        <h1 className="text-2xl">Sign in to view this consult</h1>
         <p className="sans mt-3 text-muted">
           Patient details are shown only after you confirm your login. This message was addressed to{" "}
           {consultingName || "the consulting clinician"}.
@@ -105,8 +105,8 @@ export default function ConsultLinkPage() {
   }
 
   return (
-    <main className="mx-auto max-w-lg px-6 py-16">
-      <h1 className="text-3xl">Create your clinician account</h1>
+    <main className="mx-auto max-w-lg px-6 py-10">
+      <h1 className="text-2xl">Create your clinician account</h1>
       <p className="sans mt-3 text-muted">
         Minimum details: name, email, NPI, and password. Your mobile number is already verified by
         this secure link. Patient information is not shown until setup is complete.

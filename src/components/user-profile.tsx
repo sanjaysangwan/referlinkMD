@@ -65,7 +65,7 @@ export function UserProfile() {
 
   return (
     <form onSubmit={save} className="sans chart-card mb-6 space-y-4 p-6">
-      <h2 className="font-serif text-xl">Your details</h2>
+      <h2 className="font-serif text-lg">Your details</h2>
       <div className="grid gap-3 md:grid-cols-2">
         <label className={label}>
           First name

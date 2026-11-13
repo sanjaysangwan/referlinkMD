@@ -38,7 +38,7 @@ export default function CreatePracticePage() {
 
   return (
     <div className="mx-auto max-w-lg">
-      <h1 className="text-3xl">Create your practice</h1>
+      <h1 className="text-2xl">Create your practice</h1>
       <p className="sans mt-2 mb-6 text-sm text-muted">
         You are not on a practice right now. Create one, or join another practice only through an
         invite email.

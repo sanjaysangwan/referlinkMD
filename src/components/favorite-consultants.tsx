@@ -276,7 +276,7 @@ export function FavoriteConsultantsManager() {
   return (
     <section className="sans chart-card space-y-4 p-6">
       <div>
-        <h2 className="font-serif text-xl">Consultant directory</h2>
+        <h2 className="font-serif text-lg">Consultant directory</h2>
         <p className="mt-1 text-sm text-muted">
           Add consultants by name, specialty, and office and/or cell. Specialty and at least one
           phone are required. Cell numbers can populate a new consult request.

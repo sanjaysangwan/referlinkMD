@@ -429,7 +429,7 @@ export function LoginForm() {
               </p>
               {existingPractice.admin ? (
                 <div className="mt-4">
-                  <p className="text-2xl font-semibold tracking-tight text-ink">
+                  <p className="text-lg font-semibold tracking-tight text-ink">
                     {existingPractice.admin.name}
                   </p>
                   <p className="mt-2 text-lg text-muted">

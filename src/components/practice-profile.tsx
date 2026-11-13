@@ -80,7 +80,7 @@ export function PracticeProfile() {
 
   return (
     <form onSubmit={save} className="sans chart-card mb-6 space-y-4 p-6">
-      <h2 className="font-serif text-xl">Practice details</h2>
+      <h2 className="font-serif text-lg">Practice details</h2>
       <div className="flex items-center gap-3">
         <PracticeMark name={name || "Practice"} logo={logo} size={56} />
         <label className={`${label} flex-1`}>

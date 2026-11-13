@@ -10,7 +10,7 @@ export function RequestConsultSection({ settingsHref }: { settingsHref: string }
 
   return (
     <section>
-      <h2 className="mb-3 text-2xl">Request a consult</h2>
+      <h2 className="mb-3 text-lg">Request a consult</h2>
       <div className="grid gap-6 lg:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] lg:items-start">
         <FavoriteConsultantsPicker
           settingsHref={settingsHref}

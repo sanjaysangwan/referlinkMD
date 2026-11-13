@@ -71,7 +71,7 @@ export function LeavePracticeCard({ practiceName }: { practiceName: string | nul
           if (e.target === dialogRef.current) dialogRef.current?.close();
         }}
       >
-        <h3 id="leave-practice-title" className="font-serif text-xl">
+        <h3 id="leave-practice-title" className="font-serif text-lg">
           Leave {practice}
         </h3>
         <p className="mt-2 text-sm text-muted">

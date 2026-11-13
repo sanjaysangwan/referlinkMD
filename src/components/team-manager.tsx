@@ -94,7 +94,7 @@ export function TeamManager() {
         </table>
       </div>
       <form onSubmit={invite} className="sans chart-card h-fit space-y-3 p-6">
-        <h2 className="font-serif text-xl">Invite staff</h2>
+        <h2 className="font-serif text-lg">Invite staff</h2>
         <p className="text-xs text-muted">
           Sends an email with a link to create a password. No temporary password is included.
         </p>

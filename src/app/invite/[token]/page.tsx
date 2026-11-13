@@ -61,8 +61,8 @@ export default function InviteAcceptPage() {
   }
 
   return (
-    <main className="mx-auto max-w-lg px-6 py-16">
-      <h1 className="text-4xl">{preview?.needsPassword ? "Create your password" : "Join this practice"}</h1>
+    <main className="mx-auto max-w-lg px-6 py-10">
+      <h1 className="text-2xl">{preview?.needsPassword ? "Create your password" : "Join this practice"}</h1>
       <p className="sans mt-3 text-muted">
         {preview ? (
           <>

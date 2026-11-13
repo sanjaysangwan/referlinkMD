@@ -48,17 +48,17 @@ export default function ConsultDetailPage() {
   return (
     <div className="max-w-2xl">
       <p className="sans text-xs font-semibold tracking-[0.18em] text-blue uppercase">Consult</p>
-      <h1 className="mt-2 text-3xl">
+      <h1 className="mt-2 text-2xl">
         {row.patient.firstName} {row.patient.lastName}
       </h1>
       <p className="sans mt-1 text-sm capitalize text-muted">{row.status.replaceAll("_", " ")}</p>
 
       <section className="chart-card mt-6 p-6">
-        <h2 className="text-xl">Patient</h2>
+        <h2 className="text-lg">Patient</h2>
         {row.patient.isSynthetic ? (
           <p className="sans mt-1 text-xs font-medium text-amber-800">Synthetic demo patient</p>
         ) : null}
-        <p className="mt-3 text-2xl">
+        <p className="mt-3 text-lg">
           {row.patient.firstName} {row.patient.lastName}
         </p>
         {row.patient.dob && row.patient.contactPhone ? (

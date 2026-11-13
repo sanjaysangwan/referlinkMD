@@ -23,10 +23,10 @@ type NavLink = { href: string; label: string; badge: boolean; match: string[] };
 function Brand({ session }: { session: SessionUser }) {
   return (
     <div className="flex min-w-0 items-center gap-3">
-      <PracticeMark name={session.practiceName ?? APP_NAME} logo={session.practiceLogo} size={40} />
+      <PracticeMark name={session.practiceName ?? APP_NAME} logo={session.practiceLogo} size={32} />
       <div className="min-w-0">
         <p className="sans text-xs font-semibold tracking-[0.12em] text-blue">{APP_NAME}</p>
-        <Link href="/consults" className="block truncate rounded text-lg leading-tight hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue" aria-label={`${session.practiceName ?? APP_NAME} home`}>{session.practiceName ?? "No practice"}</Link>
+        <Link href="/consults" className="block truncate rounded text-sm font-semibold leading-tight hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue" aria-label={`${session.practiceName ?? APP_NAME} home`}>{session.practiceName ?? "No practice"}</Link>
         <p className="sans truncate text-xs text-muted">
           {session.firstName || session.lastName
             ? `${session.firstName} ${session.lastName}`.trim()
@@ -57,7 +57,7 @@ function NavItems({
           <Link
             key={l.href}
             href={l.href}
-            className={`flex items-center justify-between rounded-xl px-4 py-3 text-base font-semibold ${
+            className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium ${
               active ? "bg-ink text-white" : "text-ink hover:bg-soft"
             }`}
           >
@@ -69,7 +69,7 @@ function NavItems({
       <button
         type="button"
         onClick={onLogout}
-        className="rounded-xl px-4 py-3 text-left text-base font-semibold text-muted hover:bg-soft"
+        className="rounded-lg px-3 py-2 text-left text-sm font-medium text-muted hover:bg-soft"
       >
         Sign out
       </button>
@@ -146,8 +146,8 @@ export function AppShell({
         DEMO — synthetic patients only. SMS never includes patient name, DOB, or phone.
       </div>
       <div className="lg:flex lg:items-start">
-        <aside className="hidden lg:sticky lg:top-0 lg:flex lg:h-[calc(100dvh-2.5rem)] lg:w-64 lg:shrink-0 lg:flex-col lg:border-r lg:border-line/40 lg:bg-white">
-          <div className="flex h-full flex-col gap-8 px-4 py-6">
+        <aside className="hidden lg:sticky lg:top-0 lg:flex lg:h-[calc(100dvh-2.5rem)] lg:w-56 lg:shrink-0 lg:flex-col lg:border-r lg:border-line/40 lg:bg-white">
+          <div className="flex h-full flex-col gap-6 px-3 py-4">
             <Brand session={session} />
             <nav className="flex-1">
               <NavItems links={links} pathname={pathname} newCount={newCount} onLogout={logout} />
@@ -180,7 +180,7 @@ export function AppShell({
               </nav>
             ) : null}
           </header>
-          <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">{children}</div>
+          <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-5">{children}</div>
         </div>
       </div>
     </div>

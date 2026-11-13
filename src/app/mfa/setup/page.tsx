@@ -121,16 +121,16 @@ function MfaSetupForm() {
 
   if (loading) {
     return (
-      <main className="mx-auto max-w-lg px-6 py-16">
+      <main className="mx-auto max-w-lg px-6 py-10">
         <p role="status">Loading security setup...</p>
       </main>
     );
   }
 
   return (
-    <main className="mx-auto max-w-lg px-6 py-16">
+    <main className="mx-auto max-w-lg px-6 py-10">
       <p className="sans text-sm font-medium tracking-[0.2em] text-blue uppercase">Security</p>
-      <h1 className="mt-2 text-4xl">Enable multi-factor authentication</h1>
+      <h1 className="mt-2 text-2xl">Enable multi-factor authentication</h1>
       <p className="sans mt-3 text-muted">
         PHI screens require MFA. Choose an authenticator app or a one-time code by SMS. Sessions idle
         out after 15 minutes.
@@ -293,7 +293,7 @@ export default function MfaSetupPage() {
   return (
     <Suspense
       fallback={
-        <main className="mx-auto max-w-lg px-6 py-16">
+        <main className="mx-auto max-w-lg px-6 py-10">
           <p role="status">Loading security setup...</p>
         </main>
       }

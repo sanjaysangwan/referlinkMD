@@ -29,8 +29,8 @@ export default function PasswordPage() {
   }
 
   return (
-    <main className="mx-auto max-w-lg px-6 py-16">
-      <h1 className="text-4xl">Choose a new password</h1>
+    <main className="mx-auto max-w-lg px-6 py-10">
+      <h1 className="text-2xl">Choose a new password</h1>
       <p className="sans mt-3 text-muted">Temporary passwords must be changed before you can open patient information.</p>
       <form onSubmit={submit} className="sans chart-card mt-8 space-y-4 p-8">
         <label className="label">

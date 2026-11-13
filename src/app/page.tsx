@@ -3,13 +3,13 @@ import { APP_NAME } from "@/lib/brand";
 
 export default function HomePage() {
   return (
-    <main className="mx-auto flex min-h-screen max-w-5xl flex-col justify-center px-6 py-16">
+    <main className="mx-auto flex min-h-screen max-w-5xl flex-col justify-center px-6 py-10">
       <p className="sans text-sm font-medium tracking-[0.16em] text-blue">{APP_NAME}</p>
-      <h1 className="mt-3 max-w-3xl text-5xl leading-tight font-medium text-ink">
+      <h1 className="mt-3 max-w-3xl text-4xl leading-tight font-medium text-ink">
         Peer-to-peer consults. A practice asks. A clinician answers.
 
       </h1>
-      <p className="sans mt-5 max-w-2xl text-lg leading-relaxed text-muted">
+      <p className="sans mt-4 max-w-2xl text-base leading-relaxed text-muted">
         {APP_NAME} lets a practice request a consult by texting a secure link to any clinician&apos;s
         mobile. Every physician is labeled the same. Who is primary vs consulting depends on the
         patient — not a PCP/specialist directory. Patient information is limited to name, date of
@@ -28,21 +28,21 @@ export default function HomePage() {
       </div>
       <section className="mt-16 grid gap-4 md:grid-cols-3">
         <article className="chart-card p-6">
-          <h2 className="text-2xl">Request</h2>
+          <h2 className="text-lg">Request</h2>
           <p className="sans mt-2 text-sm leading-relaxed text-muted">
             Physician, APP, or office staff enters patient identifiers and the consulting
             clinician&apos;s cell number.
           </p>
         </article>
         <article className="chart-card p-6">
-          <h2 className="text-2xl">Secure text</h2>
+          <h2 className="text-lg">Secure text</h2>
           <p className="sans mt-2 text-sm leading-relaxed text-muted">
             SMS never includes patient name, DOB, or phone — only a 24-hour link and the requesting
             clinician&apos;s public name.
           </p>
         </article>
         <article className="chart-card p-6">
-          <h2 className="text-2xl">Consultant</h2>
+          <h2 className="text-lg">Consultant</h2>
           <p className="sans mt-2 text-sm leading-relaxed text-muted">
             New clinicians set up a minimum account. Existing users sign in. Then patient identifiers
             appear on the portal.

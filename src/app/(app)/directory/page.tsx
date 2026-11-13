@@ -9,7 +9,7 @@ export default async function ConsultantDirectoryPage() {
 
   return (
     <div>
-      <h1 className="text-3xl">Consultant directory</h1>
+      <h1 className="text-2xl">Consultant directory</h1>
       <p className="sans mt-2 mb-6 max-w-xl text-sm text-muted">
         Shared consultants for your practice. Anyone on the team can add. Star people for your
         personal short list.

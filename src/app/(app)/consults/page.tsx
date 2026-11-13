@@ -27,7 +27,7 @@ export default async function ConsultsPage() {
     <div>
       {!session.practiceId ? (
         <section className="sans chart-card mb-8 space-y-3 p-6">
-          <h2 className="font-serif text-xl">No practice yet</h2>
+          <h2 className="font-serif text-lg">No practice yet</h2>
           <p className="text-sm text-muted">
             Create your own practice, or join another practice only through an invite email.
           </p>

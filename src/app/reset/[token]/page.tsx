@@ -45,9 +45,9 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center px-6 py-16">
+    <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center px-6 py-10">
       <p className="sans text-center text-sm font-medium tracking-[0.16em] text-blue">{APP_NAME}</p>
-      <h1 className="mt-2 text-center text-4xl">Choose a new password</h1>
+      <h1 className="mt-2 text-center text-2xl">Choose a new password</h1>
       <p className="sans mx-auto mt-3 text-center text-muted">
         Enter a new password for your {APP_NAME} account. The link expires after one hour. Your
         current password stays valid until you click Update password.

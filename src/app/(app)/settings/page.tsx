@@ -11,7 +11,7 @@ export default async function SettingsPage() {
   if (!session.practiceId) redirect("/create-practice");
   return (
     <div>
-      <h1 className="text-3xl">Setting</h1>
+      <h1 className="text-2xl">Setting</h1>
       <p className="sans mt-2 mb-6 max-w-xl text-sm text-muted">Your contact details for this practice.</p>
       <div className="flex w-full max-w-4xl flex-col gap-6">
         <MemberProfileCard session={session} />
